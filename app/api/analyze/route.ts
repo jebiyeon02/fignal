@@ -185,6 +185,23 @@ function extractGeminiOutputText(payload: unknown) {
   return text || null;
 }
 
+function parseGeminiJson(text: string) {
+  const unfenced = text
+    .trim()
+    .replace(/^```(?:json)?\s*/i, "")
+    .replace(/\s*```$/i, "")
+    .trim();
+
+  try {
+    return JSON.parse(unfenced) as unknown;
+  } catch {
+    const start = unfenced.indexOf("{");
+    const end = unfenced.lastIndexOf("}");
+    if (start === -1 || end <= start) throw new Error("JSON object not found");
+    return JSON.parse(unfenced.slice(start, end + 1)) as unknown;
+  }
+}
+
 export async function POST(request: Request) {
   if (isRateLimited(request)) {
     return jsonError("잠시 후 다시 분석해 주세요.", 429, "RATE_LIMITED");
@@ -321,6 +338,8 @@ export async function POST(request: Request) {
     "사진마다 해당 evidence_key로 findings를 정확히 하나씩 만들고, 업로드되지 않은 key는 만들지 마세요.",
     "한 장의 일반 제품 사진만으로 정품 가능성 높음을 주지 마세요. 핵심 표기 사진이 부족하면 insufficient_photos를 선택하세요.",
     "confidence는 정품 확률이 아니라 이번 판정의 자료 충족도입니다.",
+    "반드시 설명이나 마크다운 없이 아래 JSON 구조에 맞는 JSON 객체 하나만 출력하세요.",
+    `출력 JSON 구조: ${JSON.stringify(schema)}`,
   ].join("\n");
 
   let upstream: Response;
@@ -338,12 +357,6 @@ export async function POST(request: Request) {
         generationConfig: {
           maxOutputTokens: 2200,
           thinkingConfig: { thinkingLevel: "LOW" },
-          responseFormat: {
-            text: {
-              mimeType: "APPLICATION_JSON",
-              schema,
-            },
-          },
         },
       }),
       signal: AbortSignal.timeout(80_000),
@@ -382,7 +395,7 @@ export async function POST(request: Request) {
   }
 
   try {
-    const analysis = JSON.parse(outputText) as unknown;
+    const analysis = parseGeminiJson(outputText);
     return Response.json(
       { analysis },
       { headers: { "Cache-Control": "no-store" } },
