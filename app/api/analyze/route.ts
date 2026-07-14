@@ -1,8 +1,23 @@
 const MAX_FILES = 8;
 const MAX_FILE_BYTES = 6 * 1024 * 1024;
-const MAX_TOTAL_BYTES = 24 * 1024 * 1024;
+const MAX_TOTAL_BYTES = 9 * 1024 * 1024;
+const MAX_REFERENCE_FILE_BYTES = 1536 * 1024;
+const MAX_REFERENCE_TOTAL_BYTES = 4 * 1024 * 1024;
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const RATE_LIMIT_REQUESTS = 6;
+
+const supportedImageTypes = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/heic",
+  "image/heif",
+]);
+
+const referenceImageHosts = new Set([
+  "www.goodsmile.com",
+  "support.goodsmile.com",
+]);
 
 const evidenceKeys = [
   "boxFront",
@@ -36,9 +51,15 @@ type CasePayload = {
   signals: Array<{ evidenceKey: EvidenceKey; label: string }>;
 };
 
-type OpenAIContent =
-  | { type: "input_text"; text: string }
-  | { type: "input_image"; image_url: string; detail: "high" | "low" };
+type GeminiPart =
+  | { text: string }
+  | { inlineData: { mimeType: string; data: string } };
+
+type ReferenceImage = {
+  label: string;
+  byteLength: number;
+  part: GeminiPart;
+};
 
 const requestLog = new Map<string, number[]>();
 
@@ -85,33 +106,75 @@ function isRateLimited(request: Request) {
   return false;
 }
 
-async function fileToDataUrl(file: File) {
-  const bytes = new Uint8Array(await file.arrayBuffer());
+function bytesToBase64(bytes: Uint8Array) {
   let binary = "";
   const chunkSize = 0x8000;
   for (let offset = 0; offset < bytes.length; offset += chunkSize) {
     binary += String.fromCharCode(...bytes.subarray(offset, offset + chunkSize));
   }
-  return `data:${file.type};base64,${btoa(binary)}`;
+  return btoa(binary);
 }
 
-function extractOutputText(payload: unknown) {
+async function fileToGeminiPart(file: File): Promise<GeminiPart> {
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  return {
+    inlineData: {
+      mimeType: file.type,
+      data: bytesToBase64(bytes),
+    },
+  };
+}
+
+function isAllowedReferenceUrl(value: string) {
+  if (!isHttpUrl(value)) return false;
+  const url = new URL(value);
+  return url.protocol === "https:" && referenceImageHosts.has(url.hostname);
+}
+
+async function fetchReferenceImage(label: string, url: string): Promise<ReferenceImage | null> {
+  if (!isAllowedReferenceUrl(url)) return null;
+
+  try {
+    const response = await fetch(url, {
+      headers: { Accept: "image/*" },
+      redirect: "follow",
+      signal: AbortSignal.timeout(7_000),
+    });
+    if (!response.ok || !isAllowedReferenceUrl(response.url)) return null;
+
+    const mimeType = response.headers.get("content-type")?.split(";")[0]?.trim().toLowerCase() ?? "";
+    const statedLength = Number(response.headers.get("content-length") ?? "0");
+    if (!supportedImageTypes.has(mimeType) || statedLength > MAX_REFERENCE_FILE_BYTES) return null;
+
+    const bytes = new Uint8Array(await response.arrayBuffer());
+    if (bytes.byteLength === 0 || bytes.byteLength > MAX_REFERENCE_FILE_BYTES) return null;
+
+    return {
+      label,
+      byteLength: bytes.byteLength,
+      part: { inlineData: { mimeType, data: bytesToBase64(bytes) } },
+    };
+  } catch {
+    return null;
+  }
+}
+
+function extractGeminiOutputText(payload: unknown) {
   if (!payload || typeof payload !== "object") return null;
   const record = payload as Record<string, unknown>;
-  if (typeof record.output_text === "string") return record.output_text;
-  if (!Array.isArray(record.output)) return null;
+  const candidates = Array.isArray(record.candidates) ? record.candidates : [];
+  const firstCandidate = candidates[0];
+  if (!firstCandidate || typeof firstCandidate !== "object") return null;
+  const content = (firstCandidate as Record<string, unknown>).content;
+  if (!content || typeof content !== "object") return null;
+  const parts = (content as Record<string, unknown>).parts;
+  if (!Array.isArray(parts)) return null;
 
-  for (const item of record.output) {
-    if (!item || typeof item !== "object") continue;
-    const content = (item as Record<string, unknown>).content;
-    if (!Array.isArray(content)) continue;
-    for (const part of content) {
-      if (!part || typeof part !== "object") continue;
-      const text = (part as Record<string, unknown>).text;
-      if (typeof text === "string") return text;
-    }
-  }
-  return null;
+  const text = parts
+    .map((part) => part && typeof part === "object" ? (part as Record<string, unknown>).text : null)
+    .filter((value): value is string => typeof value === "string")
+    .join("");
+  return text || null;
 }
 
 export async function POST(request: Request) {
@@ -119,7 +182,7 @@ export async function POST(request: Request) {
     return jsonError("잠시 후 다시 분석해 주세요.", 429, "RATE_LIMITED");
   }
 
-  const apiKey = process.env.OPENAI_API_KEY?.trim();
+  const apiKey = process.env.GEMINI_API_KEY?.trim();
   if (!apiKey) {
     return jsonError("AI 분석 연결이 아직 준비되지 않았습니다.", 503, "AI_NOT_CONFIGURED");
   }
@@ -142,8 +205,8 @@ export async function POST(request: Request) {
   for (const key of evidenceKeys) {
     const value = formData.get(`evidence:${key}`);
     if (!(value instanceof File) || value.size === 0) continue;
-    if (!value.type.startsWith("image/")) {
-      return jsonError("이미지 파일만 분석할 수 있습니다.", 400, "INVALID_FILE_TYPE");
+    if (!supportedImageTypes.has(value.type.toLowerCase())) {
+      return jsonError("JPG, PNG, WEBP, HEIC 사진만 분석할 수 있습니다.", 400, "INVALID_FILE_TYPE");
     }
     if (value.size > MAX_FILE_BYTES) {
       return jsonError("사진 한 장은 6MB 이하로 올려주세요.", 413, "FILE_TOO_LARGE");
@@ -159,9 +222,8 @@ export async function POST(request: Request) {
     return jsonError("한 번에 올릴 수 있는 사진 용량을 초과했습니다.", 413, "PAYLOAD_TOO_LARGE");
   }
 
-  const content: OpenAIContent[] = [
+  const content: GeminiPart[] = [
     {
-      type: "input_text",
       text: [
         `검증 대상: ${product.name} (${product.englishName || product.name})`,
         `제품번호: ${product.number}`,
@@ -172,24 +234,32 @@ export async function POST(request: Request) {
     },
   ];
 
-  if (product.image && isHttpUrl(product.image)) {
-    content.push({ type: "input_text", text: "[공식 참고 이미지] 제품 전체 외형 참고용. 패키지 정답 이미지로 간주하지 마세요." });
-    content.push({ type: "input_image", image_url: product.image, detail: "high" });
+  const referenceRequests: Array<Promise<ReferenceImage | null>> = [];
+  if (product.image && isAllowedReferenceUrl(product.image)) {
+    referenceRequests.push(fetchReferenceImage("[공식 참고 이미지] 제품 전체 외형 참고용. 패키지 정답 이미지로 간주하지 마세요.", product.image));
   }
 
   for (const counterfeitCase of cases.slice(0, 3)) {
     content.push({
-      type: "input_text",
       text: `[알려진 가품 사례 ${counterfeitCase.id}] ${counterfeitCase.title}\n${counterfeitCase.summary}\n특징: ${counterfeitCase.signals.map((signal) => signal.label).join(", ")}`,
     });
-    for (const image of counterfeitCase.images.filter(isHttpUrl).slice(0, 2)) {
-      content.push({ type: "input_image", image_url: image, detail: "high" });
+    for (const image of counterfeitCase.images.filter(isAllowedReferenceUrl).slice(0, 2)) {
+      referenceRequests.push(fetchReferenceImage(`[가품 사례 이미지 ${counterfeitCase.id}]`, image));
     }
   }
 
+  const references = await Promise.all(referenceRequests);
+  let referenceBytes = 0;
+  for (const reference of references) {
+    if (!reference || referenceBytes + reference.byteLength > MAX_REFERENCE_TOTAL_BYTES) continue;
+    referenceBytes += reference.byteLength;
+    content.push({ text: reference.label });
+    content.push(reference.part);
+  }
+
   for (const item of uploaded) {
-    content.push({ type: "input_text", text: `[사용자 증거 사진] evidence_key=${item.key}` });
-    content.push({ type: "input_image", image_url: await fileToDataUrl(item.file), detail: "high" });
+    content.push({ text: `[사용자 증거 사진] evidence_key=${item.key}` });
+    content.push(await fileToGeminiPart(item.file));
   }
 
   const schema = {
@@ -247,29 +317,25 @@ export async function POST(request: Request) {
 
   let upstream: Response;
   try {
-    upstream = await fetch("https://api.openai.com/v1/responses", {
+    const model = process.env.GEMINI_MODEL?.trim() || "gemini-2.5-flash";
+    upstream = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${apiKey}`,
+        "x-goog-api-key": apiKey,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: process.env.OPENAI_MODEL?.trim() || "gpt-4o-mini",
-        store: false,
-        max_output_tokens: 1800,
-        input: [
-          { role: "system", content: [{ type: "input_text", text: prompt }] },
-          { role: "user", content },
-        ],
-        text: {
-          format: {
-            type: "json_schema",
-            name: "figure_authenticity_screening",
-            strict: true,
-            schema,
-          },
+        systemInstruction: { parts: [{ text: prompt }] },
+        contents: [{ role: "user", parts: content }],
+        generationConfig: {
+          temperature: 0.1,
+          maxOutputTokens: 2200,
+          responseMimeType: "application/json",
+          responseJsonSchema: schema,
+          thinkingConfig: { thinkingBudget: 512 },
         },
       }),
+      signal: AbortSignal.timeout(45_000),
     });
   } catch {
     return jsonError("AI 분석 서버에 연결하지 못했습니다.", 502, "UPSTREAM_UNREACHABLE");
@@ -283,8 +349,14 @@ export async function POST(request: Request) {
     const errorRecord = upstreamRecord?.error && typeof upstreamRecord.error === "object"
       ? upstreamRecord.error as Record<string, unknown>
       : null;
-    const upstreamCode = typeof errorRecord?.code === "string" ? errorRecord.code : "";
-    if (upstream.status === 401 || upstreamCode === "invalid_api_key") {
+    const upstreamStatus = typeof errorRecord?.status === "string" ? errorRecord.status : "";
+    const upstreamMessage = typeof errorRecord?.message === "string" ? errorRecord.message : "";
+    if (
+      upstream.status === 401
+      || upstream.status === 403
+      || upstreamStatus === "PERMISSION_DENIED"
+      || /api key not valid|API_KEY_INVALID/i.test(upstreamMessage)
+    ) {
       return jsonError("AI 분석 연결 정보를 확인해 주세요.", 503, "AI_AUTH_FAILED");
     }
     if (upstream.status === 429) {
@@ -293,7 +365,7 @@ export async function POST(request: Request) {
     return jsonError("AI가 사진을 분석하지 못했습니다. 잠시 후 다시 시도해 주세요.", 502, "AI_ANALYSIS_FAILED");
   }
 
-  const outputText = extractOutputText(upstreamPayload);
+  const outputText = extractGeminiOutputText(upstreamPayload);
   if (!outputText) {
     return jsonError("AI 분석 결과를 읽지 못했습니다.", 502, "EMPTY_AI_RESULT");
   }
