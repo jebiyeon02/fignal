@@ -1,3 +1,5 @@
+import { env } from "cloudflare:workers";
+
 const MAX_FILES = 8;
 const MAX_FILE_BYTES = 6 * 1024 * 1024;
 const MAX_TOTAL_BYTES = 9 * 1024 * 1024;
@@ -62,6 +64,12 @@ type ReferenceImage = {
 };
 
 const requestLog = new Map<string, number[]>();
+
+function runtimeVariable(key: string) {
+  const binding = (env as unknown as Record<string, unknown>)[key];
+  if (typeof binding === "string" && binding.trim()) return binding.trim();
+  return process.env[key]?.trim() ?? "";
+}
 
 function jsonError(message: string, status: number, code: string) {
   return Response.json(
@@ -182,7 +190,7 @@ export async function POST(request: Request) {
     return jsonError("잠시 후 다시 분석해 주세요.", 429, "RATE_LIMITED");
   }
 
-  const apiKey = process.env.GEMINI_API_KEY?.trim();
+  const apiKey = runtimeVariable("GEMINI_API_KEY");
   if (!apiKey) {
     return jsonError("AI 분석 연결이 아직 준비되지 않았습니다.", 503, "AI_NOT_CONFIGURED");
   }
@@ -317,7 +325,7 @@ export async function POST(request: Request) {
 
   let upstream: Response;
   try {
-    const model = process.env.GEMINI_MODEL?.trim() || "gemini-2.5-flash";
+    const model = runtimeVariable("GEMINI_MODEL") || "gemini-2.5-flash";
     upstream = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
       method: "POST",
       headers: {
