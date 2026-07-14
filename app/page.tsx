@@ -627,6 +627,42 @@ export default function Home() {
     event.target.value = "";
   };
 
+  const pasteFromClipboard = async (key: EvidenceKey) => {
+    const item = evidenceItems.find((candidate) => candidate.key === key);
+    if (!item) return;
+    setPasteTarget(key);
+
+    if (!navigator.clipboard?.read) {
+      showToast("브라우저가 자동 붙여넣기를 지원하지 않아요. ⌘V 또는 Ctrl+V를 눌러주세요.");
+      return;
+    }
+
+    try {
+      const clipboardItems = await navigator.clipboard.read();
+      const clipboardItem = clipboardItems.find((candidate) => candidate.types.some((type) => type.startsWith("image/")));
+      const imageType = clipboardItem?.types.find((type) => type.startsWith("image/"));
+      if (!clipboardItem || !imageType) {
+        setPasteTarget(null);
+        showToast("클립보드에 복사된 이미지가 없어요.");
+        return;
+      }
+
+      const blob = await clipboardItem.getType(imageType);
+      const extension = imageType.split("/")[1]?.replace("jpeg", "jpg") || "png";
+      const file = new File([blob], `clipboard-${Date.now()}.${extension}`, { type: imageType });
+      const replacing = observations[key] !== "missing";
+      const stored = await storeEvidenceFile(key, file);
+      if (!stored) {
+        setPasteTarget(null);
+        return;
+      }
+      setPasteTarget(null);
+      showToast(`${item.title} 사진을 ${replacing ? "바꿨습니다" : "붙였습니다"}.`);
+    } catch {
+      showToast("브라우저가 자동 붙여넣기를 막았어요. ⌘V 또는 Ctrl+V를 눌러주세요.");
+    }
+  };
+
   const removeEvidence = (key: EvidenceKey) => {
     if (filePreviews[key]) URL.revokeObjectURL(filePreviews[key]!);
     setObservations((current) => ({ ...current, [key]: "missing" }));
@@ -895,16 +931,16 @@ export default function Home() {
           <div className={`paste-tip ${pasteTarget ? "active" : ""}`}>
             <Clipboard size={18} />
             {pasteTarget ? (
-              <span><strong>{evidenceItems.find((item) => item.key === pasteTarget)?.title} 선택됨</strong><small>이미지를 복사한 뒤 ⌘V 또는 Ctrl+V를 누르세요.</small></span>
+              <span><strong>{evidenceItems.find((item) => item.key === pasteTarget)?.title} 선택됨</strong><small>자동 붙여넣기가 막힌 경우 ⌘V 또는 Ctrl+V를 눌러주세요.</small></span>
             ) : (
-              <span><strong>붙여넣을 사진 칸을 먼저 선택하세요</strong><small>각 사진 카드의 ‘이 칸에 붙여넣기’를 누른 뒤 ⌘V 또는 Ctrl+V</small></span>
+              <span><strong>클립보드 이미지를 바로 붙여넣을 수 있어요</strong><small>이미지를 복사한 뒤 원하는 사진 칸의 ‘붙여넣기’ 버튼을 누르세요.</small></span>
             )}
           </div>
 
           <div className="photo-topline"><div><strong>필수 사진</strong><span>{essentialCompleted}/5</span></div><button onClick={copySellerMessage}><Clipboard size={14} /> 판매자에게 요청</button></div>
           <div className="photo-grid">
             {evidenceItems.filter((item) => item.essential).map((item) => (
-              <EvidenceCard key={item.key} item={item} observation={observations[item.key]} fileName={fileNames[item.key]} preview={filePreviews[item.key]} selected={pasteTarget === item.key} onFile={handleFile} onRemove={removeEvidence} onSelect={setPasteTarget} />
+              <EvidenceCard key={item.key} item={item} observation={observations[item.key]} fileName={fileNames[item.key]} preview={filePreviews[item.key]} selected={pasteTarget === item.key} onFile={handleFile} onRemove={removeEvidence} onPaste={pasteFromClipboard} />
             ))}
           </div>
 
@@ -912,7 +948,7 @@ export default function Home() {
             <summary><span><Plus size={15} /> 추가 사진</span><small>있으면 판정이 더 선명해져요</small><ChevronDown size={17} /></summary>
             <div className="photo-grid optional-grid">
               {evidenceItems.filter((item) => !item.essential).map((item) => (
-                <EvidenceCard key={item.key} item={item} observation={observations[item.key]} fileName={fileNames[item.key]} preview={filePreviews[item.key]} selected={pasteTarget === item.key} onFile={handleFile} onRemove={removeEvidence} onSelect={setPasteTarget} />
+                <EvidenceCard key={item.key} item={item} observation={observations[item.key]} fileName={fileNames[item.key]} preview={filePreviews[item.key]} selected={pasteTarget === item.key} onFile={handleFile} onRemove={removeEvidence} onPaste={pasteFromClipboard} />
               ))}
             </div>
           </details>
@@ -983,7 +1019,7 @@ function PageBack({ onClick, label }: { onClick: () => void; label: string }) {
   return <button className="page-back" onClick={onClick}><ArrowLeft size={17} /> {label}</button>;
 }
 
-function EvidenceCard({ item, observation, fileName, preview, selected, onFile, onRemove, onSelect }: {
+function EvidenceCard({ item, observation, fileName, preview, selected, onFile, onRemove, onPaste }: {
   item: EvidenceItem;
   observation: Observation;
   fileName?: string;
@@ -991,7 +1027,7 @@ function EvidenceCard({ item, observation, fileName, preview, selected, onFile, 
   selected: boolean;
   onFile: (key: EvidenceKey, event: ChangeEvent<HTMLInputElement>) => void;
   onRemove: (key: EvidenceKey) => void;
-  onSelect: (key: EvidenceKey | null) => void;
+  onPaste: (key: EvidenceKey) => void;
 }) {
   const Icon = item.icon;
   return (
@@ -1005,10 +1041,10 @@ function EvidenceCard({ item, observation, fileName, preview, selected, onFile, 
       <button
         type="button"
         className={`paste-target-button ${selected ? "selected" : ""}`}
-        onClick={() => onSelect(selected ? null : item.key)}
-        aria-pressed={selected}
+        onClick={() => void onPaste(item.key)}
+        aria-label={`${item.title}에 클립보드 이미지 붙여넣기`}
       >
-        <Clipboard size={13} /> {selected ? "붙여넣을 위치로 선택됨" : "이 칸에 붙여넣기"}
+        <Clipboard size={13} /> {selected ? "다시 붙여넣기" : "붙여넣기"}
       </button>
     </article>
   );
