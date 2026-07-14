@@ -30,7 +30,7 @@ import {
   TriangleAlert,
   X,
 } from "lucide-react";
-import { ChangeEvent, KeyboardEvent, useEffect, useMemo, useState } from "react";
+import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { expandedProducts } from "./catalog";
 
 type Stage = "search" | "photos" | "result";
@@ -80,6 +80,29 @@ type CounterfeitCase = {
     label: string;
   }>;
   sourceUrl: string;
+};
+
+type AiFinding = {
+  key: EvidenceKey;
+  status: "match" | "concern" | "unclear";
+  title: string;
+  reason: string;
+  visibleEvidence: string;
+  userAction: string;
+};
+
+type AiAnalysis = {
+  verdict: "likely_authentic" | "needs_review" | "counterfeit_suspected" | "insufficient_photos";
+  confidence: number;
+  summary: string;
+  findings: AiFinding[];
+  caseMatches: Array<{
+    caseId: string;
+    similarity: "high" | "medium" | "low";
+    reason: string;
+    evidenceKeys: EvidenceKey[];
+  }>;
+  caveat: string;
 };
 
 const curatedProducts: Product[] = [
@@ -350,6 +373,54 @@ const initialObservations = Object.fromEntries(
   evidenceItems.map((item) => [item.key, "missing"]),
 ) as Record<EvidenceKey, Observation>;
 
+const supportedImageTypes = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
+
+async function prepareImageFile(file: File) {
+  if (!supportedImageTypes.has(file.type)) {
+    throw new Error("JPG, PNG, WEBP, GIF 사진만 올릴 수 있습니다.");
+  }
+  if (file.type === "image/gif") return file;
+
+  let bitmap: ImageBitmap;
+  try {
+    bitmap = await createImageBitmap(file);
+  } catch {
+    throw new Error("이 사진을 읽을 수 없습니다. JPG 또는 PNG로 다시 저장해 주세요.");
+  }
+
+  const maxSide = 1600;
+  const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
+  const width = Math.max(1, Math.round(bitmap.width * scale));
+  const height = Math.max(1, Math.round(bitmap.height * scale));
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const context = canvas.getContext("2d");
+  if (!context) {
+    bitmap.close();
+    return file;
+  }
+  context.fillStyle = "#fff";
+  context.fillRect(0, 0, width, height);
+  context.drawImage(bitmap, 0, 0, width, height);
+  bitmap.close();
+
+  const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.84));
+  if (!blob || (scale === 1 && blob.size >= file.size)) return file;
+  const baseName = file.name.replace(/\.[^.]+$/, "") || "figure-photo";
+  return new File([blob], `${baseName}.jpg`, { type: "image/jpeg" });
+}
+
+function isAiAnalysis(value: unknown): value is AiAnalysis {
+  if (!value || typeof value !== "object") return false;
+  const candidate = value as Partial<AiAnalysis>;
+  return typeof candidate.summary === "string"
+    && typeof candidate.confidence === "number"
+    && Array.isArray(candidate.findings)
+    && Array.isArray(candidate.caseMatches)
+    && typeof candidate.caveat === "string";
+}
+
 export default function Home() {
   const [stage, setStage] = useState<Stage>("search");
   const [query, setQuery] = useState("");
@@ -362,10 +433,42 @@ export default function Home() {
   const [manualMakerOther, setManualMakerOther] = useState("");
   const [manualNumber, setManualNumber] = useState("");
   const [observations, setObservations] = useState(initialObservations);
+  const [files, setFiles] = useState<Partial<Record<EvidenceKey, File>>>({});
   const [fileNames, setFileNames] = useState<Partial<Record<EvidenceKey, string>>>({});
   const [filePreviews, setFilePreviews] = useState<Partial<Record<EvidenceKey, string>>>({});
+  const [aiAnalysis, setAiAnalysis] = useState<AiAnalysis | null>(null);
+  const [analysisError, setAnalysisError] = useState("");
+  const [reviewedEvidence, setReviewedEvidence] = useState<Partial<Record<EvidenceKey, boolean>>>({});
+  const [userOverrides, setUserOverrides] = useState<Partial<Record<EvidenceKey, Observation>>>({});
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [toast, setToast] = useState("");
+
+  const showToast = useCallback((message: string) => {
+    setToast(message);
+    window.setTimeout(() => setToast(""), 2200);
+  }, []);
+
+  const storeEvidenceFile = useCallback(async (key: EvidenceKey, file: File) => {
+    try {
+      const prepared = await prepareImageFile(file);
+      const nextPreview = URL.createObjectURL(prepared);
+      setFiles((current) => ({ ...current, [key]: prepared }));
+      setFileNames((current) => ({ ...current, [key]: prepared.name }));
+      setFilePreviews((current) => {
+        if (current[key]) URL.revokeObjectURL(current[key]!);
+        return { ...current, [key]: nextPreview };
+      });
+      setObservations((current) => ({ ...current, [key]: "unverified" }));
+      setAiAnalysis(null);
+      setAnalysisError("");
+      setReviewedEvidence({});
+      setUserOverrides({});
+      return true;
+    } catch (error) {
+      showToast(error instanceof Error ? error.message : "사진을 추가하지 못했습니다.");
+      return false;
+    }
+  }, [showToast]);
 
   useEffect(() => {
     if (stage !== "photos") return;
@@ -386,18 +489,14 @@ export default function Home() {
 
       const extension = clipboardFile.type.split("/")[1]?.replace("jpeg", "jpg") || "png";
       const namedFile = new File([clipboardFile], `clipboard-${Date.now()}.${extension}`, { type: clipboardFile.type });
-      const oldPreview = filePreviews[nextItem.key];
-      if (oldPreview) URL.revokeObjectURL(oldPreview);
-      setFileNames((current) => ({ ...current, [nextItem.key]: namedFile.name }));
-      setFilePreviews((current) => ({ ...current, [nextItem.key]: URL.createObjectURL(namedFile) }));
-      setObservations((current) => ({ ...current, [nextItem.key]: "unverified" }));
-      setToast(`${nextItem.title}에 이미지를 붙였습니다.`);
-      window.setTimeout(() => setToast(""), 2200);
+      void storeEvidenceFile(nextItem.key, namedFile).then((stored) => {
+        if (stored) showToast(`${nextItem.title}에 이미지를 붙였습니다.`);
+      });
     };
 
     document.addEventListener("paste", pasteImage);
     return () => document.removeEventListener("paste", pasteImage);
-  }, [stage, observations, filePreviews]);
+  }, [stage, observations, showToast, storeEvidenceFile]);
 
   const filteredProducts = useMemo(() => {
     const keyword = query.trim().toLowerCase();
@@ -429,7 +528,6 @@ export default function Home() {
   const completedCount = Object.values(observations).filter((value) => value !== "missing").length;
   const assessedCount = Object.values(observations).filter((value) => value === "match" || value === "concern").length;
   const essentialCompleted = evidenceItems.filter((item) => item.essential && observations[item.key] !== "missing").length;
-  const matchedItems = evidenceItems.filter((item) => observations[item.key] === "match");
   const concernItems = evidenceItems.filter((item) => observations[item.key] === "concern");
   const pendingItems = evidenceItems.filter((item) => observations[item.key] === "unverified" || observations[item.key] === "missing");
   const productCases = counterfeitCases.filter((item) => item.productId === currentProduct?.id);
@@ -437,22 +535,40 @@ export default function Home() {
     .filter((signal) => observations[signal.evidenceKey] === "concern");
   const hasKnownCaseOverlap = matchedCaseSignals.length > 0;
   const riskPoints = concernItems.reduce((sum, item) => sum + item.weight, 0);
-  const confidence = Math.min(96, (currentProduct?.verified ? 18 : 8) + completedCount * 8 + assessedCount * 4);
+  const confidence = aiAnalysis?.confidence ?? Math.min(96, (currentProduct?.verified ? 18 : 8) + completedCount * 8 + assessedCount * 4);
+  const reviewedCount = Object.values(reviewedEvidence).filter(Boolean).length;
+  const hasUserOverride = Object.keys(userOverrides).length > 0;
 
-  const result = essentialCompleted < 4 || assessedCount < 3
+  const calculatedResult = essentialCompleted < 4 || assessedCount < 3
     ? { label: "판단 보류", tone: "neutral", summary: "핵심 사진을 조금 더 확인해야 합니다." }
     : riskPoints >= 18
       ? { label: "가품 의심", tone: "danger", summary: hasKnownCaseOverlap ? "확인한 차이 중 알려진 가품 사례와 겹치는 특징이 있습니다." : "공식 제품과 다른 점이 여러 곳에서 보입니다." }
       : riskPoints >= 8
         ? { label: "추가 확인", tone: "caution", summary: hasKnownCaseOverlap ? "알려진 가품 사례와 겹치는 항목을 거래 전에 다시 확인하세요." : "거래 전에 다시 볼 항목이 있습니다." }
         : { label: "진품 가능성 높음", tone: "safe", summary: "확인한 사진에서는 큰 차이가 보이지 않습니다." };
-
-  const showToast = (message: string) => {
-    setToast(message);
-    window.setTimeout(() => setToast(""), 2200);
-  };
+  const aiVerdict = aiAnalysis ? {
+    likely_authentic: { label: "진품 가능성 높음", tone: "safe", summary: aiAnalysis.summary },
+    needs_review: { label: "추가 확인", tone: "caution", summary: aiAnalysis.summary },
+    counterfeit_suspected: { label: "가품 의심", tone: "danger", summary: aiAnalysis.summary },
+    insufficient_photos: { label: "판단 보류", tone: "neutral", summary: aiAnalysis.summary },
+  }[aiAnalysis.verdict] : null;
+  const result = hasUserOverride ? {
+    ...calculatedResult,
+    summary: `사용자가 수정한 ${Object.keys(userOverrides).length}개 항목을 반영한 결과입니다.`,
+  } : (aiVerdict ?? calculatedResult);
 
   const selectProduct = (product: Product) => {
+    if (selectedProduct?.id && selectedProduct.id !== product.id) {
+      Object.values(filePreviews).forEach((preview) => preview && URL.revokeObjectURL(preview));
+      setFiles({});
+      setFileNames({});
+      setFilePreviews({});
+      setObservations(initialObservations);
+      setAiAnalysis(null);
+      setAnalysisError("");
+      setReviewedEvidence({});
+      setUserOverrides({});
+    }
     setSelectedProduct(product);
     setQuery(product.name);
     setSearchOpen(false);
@@ -487,18 +603,18 @@ export default function Home() {
   const handleFile = (key: EvidenceKey, event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-    const oldPreview = filePreviews[key];
-    if (oldPreview) URL.revokeObjectURL(oldPreview);
-    setFileNames((current) => ({ ...current, [key]: file.name }));
-    setFilePreviews((current) => ({ ...current, [key]: URL.createObjectURL(file) }));
-    if (observations[key] === "missing") {
-      setObservations((current) => ({ ...current, [key]: "unverified" }));
-    }
+    void storeEvidenceFile(key, file);
+    event.target.value = "";
   };
 
   const removeEvidence = (key: EvidenceKey) => {
     if (filePreviews[key]) URL.revokeObjectURL(filePreviews[key]!);
     setObservations((current) => ({ ...current, [key]: "missing" }));
+    setFiles((current) => {
+      const next = { ...current };
+      delete next[key];
+      return next;
+    });
     setFileNames((current) => {
       const next = { ...current };
       delete next[key];
@@ -509,6 +625,10 @@ export default function Home() {
       delete next[key];
       return next;
     });
+    setAiAnalysis(null);
+    setAnalysisError("");
+    setReviewedEvidence({});
+    setUserOverrides({});
   };
 
   const sellerMessage = `안녕하세요. 구매 전에 제품 확인용 사진을 부탁드립니다.\n① 박스 정면 ② 박스 뒷면 ③ 바코드 ④ 받침대 밑면 각인 ⑤ 얼굴 근접\n같은 배경에서 오늘 날짜 메모가 보이게 촬영해 주세요.`;
@@ -522,13 +642,67 @@ export default function Home() {
     }
   };
 
-  const analyze = () => {
+  const analyze = async () => {
+    if (!currentProduct || Object.keys(files).length === 0) return;
     setIsAnalyzing(true);
-    window.setTimeout(() => {
+    setAnalysisError("");
+    const formData = new FormData();
+    formData.set("product", JSON.stringify({
+      id: currentProduct.id,
+      name: currentProduct.name,
+      englishName: currentProduct.englishName,
+      number: currentProduct.number,
+      maker: currentProduct.maker,
+      image: currentProduct.image,
+      officialUrl: currentProduct.officialUrl,
+      verified: currentProduct.verified,
+    }));
+    formData.set("cases", JSON.stringify(productCases.map(({ id, title, summary, images, signals }) => ({
+      id,
+      title,
+      summary,
+      images,
+      signals,
+    }))));
+    Object.entries(files).forEach(([key, file]) => {
+      if (file) formData.set(`evidence:${key}`, file);
+    });
+
+    try {
+      const response = await fetch("/api/analyze", { method: "POST", body: formData });
+      const payload = await response.json().catch(() => null) as { analysis?: unknown; error?: string; code?: string } | null;
+      if (!response.ok || !isAiAnalysis(payload?.analysis)) {
+        throw new Error(payload?.error || "AI 분석 결과를 받지 못했습니다.");
+      }
+
+      const analysis = payload.analysis;
+      const nextObservations = { ...initialObservations };
+      analysis.findings.forEach((finding) => {
+        nextObservations[finding.key] = finding.status === "unclear" ? "unverified" : finding.status;
+      });
+      setObservations(nextObservations);
+      setAiAnalysis(analysis);
+      setReviewedEvidence({});
+      setUserOverrides({});
       setIsAnalyzing(false);
       setStage("result");
       window.scrollTo({ top: 0, behavior: "smooth" });
-    }, 650);
+    } catch (error) {
+      setIsAnalyzing(false);
+      setAnalysisError(error instanceof Error ? error.message : "AI 분석을 시작하지 못했습니다.");
+    }
+  };
+
+  const reviewFinding = (finding: AiFinding, value: Observation) => {
+    const original = finding.status === "unclear" ? "unverified" : finding.status;
+    setObservations((current) => ({ ...current, [finding.key]: value }));
+    setReviewedEvidence((current) => ({ ...current, [finding.key]: true }));
+    setUserOverrides((current) => {
+      const next = { ...current };
+      if (value === original) delete next[finding.key];
+      else next[finding.key] = value;
+      return next;
+    });
   };
 
   const shareResult = async () => {
@@ -563,8 +737,13 @@ export default function Home() {
     setManualMakerOther("");
     setManualNumber("");
     setObservations(initialObservations);
+    setFiles({});
     setFileNames({});
     setFilePreviews({});
+    setAiAnalysis(null);
+    setAnalysisError("");
+    setReviewedEvidence({});
+    setUserOverrides({});
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -684,7 +863,7 @@ export default function Home() {
       {stage === "photos" && currentProduct && (
         <section className="photos-page page-enter">
           <PageBack onClick={() => setStage("search")} label="제품 다시 선택" />
-          <header className="simple-heading"><span>사진 확인</span><h1>핵심 사진만 올려주세요</h1><p>다섯 장이면 1차 판정이 가능합니다.</p></header>
+          <header className="simple-heading"><span>AI 1차 분석</span><h1>핵심 사진만 올려주세요</h1><p>사진이 많을수록 비교할 수 있는 근거가 늘어납니다.</p></header>
 
           <ProductStrip product={currentProduct} />
 
@@ -696,7 +875,7 @@ export default function Home() {
           <div className="photo-topline"><div><strong>필수 사진</strong><span>{essentialCompleted}/5</span></div><button onClick={copySellerMessage}><Clipboard size={14} /> 판매자에게 요청</button></div>
           <div className="photo-grid">
             {evidenceItems.filter((item) => item.essential).map((item) => (
-              <EvidenceCard key={item.key} item={item} observation={observations[item.key]} fileName={fileNames[item.key]} preview={filePreviews[item.key]} onFile={handleFile} onObserve={(value) => setObservations((current) => ({ ...current, [item.key]: value }))} onRemove={removeEvidence} />
+              <EvidenceCard key={item.key} item={item} observation={observations[item.key]} fileName={fileNames[item.key]} preview={filePreviews[item.key]} onFile={handleFile} onRemove={removeEvidence} />
             ))}
           </div>
 
@@ -704,13 +883,14 @@ export default function Home() {
             <summary><span><Plus size={15} /> 추가 사진</span><small>있으면 판정이 더 선명해져요</small><ChevronDown size={17} /></summary>
             <div className="photo-grid optional-grid">
               {evidenceItems.filter((item) => !item.essential).map((item) => (
-                <EvidenceCard key={item.key} item={item} observation={observations[item.key]} fileName={fileNames[item.key]} preview={filePreviews[item.key]} onFile={handleFile} onObserve={(value) => setObservations((current) => ({ ...current, [item.key]: value }))} onRemove={removeEvidence} />
+                <EvidenceCard key={item.key} item={item} observation={observations[item.key]} fileName={fileNames[item.key]} preview={filePreviews[item.key]} onFile={handleFile} onRemove={removeEvidence} />
               ))}
             </div>
           </details>
 
           <div className="photo-note"><Info size={16} /><span>라이선스 씰은 복제되거나 발매판마다 달라질 수 있어 단독으로 판단하지 않습니다.</span></div>
-          <button className="black-button full" disabled={completedCount === 0 || isAnalyzing} onClick={analyze}>{isAnalyzing ? <><LoaderCircle className="spin" size={18} /> 확인 중</> : <>판정 결과 보기 <ArrowRight size={18} /></>}</button>
+          {analysisError && <div className="analysis-error" role="alert"><TriangleAlert size={17} /><span><strong>분석을 시작하지 못했어요</strong>{analysisError}</span></div>}
+          <button className="black-button full" disabled={completedCount === 0 || isAnalyzing} onClick={analyze}>{isAnalyzing ? <><LoaderCircle className="spin" size={18} /> 사진 분석 중</> : <><ShieldCheck size={18} /> AI로 1차 분석</>}</button>
         </section>
       )}
 
@@ -719,20 +899,25 @@ export default function Home() {
           <PageBack onClick={() => setStage("photos")} label="사진 수정" />
           <article className={`verdict-card ${result.tone}`}>
             <div className="verdict-product"><ProductImage product={currentProduct} size="medium" /><span><small>No.{currentProduct.number}</small><strong>{currentProduct.name}</strong><em>{currentProduct.maker}</em></span></div>
-            <div className="verdict-copy"><span>FIGSIGNAL 판정</span><h1>{result.label}</h1><p>{result.summary}</p></div>
-            <div className="verdict-numbers"><div><strong>{confidence}%</strong><span>자료 충족도</span></div><div><strong>{completedCount}</strong><span>확인 사진</span></div><div><strong>{concernItems.length}</strong><span>차이 발견</span></div></div>
+            <div className="verdict-copy"><span>{hasUserOverride ? "사용자 확인 반영" : "AI 1차 판정"}</span><h1>{result.label}</h1><p>{result.summary}</p></div>
+            <div className="verdict-numbers"><div><strong>{confidence}%</strong><span>자료 충족도</span></div><div><strong>{completedCount}</strong><span>분석 사진</span></div><div><strong>{reviewedCount}/{aiAnalysis?.findings.length ?? assessedCount}</strong><span>사용자 확인</span></div></div>
           </article>
+
+          {aiAnalysis && (
+            <AiFindingsSection
+              analysis={aiAnalysis}
+              observations={observations}
+              previews={filePreviews}
+              reviewed={reviewedEvidence}
+              onReview={reviewFinding}
+            />
+          )}
 
           {productCases.length > 0 && (
             <CounterfeitCaseSection cases={productCases} observations={observations} />
           )}
 
-          <section className="reason-section">
-            <header><h2>판정 근거</h2><span>사진별 비교 결과</span></header>
-            {concernItems.length > 0 && <ReasonGroup title="다른 점" tone="negative" items={concernItems} previews={filePreviews} observations={observations} />}
-            {matchedItems.length > 0 && <ReasonGroup title="비슷한 점" tone="positive" items={matchedItems} previews={filePreviews} observations={observations} />}
-            {pendingItems.length > 0 && <div className="pending-line"><CircleHelp size={16} /><span><strong>확인하지 못한 항목</strong>{pendingItems.map((item) => item.title).join(" · ")}</span></div>}
-          </section>
+          {pendingItems.some((item) => observations[item.key] === "missing") && <div className="pending-line"><CircleHelp size={16} /><span><strong>올리지 않은 사진</strong>{pendingItems.filter((item) => observations[item.key] === "missing").map((item) => item.title).join(" · ")}</span></div>}
 
           <section className="lookup-source">
             <div><ShieldCheck size={19} /><span><strong>{currentProduct.verified ? "공식 제품 정보 확인됨" : "직접 입력한 제품"}</strong><small>{currentProduct.verified ? `${currentProduct.maker} · No.${currentProduct.number}` : "공식 제품 페이지를 추가로 확인하세요."}</small></span></div>
@@ -740,7 +925,7 @@ export default function Home() {
           </section>
 
           <div className="result-actions"><button className="line-button" onClick={shareResult}><Share2 size={17} /> 공유</button><button className="black-button" onClick={resetAll}><RotateCcw size={16} /> 새 검증</button></div>
-          <p className="disclaimer">현재 결과는 AI 자동 판독이 아니라 사용자가 표시한 사진 비교를 정리한 참고 의견이며 정품 보증서가 아닙니다.</p>
+          <p className="disclaimer">AI 시각 분석과 사용자 확인을 정리한 참고 의견이며 정품 보증서가 아닙니다.</p>
         </section>
       )}
 
@@ -768,13 +953,12 @@ function PageBack({ onClick, label }: { onClick: () => void; label: string }) {
   return <button className="page-back" onClick={onClick}><ArrowLeft size={17} /> {label}</button>;
 }
 
-function EvidenceCard({ item, observation, fileName, preview, onFile, onObserve, onRemove }: {
+function EvidenceCard({ item, observation, fileName, preview, onFile, onRemove }: {
   item: EvidenceItem;
   observation: Observation;
   fileName?: string;
   preview?: string;
   onFile: (key: EvidenceKey, event: ChangeEvent<HTMLInputElement>) => void;
-  onObserve: (value: Observation) => void;
   onRemove: (key: EvidenceKey) => void;
 }) {
   const Icon = item.icon;
@@ -785,8 +969,54 @@ function EvidenceCard({ item, observation, fileName, preview, onFile, onObserve,
         {preview ? <img src={preview} alt={`${item.title} 업로드 사진`} /> : <div><Icon size={26} /><span>사진 추가</span></div>}
       </label>
       <div className="photo-card-copy"><div><strong>{item.title}</strong>{fileName && <button onClick={() => onRemove(item.key)} aria-label={`${item.title} 삭제`}><X size={14} /></button>}</div><p>{item.description}</p></div>
-      {observation !== "missing" && <div className="compare-buttons"><span>공식 이미지와</span><button className={observation === "match" ? "active match" : ""} onClick={() => onObserve("match")}><Check size={12} /> 비슷해요</button><button className={observation === "concern" ? "active concern" : ""} onClick={() => onObserve("concern")}><TriangleAlert size={12} /> 달라요</button><button className={observation === "unverified" ? "active" : ""} onClick={() => onObserve("unverified")}>모르겠어요</button></div>}
+      {observation !== "missing" && <div className="photo-ready"><ShieldCheck size={13} /> AI 분석 대기</div>}
     </article>
+  );
+}
+
+function AiFindingsSection({ analysis, observations, previews, reviewed, onReview }: {
+  analysis: AiAnalysis;
+  observations: Record<EvidenceKey, Observation>;
+  previews: Partial<Record<EvidenceKey, string>>;
+  reviewed: Partial<Record<EvidenceKey, boolean>>;
+  onReview: (finding: AiFinding, value: Observation) => void;
+}) {
+  const reviewedCount = analysis.findings.filter((finding) => reviewed[finding.key]).length;
+  const statusLabel = (status: AiFinding["status"]) => status === "match" ? "일치" : status === "concern" ? "차이 의심" : "확인 불가";
+
+  return (
+    <section className="ai-section">
+      <header>
+        <div><ShieldCheck size={18} /><h2>AI가 찾은 근거</h2></div>
+        <span>직접 확인 {reviewedCount}/{analysis.findings.length}</span>
+      </header>
+      <p className="ai-review-intro">사진에서 실제로 보이는 내용을 확인한 뒤 판정을 선택해 주세요.</p>
+      <div className="ai-finding-list">
+        {analysis.findings.map((finding) => {
+          const current = observations[finding.key];
+          const original = finding.status === "unclear" ? "unverified" : finding.status;
+          const changed = reviewed[finding.key] && current !== original;
+          return (
+            <article className={`ai-finding ${finding.status}`} key={finding.key}>
+              <div className="ai-finding-thumb">{previews[finding.key] ? <img src={previews[finding.key]} alt={`${finding.title} 분석 사진`} /> : <ImageIcon size={20} />}</div>
+              <div className="ai-finding-copy">
+                <div className="ai-finding-title"><strong>{finding.title}</strong><span>{statusLabel(finding.status)}</span></div>
+                <p>{finding.reason}</p>
+                <dl><dt>사진 근거</dt><dd>{finding.visibleEvidence}</dd></dl>
+                {finding.userAction && finding.status !== "match" && <dl><dt>다음 확인</dt><dd>{finding.userAction}</dd></dl>}
+                <div className="review-controls" aria-label={`${finding.title} 사용자 확인`}>
+                  <span>{reviewed[finding.key] ? (changed ? "수정됨" : "확인됨") : "내가 확인"}</span>
+                  <button className={reviewed[finding.key] && current === "match" ? "active match" : ""} onClick={() => onReview(finding, "match")}><Check size={12} /> 일치</button>
+                  <button className={reviewed[finding.key] && current === "concern" ? "active concern" : ""} onClick={() => onReview(finding, "concern")}><TriangleAlert size={12} /> 차이</button>
+                  <button className={reviewed[finding.key] && current === "unverified" ? "active" : ""} onClick={() => onReview(finding, "unverified")}>모름</button>
+                </div>
+              </div>
+            </article>
+          );
+        })}
+      </div>
+      <p className="ai-caveat">{analysis.caveat}</p>
+    </section>
   );
 }
 
@@ -847,14 +1077,4 @@ function CounterfeitCaseSection({ cases, observations }: {
       <p className="case-note">사례와 모양이 다르다고 정품이라는 뜻은 아닙니다. 사진과 실물을 함께 비교하세요.</p>
     </section>
   );
-}
-
-function ReasonGroup({ title, tone, items, previews, observations }: {
-  title: string;
-  tone: "positive" | "negative";
-  items: EvidenceItem[];
-  previews: Partial<Record<EvidenceKey, string>>;
-  observations: Record<EvidenceKey, Observation>;
-}) {
-  return <div className={`reason-group ${tone}`}><div className="reason-title"><span>{tone === "positive" ? <CheckCircle2 size={16} /> : <TriangleAlert size={16} />}{title}</span><b>{items.length}</b></div><div>{items.map((item) => <article className="reason-row" key={item.key}><div className="reason-thumb">{previews[item.key] ? <img src={previews[item.key]} alt={`${item.title} 증거`} /> : <ImageIcon size={18} />}</div><span><strong>{item.title}</strong><p>{observations[item.key] === "match" ? item.matchReason : item.concernReason}</p></span></article>)}</div></div>;
 }
