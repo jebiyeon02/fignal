@@ -186,8 +186,6 @@ function extractGeminiOutputText(payload: unknown) {
 }
 
 export async function POST(request: Request) {
-  const diagnosticMode = new URL(request.url).searchParams.get("_diagnostic") === "gemini-v3";
-
   if (isRateLimited(request)) {
     return jsonError("잠시 후 다시 분석해 주세요.", 429, "RATE_LIMITED");
   }
@@ -338,8 +336,8 @@ export async function POST(request: Request) {
         systemInstruction: { parts: [{ text: prompt }] },
         contents: [{ role: "user", parts: content }],
         generationConfig: {
-          temperature: 0.1,
           maxOutputTokens: 2200,
+          thinkingConfig: { thinkingLevel: "low" },
           responseFormat: {
             text: {
               mimeType: "APPLICATION_JSON",
@@ -348,7 +346,7 @@ export async function POST(request: Request) {
           },
         },
       }),
-      signal: AbortSignal.timeout(45_000),
+      signal: AbortSignal.timeout(80_000),
     });
   } catch {
     return jsonError("AI 분석 서버에 연결하지 못했습니다.", 502, "UPSTREAM_UNREACHABLE");
@@ -374,20 +372,6 @@ export async function POST(request: Request) {
     }
     if (upstream.status === 429) {
       return jsonError("AI 요청이 많습니다. 잠시 후 다시 시도해 주세요.", 429, "AI_BUSY");
-    }
-    if (diagnosticMode) {
-      return Response.json(
-        {
-          error: "AI가 사진을 분석하지 못했습니다. 잠시 후 다시 시도해 주세요.",
-          code: "AI_ANALYSIS_FAILED",
-          diagnostic: {
-            httpStatus: upstream.status,
-            upstreamStatus,
-            message: upstreamMessage.replaceAll(apiKey, "[redacted]").slice(0, 500),
-          },
-        },
-        { status: 502, headers: { "Cache-Control": "no-store" } },
-      );
     }
     return jsonError("AI가 사진을 분석하지 못했습니다. 잠시 후 다시 시도해 주세요.", 502, "AI_ANALYSIS_FAILED");
   }
