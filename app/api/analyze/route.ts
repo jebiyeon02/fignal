@@ -186,8 +186,6 @@ function extractGeminiOutputText(payload: unknown) {
 }
 
 export async function POST(request: Request) {
-  const diagnosticMode = request.headers.get("x-figsignal-diagnostic") === "gemini-format-v2";
-
   if (isRateLimited(request)) {
     return jsonError("잠시 후 다시 분석해 주세요.", 429, "RATE_LIMITED");
   }
@@ -273,40 +271,43 @@ export async function POST(request: Request) {
   }
 
   const schema = {
-    type: "OBJECT",
+    type: "object",
+    additionalProperties: false,
     properties: {
-      verdict: { type: "STRING", enum: ["likely_authentic", "needs_review", "counterfeit_suspected", "insufficient_photos"] },
-      confidence: { type: "INTEGER" },
-      summary: { type: "STRING" },
+      verdict: { type: "string", enum: ["likely_authentic", "needs_review", "counterfeit_suspected", "insufficient_photos"] },
+      confidence: { type: "integer", minimum: 0, maximum: 100 },
+      summary: { type: "string" },
       findings: {
-        type: "ARRAY",
+        type: "array",
         items: {
-          type: "OBJECT",
+          type: "object",
+          additionalProperties: false,
           properties: {
-            key: { type: "STRING", enum: evidenceKeys },
-            status: { type: "STRING", enum: ["match", "concern", "unclear"] },
-            title: { type: "STRING" },
-            reason: { type: "STRING" },
-            visibleEvidence: { type: "STRING" },
-            userAction: { type: "STRING" },
+            key: { type: "string", enum: evidenceKeys },
+            status: { type: "string", enum: ["match", "concern", "unclear"] },
+            title: { type: "string" },
+            reason: { type: "string" },
+            visibleEvidence: { type: "string" },
+            userAction: { type: "string" },
           },
           required: ["key", "status", "title", "reason", "visibleEvidence", "userAction"],
         },
       },
       caseMatches: {
-        type: "ARRAY",
+        type: "array",
         items: {
-          type: "OBJECT",
+          type: "object",
+          additionalProperties: false,
           properties: {
-            caseId: { type: "STRING" },
-            similarity: { type: "STRING", enum: ["high", "medium", "low"] },
-            reason: { type: "STRING" },
-            evidenceKeys: { type: "ARRAY", items: { type: "STRING", enum: evidenceKeys } },
+            caseId: { type: "string" },
+            similarity: { type: "string", enum: ["high", "medium", "low"] },
+            reason: { type: "string" },
+            evidenceKeys: { type: "array", items: { type: "string", enum: evidenceKeys } },
           },
           required: ["caseId", "similarity", "reason", "evidenceKeys"],
         },
       },
-      caveat: { type: "STRING" },
+      caveat: { type: "string" },
     },
     required: ["verdict", "confidence", "summary", "findings", "caseMatches", "caveat"],
   };
@@ -324,7 +325,7 @@ export async function POST(request: Request) {
 
   let upstream: Response;
   try {
-    const model = runtimeVariable("GEMINI_MODEL") || "gemini-2.5-flash";
+    const model = runtimeVariable("GEMINI_MODEL") || "gemini-3.5-flash";
     upstream = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
       method: "POST",
       headers: {
@@ -337,9 +338,12 @@ export async function POST(request: Request) {
         generationConfig: {
           temperature: 0.1,
           maxOutputTokens: 2200,
-          responseMimeType: "application/json",
-          responseSchema: schema,
-          thinkingConfig: { thinkingBudget: 512 },
+          responseFormat: {
+            text: {
+              mimeType: "APPLICATION_JSON",
+              schema,
+            },
+          },
         },
       }),
       signal: AbortSignal.timeout(45_000),
@@ -368,20 +372,6 @@ export async function POST(request: Request) {
     }
     if (upstream.status === 429) {
       return jsonError("AI 요청이 많습니다. 잠시 후 다시 시도해 주세요.", 429, "AI_BUSY");
-    }
-    if (diagnosticMode) {
-      return Response.json(
-        {
-          error: "AI가 사진을 분석하지 못했습니다. 잠시 후 다시 시도해 주세요.",
-          code: "AI_ANALYSIS_FAILED",
-          diagnostic: {
-            httpStatus: upstream.status,
-            upstreamStatus,
-            message: upstreamMessage.replaceAll(apiKey, "[redacted]").slice(0, 500),
-          },
-        },
-        { status: 502, headers: { "Cache-Control": "no-store" } },
-      );
     }
     return jsonError("AI가 사진을 분석하지 못했습니다. 잠시 후 다시 시도해 주세요.", 502, "AI_ANALYSIS_FAILED");
   }
