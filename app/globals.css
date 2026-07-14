@@ -180,15 +180,28 @@ input:focus, select:focus { border-color: #69917f; box-shadow: 0 0 0 3px rgba(31
 .price-input input { padding-right: 35px; }
 .price-input span { position: absolute; right: 12px; top: 50%; color: #888c92; font-size: 12px; transform: translateY(-50%); }
 
-.segmented { width: fit-content; display: flex; padding: 3px; border: 1px solid var(--line); border-radius: 8px; background: #f5f6f5; }
-.segmented button { min-width: 68px; padding: 7px 11px; border: 0; border-radius: 5px; background: transparent; color: #777b81; font-size: 12px; cursor: pointer; }
-.segmented button.active { background: #fff; color: #1e2023; font-weight: 650; box-shadow: 0 1px 3px rgba(24, 26, 29, .1); }
+.scope-banner { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 13px; border: 1px solid #cfe0d7; border-radius: 7px; background: #f1f7f4; }
+.scope-banner > div { display: flex; align-items: center; gap: 9px; color: var(--green); }
+.scope-banner span { display: flex; align-items: baseline; gap: 7px; }
+.scope-banner strong { font-size: 9px; letter-spacing: .06em; }
+.scope-banner b { color: #214a39; font-size: 12px; }
+.scope-banner small { color: #688073; font-size: 10px; }
+
+.field-help { margin-top: 0; color: #777b81; font-size: 10px; }
+.field-help summary { width: fit-content; color: #557264; cursor: pointer; }
+.field-help p { margin: 7px 0 0; padding: 8px 10px; border-left: 2px solid #cbd9d2; background: #f7f8f7; color: #71757a; line-height: 1.55; }
 
 .lookup-row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
 .lookup-row label { display: grid; gap: 8px; }
 .lookup-row label > span { display: flex; align-items: center; gap: 7px; color: #53575d; font-size: 11px; font-weight: 650; }
 .lookup-row label > span svg { color: #777b80; }
 .inline-note { display: flex; align-items: center; gap: 7px; margin: -2px 0 0; color: #72767c; font-size: 11px; }
+
+.official-search { min-height: 44px; display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 0 13px; border: 1px solid var(--line); border-radius: 7px; background: #fafafa; color: #40444a; text-decoration: none; }
+.official-search > span { display: flex; align-items: center; gap: 8px; }
+.official-search svg { color: #73777d; }
+.official-search b { font-size: 11px; }
+.official-search:hover { border-color: #aeb8b3; background: #f7faf8; }
 
 .price-signal { width: fit-content; display: flex; align-items: center; gap: 7px; padding: 7px 9px; border-radius: 6px; font-size: 11px; }
 .price-signal strong { font-weight: 700; }
@@ -205,6 +218,10 @@ input:focus, select:focus { border-color: #69917f; box-shadow: 0 0 0 3px rgba(31
 .side-guide li > span { width: 23px; height: 23px; display: grid; place-items: center; border: 1px solid var(--line-strong); border-radius: 50%; color: #777b80; font-size: 10px; }
 .side-guide p { margin: 0; color: #7b7f85; font-size: 11px; line-height: 1.5; }
 .side-guide p strong { display: block; margin-bottom: 2px; color: #383b40; font-size: 12px; }
+.next-scope { margin-top: 24px; padding: 14px 0 0; border-top: 1px solid var(--line-strong); }
+.next-scope > span { display: block; margin-bottom: 5px; color: #999da2; font-size: 9px; font-weight: 700; letter-spacing: .06em; }
+.next-scope > strong { font-size: 11px; }
+.next-scope p { margin-top: 5px; }
 
 .page-actions { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 24px; }
 .page-actions.end { justify-content: flex-end; }
@@ -375,8 +392,7 @@ input:focus, select:focus { border-color: #69917f; box-shadow: 0 0 0 3px rgba(31
   .page-header { min-height: auto; margin-bottom: 22px; }
   .page-header h1 { font-size: 25px; }
   .field-row, .lookup-row { grid-template-columns: 1fr; }
-  .segmented { width: 100%; }
-  .segmented button { min-width: 0; flex: 1; padding-left: 5px; padding-right: 5px; }
+  .scope-banner { align-items: flex-start; flex-direction: column; gap: 5px; }
   .panel-title { padding: 0 16px; }
   .panel-body { padding: 16px; }
   .request-bar { align-items: flex-start; }

@@ -11,13 +11,13 @@ import {
   ChevronRight,
   CircleHelp,
   Clipboard,
+  ExternalLink,
   Factory,
   FileCheck2,
   Fingerprint,
   Globe2,
   Image as ImageIcon,
   Info,
-  Link2,
   LoaderCircle,
   PackageCheck,
   Plus,
@@ -36,7 +36,6 @@ import {
 import { ChangeEvent, useMemo, useState } from "react";
 
 type Stage = "identity" | "evidence" | "report";
-type Platform = "당근" | "X" | "번개장터" | "기타";
 type LookupStatus = "unknown" | "reported" | "not_reported" | "not_found";
 type Observation = "missing" | "unverified" | "match" | "concern";
 type EvidenceGroup = "패키지" | "본체" | "거래";
@@ -169,7 +168,15 @@ const evidenceGroups: EvidenceGroup[] = ["패키지", "본체", "거래"];
 const initialObservations = Object.fromEntries(
   evidenceItems.map((item) => [item.key, "missing"]),
 ) as Record<EvidenceKey, Observation>;
-const platforms: Platform[] = ["당근", "X", "번개장터", "기타"];
+
+const manufacturers = [
+  "Good Smile Company",
+  "ORANGE ROUGE",
+  "Good Smile Arts Shanghai",
+  "Max Factory",
+  "Phat! Company",
+  "기타",
+] as const;
 
 const sourceLabels: Record<LookupStatus, string> = {
   unknown: "조회 전",
@@ -184,11 +191,11 @@ function toNumber(value: string) {
 
 export default function Home() {
   const [stage, setStage] = useState<Stage>("identity");
-  const [platform, setPlatform] = useState<Platform>("당근");
-  const [listingUrl, setListingUrl] = useState("");
-  const [brand, setBrand] = useState("");
+  const [selectedBrand, setSelectedBrand] = useState<(typeof manufacturers)[number]>("Good Smile Company");
+  const [customBrand, setCustomBrand] = useState("");
   const [productName, setProductName] = useState("");
   const [productNumber, setProductNumber] = useState("");
+  const [janCode, setJanCode] = useState("");
   const [releaseVersion, setReleaseVersion] = useState("");
   const [price, setPrice] = useState("");
   const [retailPrice, setRetailPrice] = useState("");
@@ -201,6 +208,8 @@ export default function Home() {
   const [filePreviews, setFilePreviews] = useState<Partial<Record<EvidenceKey, string>>>({});
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [toast, setToast] = useState("");
+
+  const brand = selectedBrand === "기타" ? customBrand.trim() : selectedBrand;
 
   const completedCount = Object.values(observations).filter((value) => value !== "missing").length;
   const assessedCount = Object.values(observations).filter((value) => value === "match" || value === "concern").length;
@@ -244,7 +253,7 @@ export default function Home() {
         ? { label: "추가 확인", tone: "caution", summary: "거래 전에 확인할 항목이 남았습니다." }
         : { label: "진품 가능성 높음", tone: "safe", summary: "확인한 범위에서 큰 차이가 없습니다." };
 
-  const canContinue = brand.trim().length > 1 && productName.trim().length > 1 && productNumber.trim().length > 1;
+  const canContinue = brand.length > 1 && productName.trim().length > 1 && productNumber.trim().length > 0;
 
   const showToast = (message: string) => {
     setToast(message);
@@ -263,11 +272,11 @@ export default function Home() {
   const sellerMessage = `안녕하세요. 구매 전 확인할 사진을 부탁드립니다.\n① 박스 정·후면 ② 제조사 로고와 라이선스 씰 ③ 바코드·QR ④ 받침대 저작권 각인 ⑤ 본체 정·후면 ⑥ 얼굴·도색 근접 ⑦ 블리스터와 구성품 전체 ⑧ 가능하면 구매내역\n같은 배경에서 오늘 날짜 메모가 보이게 촬영해 주세요.`;
 
   const loadDemo = () => {
-    setPlatform("당근");
-    setListingUrl("https://www.daangn.com/articles/figure-sample");
-    setBrand("Good Smile Company");
+    setSelectedBrand("Good Smile Company");
+    setCustomBrand("");
     setProductName("넨도로이드 고죠 사토루");
-    setProductNumber("No. 1528 / 샘플 SKU");
+    setProductNumber("1528");
+    setJanCode("");
     setReleaseVersion("초판 · 국내 유통판");
     setPrice("72,000");
     setRetailPrice("68,000");
@@ -358,10 +367,11 @@ export default function Home() {
       if (preview) URL.revokeObjectURL(preview);
     });
     setStage("identity");
-    setListingUrl("");
-    setBrand("");
+    setSelectedBrand("Good Smile Company");
+    setCustomBrand("");
     setProductName("");
     setProductNumber("");
+    setJanCode("");
     setReleaseVersion("");
     setPrice("");
     setRetailPrice("");
@@ -439,42 +449,37 @@ export default function Home() {
 
               <div className="form-layout">
                 <div className="form-stack">
-                  <Panel title="거래 정보" icon={Link2}>
-                    <div className="field-group">
-                      <label>거래 플랫폼</label>
-                      <div className="segmented" role="radiogroup" aria-label="거래 플랫폼">
-                        {platforms.map((item) => (
-                          <button
-                            key={item}
-                            className={platform === item ? "active" : ""}
-                            onClick={() => setPlatform(item)}
-                            role="radio"
-                            aria-checked={platform === item}
-                          >
-                            {item}
-                          </button>
-                        ))}
+                  <Panel title="제품 정보" icon={Fingerprint}>
+                    <div className="scope-banner">
+                      <div><BadgeCheck size={18} /><span><strong>현재 지원</strong><b>넨도로이드</b></span></div>
+                      <small>공식 제품 페이지가 확인되는 제품만 검증합니다.</small>
+                    </div>
+                    <div className="field-group"><label htmlFor="product-name">제품명</label><input id="product-name" value={productName} onChange={(event) => setProductName(event.target.value)} placeholder="예: 넨도로이드 고죠 사토루" /></div>
+                    <div className="field-row">
+                      <div className="field-group">
+                        <label htmlFor="brand">제조사</label>
+                        <select id="brand" value={selectedBrand} onChange={(event) => setSelectedBrand(event.target.value as (typeof manufacturers)[number])}>
+                          {manufacturers.map((manufacturer) => <option key={manufacturer} value={manufacturer}>{manufacturer}</option>)}
+                        </select>
+                      </div>
+                      <div className="field-group">
+                        <label htmlFor="product-number">넨도로이드 번호</label>
+                        <input id="product-number" value={productNumber} onChange={(event) => setProductNumber(event.target.value.replace(/[^0-9]/g, ""))} placeholder="예: 1528" inputMode="numeric" />
+                        <details className="field-help"><summary>번호는 어디에 있나요?</summary><p>박스 정면의 `Nendoroid` 로고 주변에 있는 No. 숫자입니다. 공식 제품 페이지에서는 제품명 바로 아래에 표시됩니다.</p></details>
                       </div>
                     </div>
-                    <div className="field-group">
-                      <label htmlFor="listing-url">거래글 링크 <span>선택</span></label>
-                      <div className="input-icon"><Link2 size={17} /><input id="listing-url" value={listingUrl} onChange={(event) => setListingUrl(event.target.value)} placeholder="https://" inputMode="url" /></div>
-                    </div>
-                  </Panel>
-
-                  <Panel title="제품 정보" icon={Fingerprint}>
+                    {selectedBrand === "기타" && <div className="field-group"><label htmlFor="custom-brand">제조사 직접 입력</label><input id="custom-brand" value={customBrand} onChange={(event) => setCustomBrand(event.target.value)} placeholder="박스에 적힌 제조사명" /></div>}
                     <div className="field-row">
-                      <div className="field-group"><label htmlFor="brand">제조사</label><input id="brand" value={brand} onChange={(event) => setBrand(event.target.value)} placeholder="Good Smile Company" /></div>
-                      <div className="field-group"><label htmlFor="product-number">제품번호·JAN</label><input id="product-number" value={productNumber} onChange={(event) => setProductNumber(event.target.value)} placeholder="No.1528 / 458..." /></div>
+                      <div className="field-group"><label htmlFor="jan-code">JAN 바코드 <span>선택</span></label><input id="jan-code" value={janCode} onChange={(event) => setJanCode(event.target.value.replace(/[^0-9]/g, ""))} placeholder="박스 뒤 13자리 숫자" inputMode="numeric" /></div>
+                      <div className="field-group"><label htmlFor="release-version">발매판·버전 <span>선택</span></label><input id="release-version" value={releaseVersion} onChange={(event) => setReleaseVersion(event.target.value)} placeholder="초판 · 재판 · 국내 유통판" /></div>
                     </div>
-                    <div className="field-group"><label htmlFor="product-name">제품명</label><input id="product-name" value={productName} onChange={(event) => setProductName(event.target.value)} placeholder="넨도로이드 고죠 사토루" /></div>
-                    <div className="field-group"><label htmlFor="release-version">발매판·버전 <span>선택</span></label><input id="release-version" value={releaseVersion} onChange={(event) => setReleaseVersion(event.target.value)} placeholder="초판 · 국내 유통판" /></div>
                   </Panel>
 
                   <Panel title="가품 정보" icon={SearchCheck}>
+                    {productName.trim() && <a className="official-search" href={`https://www.goodsmile.com/en/search?search_keyword=${encodeURIComponent(productName.trim())}`} target="_blank" rel="noreferrer"><span><ShieldCheck size={17} /><b>공식 제품 페이지 찾기</b></span><ExternalLink size={15} /></a>}
                     <div className="lookup-row">
                       <label>
-                        <span><ShieldCheck size={17} /> 제조사 공식</span>
+                        <span><ShieldCheck size={17} /> GSC 공식 자료</span>
                         <select value={officialStatus} onChange={(event) => setOfficialStatus(event.target.value as LookupStatus)} aria-label="제조사 공식 자료 조회 결과">
                           <option value="unknown">조회 전</option>
                           <option value="reported">가품 사례 있음</option>
@@ -512,12 +517,13 @@ export default function Home() {
                 </div>
 
                 <aside className="side-guide">
-                  <div className="guide-head"><Fingerprint size={19} /><strong>식별 기준</strong></div>
+                  <div className="guide-head"><Fingerprint size={19} /><strong>번호 찾는 법</strong></div>
                   <ol>
-                    <li><span>1</span><p><strong>제품번호</strong>캐릭터명보다 정확합니다.</p></li>
-                    <li><span>2</span><p><strong>발매판</strong>초판·재판의 포장이 다를 수 있습니다.</p></li>
-                    <li><span>3</span><p><strong>출처 순서</strong>제조사 자료를 먼저 봅니다.</p></li>
+                    <li><span>1</span><p><strong>No.</strong>박스 정면 로고 주변의 숫자</p></li>
+                    <li><span>2</span><p><strong>JAN</strong>박스 뒤나 밑면 바코드의 13자리</p></li>
+                    <li><span>3</span><p><strong>공식 페이지</strong>제품명 아래 번호와 제조사를 대조</p></li>
                   </ol>
+                  <div className="next-scope"><span>다음 지원</span><strong>경품 인형 택 조회</strong><p>택 번호를 공식 경품 목록과 연결할 수 있는 제조사부터 추가합니다.</p></div>
                 </aside>
               </div>
 
