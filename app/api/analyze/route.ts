@@ -338,8 +338,12 @@ export async function POST(request: Request) {
         generationConfig: {
           temperature: 0.1,
           maxOutputTokens: 2200,
-          responseMimeType: "application/json",
-          responseJsonSchema: schema,
+          responseFormat: {
+            text: {
+              mimeType: "application/json",
+              schema,
+            },
+          },
           thinkingConfig: { thinkingBudget: 512 },
         },
       }),
