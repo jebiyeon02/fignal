@@ -344,7 +344,7 @@ export async function POST(request: Request) {
 
   let upstream: Response;
   try {
-    const model = runtimeVariable("GEMINI_MODEL") || "gemini-3.5-flash";
+    const model = runtimeVariable("GEMINI_MODEL") || "gemini-3.1-flash-lite";
     upstream = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`, {
       method: "POST",
       headers: {
@@ -355,11 +355,10 @@ export async function POST(request: Request) {
         systemInstruction: { parts: [{ text: prompt }] },
         contents: [{ role: "user", parts: content }],
         generationConfig: {
-          maxOutputTokens: 2200,
-          thinkingConfig: { thinkingLevel: "LOW" },
+          maxOutputTokens: 1400,
         },
       }),
-      signal: AbortSignal.timeout(80_000),
+      signal: AbortSignal.timeout(60_000),
     });
   } catch {
     return jsonError("AI 분석 서버에 연결하지 못했습니다.", 502, "UPSTREAM_UNREACHABLE");
