@@ -1,21 +1,19 @@
 "use client";
 
+/* eslint-disable @next/next/no-img-element */
+
 import {
   ArrowLeft,
   ArrowRight,
-  BadgeCheck,
   Box,
   Camera,
   Check,
   CheckCircle2,
-  ChevronRight,
+  ChevronDown,
   CircleHelp,
   Clipboard,
   ExternalLink,
-  Factory,
   FileCheck2,
-  Fingerprint,
-  Globe2,
   Image as ImageIcon,
   Info,
   LoaderCircle,
@@ -24,150 +22,126 @@ import {
   RotateCcw,
   ScanBarcode,
   ScanFace,
-  SearchCheck,
+  Search,
   Share2,
   ShieldCheck,
   Stamp,
   Store,
-  Tag,
   TriangleAlert,
   X,
 } from "lucide-react";
-import { ChangeEvent, useMemo, useState } from "react";
+import { ChangeEvent, KeyboardEvent, useMemo, useState } from "react";
 
-type Stage = "identity" | "evidence" | "report";
-type LookupStatus = "unknown" | "reported" | "not_reported" | "not_found";
+type Stage = "search" | "photos" | "result";
 type Observation = "missing" | "unverified" | "match" | "concern";
-type EvidenceGroup = "패키지" | "본체" | "거래";
 type EvidenceKey =
   | "boxFront"
   | "boxBack"
-  | "logoSeal"
   | "barcode"
   | "baseMark"
-  | "figureFull"
   | "facePaint"
+  | "figureFull"
   | "parts"
   | "purchaseProof";
 
+type Product = {
+  id: string;
+  name: string;
+  englishName: string;
+  aliases: string[];
+  number: string;
+  maker: string;
+  release: string;
+  image: string;
+  officialUrl: string;
+  verified: boolean;
+};
+
 type EvidenceItem = {
   key: EvidenceKey;
-  group: EvidenceGroup;
   title: string;
   description: string;
   matchReason: string;
   concernReason: string;
   weight: number;
-  strength: "강함" | "중간" | "보조";
+  essential: boolean;
   icon: typeof Camera;
 };
 
-const evidenceItems: EvidenceItem[] = [
+const products: Product[] = [
   {
-    key: "boxFront",
-    group: "패키지",
-    title: "박스 정면",
-    description: "로고·상품명·패키지판",
-    matchReason: "제조사 로고와 상품명 배치가 기준 사진과 일치",
-    concernReason: "로고·상품명 배치가 기준 패키지와 다름",
-    weight: 6,
-    strength: "중간",
-    icon: Box,
+    id: "nendoroid-1528",
+    name: "넨도로이드 고죠 사토루",
+    englishName: "Nendoroid Satoru Gojo",
+    aliases: ["고죠", "고죠 사토루", "gojo", "satoru gojo", "주술회전"],
+    number: "1528",
+    maker: "Good Smile Company",
+    release: "2021.07 · 2026.09 재판",
+    image: "https://www.goodsmile.com/gsc-webrevo-sdk-storage-prd/product/image/8185/74e26f5bb9e39a1658de222ca95ab9bc.jpg",
+    officialUrl: "https://www.goodsmile.com/en/product/8185/Nendoroid%2BSatoru%2BGojo",
+    verified: true,
   },
   {
-    key: "boxBack",
-    group: "패키지",
-    title: "박스 후면",
-    description: "주의문구·언어·인쇄 배열",
-    matchReason: "주의문구와 인쇄 배열에서 오탈자나 위치 차이가 없음",
-    concernReason: "주의문구·언어·인쇄 배열에서 기준과 다른 부분이 있음",
-    weight: 8,
-    strength: "강함",
-    icon: PackageCheck,
+    id: "nendoroid-2367",
+    name: "넨도로이드 프리렌",
+    englishName: "Nendoroid Frieren",
+    aliases: ["프리렌", "frieren", "장송의 프리렌"],
+    number: "2367",
+    maker: "Good Smile Company",
+    release: "2024.07 · 2026.08 재판",
+    image: "https://www.goodsmile.com/gsc-webrevo-sdk-storage-prd/product/image/56111/751f1215c9303dc1cfbfb03e3d3b4dfb.jpg",
+    officialUrl: "https://www.goodsmile.com/en/product/56111/Nendoroid%2BFrieren",
+    verified: true,
   },
   {
-    key: "logoSeal",
-    group: "패키지",
-    title: "라이선스 씰",
-    description: "홀로그램·유통사 씰 위치",
-    matchReason: "씰 형태와 부착 위치가 해당 유통판 기준과 일치",
-    concernReason: "씰 형태나 위치가 해당 유통판 기준과 다름",
-    weight: 3,
-    strength: "보조",
-    icon: BadgeCheck,
+    id: "nendoroid-1935",
+    name: "넨도로이드 키타가와 마린",
+    englishName: "Nendoroid Marin Kitagawa",
+    aliases: ["마린", "키타가와", "marin", "marin kitagawa", "비스크돌"],
+    number: "1935",
+    maker: "Good Smile Company",
+    release: "2023.03 · 2026.02 재판",
+    image: "https://www.goodsmile.com/gsc-webrevo-sdk-storage-prd/product/image/10754/W3qiUkLJwp9GuECV5gx2vDzdyKmtAFNn.jpg",
+    officialUrl: "https://www.goodsmile.com/en/product/10754/Nendoroid%2BMarin%2BKitagawa",
+    verified: true,
   },
   {
-    key: "barcode",
-    group: "패키지",
-    title: "바코드·QR",
-    description: "JAN·제품번호·제품판",
-    matchReason: "JAN과 제품번호가 입력한 제품판 정보와 일치",
-    concernReason: "JAN 또는 제품번호가 입력한 제품판 정보와 맞지 않음",
-    weight: 8,
-    strength: "강함",
-    icon: ScanBarcode,
+    id: "nendoroid-1560",
+    name: "넨도로이드 덴지",
+    englishName: "Nendoroid Denji",
+    aliases: ["덴지", "denji", "체인소맨", "chainsaw man"],
+    number: "1560",
+    maker: "Good Smile Company",
+    release: "2021.10 · 2026.02 재판",
+    image: "https://www.goodsmile.com/gsc-webrevo-sdk-storage-prd/product/image/8409/wPBL9bTrCdun6pa50214ZkQXRcGvxhNz.jpg",
+    officialUrl: "https://www.goodsmile.com/en/product/8409/Nendoroid%20Denji",
+    verified: true,
   },
   {
-    key: "baseMark",
-    group: "본체",
-    title: "받침대 각인",
-    description: "저작권 문구·제조국·형태",
-    matchReason: "저작권 문구와 제조국 표기, 받침대 형태가 기준과 일치",
-    concernReason: "각인 문구·글꼴·받침대 형태에서 기준과 다른 부분이 있음",
-    weight: 12,
-    strength: "강함",
-    icon: Stamp,
+    id: "nendoroid-2004",
+    name: "넨도로이드 마키마",
+    englishName: "Nendoroid Makima",
+    aliases: ["마키마", "makima", "체인소맨", "chainsaw man"],
+    number: "2004",
+    maker: "Good Smile Company",
+    release: "2023.06 · 2026.02 재판",
+    image: "https://www.goodsmile.com/gsc-webrevo-sdk-storage-prd/product/image/11275/042d83372814f367457c49b876525213.jpg",
+    officialUrl: "https://www.goodsmile.com/en/product/11275/Nendoroid%2BMakima",
+    verified: true,
   },
   {
-    key: "figureFull",
-    group: "본체",
-    title: "본체 전체",
-    description: "조형 비율·부품 위치·누락",
-    matchReason: "조형 비율과 부품 위치가 공식 제품 사진과 일치",
-    concernReason: "조형 비율이나 부품 위치가 공식 제품 사진과 다름",
-    weight: 8,
-    strength: "중간",
-    icon: Camera,
-  },
-  {
-    key: "facePaint",
-    group: "본체",
-    title: "얼굴·도색",
-    description: "눈 프린팅·광택·도색 경계",
-    matchReason: "눈 프린팅과 광택, 도색 경계가 기준 사진과 일치",
-    concernReason: "눈 프린팅·광택·도색 경계에서 뚜렷한 차이가 있음",
-    weight: 12,
-    strength: "강함",
-    icon: ScanFace,
-  },
-  {
-    key: "parts",
-    group: "본체",
-    title: "블리스터·구성품",
-    description: "교체 파츠·내부 포장",
-    matchReason: "블리스터 구성과 교체 파츠가 공식 구성표와 일치",
-    concernReason: "내부 포장이나 교체 파츠 구성이 공식 구성표와 다름",
-    weight: 8,
-    strength: "중간",
-    icon: FileCheck2,
-  },
-  {
-    key: "purchaseProof",
-    group: "거래",
-    title: "공식 구매내역",
-    description: "판매처·주문일·상품명",
-    matchReason: "주문내역의 판매처와 상품명이 입력 제품과 일치",
-    concernReason: "구매내역의 판매처나 상품명이 입력 제품과 맞지 않음",
-    weight: 12,
-    strength: "강함",
-    icon: Store,
+    id: "nendoroid-1055",
+    name: "넨도로이드 빔 커비",
+    englishName: "Nendoroid Beam Kirby",
+    aliases: ["커비", "빔 커비", "kirby", "beam kirby"],
+    number: "1055",
+    maker: "Good Smile Company",
+    release: "2019.09 · 2025.06 재판",
+    image: "https://www.goodsmile.com/gsc-webrevo-sdk-storage-prd/product/image/5625/wWBNap4JA0KV9mETDQhyCgS6cPdft8sH.jpg",
+    officialUrl: "https://www.goodsmile.com/en/product/5625/Nendoroid%2BBeam%2BKirby",
+    verified: true,
   },
 ];
-
-const evidenceGroups: EvidenceGroup[] = ["패키지", "본체", "거래"];
-const initialObservations = Object.fromEntries(
-  evidenceItems.map((item) => [item.key, "missing"]),
-) as Record<EvidenceKey, Observation>;
 
 const manufacturers = [
   "Good Smile Company",
@@ -176,148 +150,197 @@ const manufacturers = [
   "Max Factory",
   "Phat! Company",
   "기타",
-] as const;
+];
 
-const sourceLabels: Record<LookupStatus, string> = {
-  unknown: "조회 전",
-  reported: "가품 사례 있음",
-  not_reported: "현재 보고 없음",
-  not_found: "제품 식별 실패",
-};
+const evidenceItems: EvidenceItem[] = [
+  {
+    key: "boxFront",
+    title: "박스 정면",
+    description: "로고와 제품번호가 보이게",
+    matchReason: "로고와 상품명, 패키지 구성이 공식 이미지와 비슷합니다.",
+    concernReason: "로고나 상품명 배치가 공식 패키지와 다릅니다.",
+    weight: 7,
+    essential: true,
+    icon: Box,
+  },
+  {
+    key: "boxBack",
+    title: "박스 뒷면",
+    description: "주의문구와 저작권 표기",
+    matchReason: "주의문구와 저작권 표기가 공식 패키지와 비슷합니다.",
+    concernReason: "문구나 인쇄 배열에서 공식 패키지와 다른 점이 있습니다.",
+    weight: 9,
+    essential: true,
+    icon: PackageCheck,
+  },
+  {
+    key: "barcode",
+    title: "바코드",
+    description: "JAN 숫자가 선명하게",
+    matchReason: "JAN과 제품번호가 선택한 제품 정보와 맞습니다.",
+    concernReason: "JAN 또는 제품번호가 선택한 제품과 맞지 않습니다.",
+    weight: 11,
+    essential: true,
+    icon: ScanBarcode,
+  },
+  {
+    key: "baseMark",
+    title: "받침대 각인",
+    description: "바닥의 저작권 문구",
+    matchReason: "받침대의 저작권 문구와 형태가 기준과 비슷합니다.",
+    concernReason: "각인 문구나 받침대 형태가 기준과 다릅니다.",
+    weight: 13,
+    essential: true,
+    icon: Stamp,
+  },
+  {
+    key: "facePaint",
+    title: "얼굴 근접",
+    description: "눈과 도색이 보이게",
+    matchReason: "눈 프린팅과 도색 경계가 공식 이미지와 비슷합니다.",
+    concernReason: "눈 프린팅이나 도색에서 뚜렷한 차이가 있습니다.",
+    weight: 13,
+    essential: true,
+    icon: ScanFace,
+  },
+  {
+    key: "figureFull",
+    title: "본체 전체",
+    description: "앞뒤 조형과 부품 위치",
+    matchReason: "본체 비율과 부품 위치가 공식 이미지와 비슷합니다.",
+    concernReason: "조형 비율이나 부품 위치가 공식 이미지와 다릅니다.",
+    weight: 8,
+    essential: false,
+    icon: Camera,
+  },
+  {
+    key: "parts",
+    title: "구성품",
+    description: "블리스터와 교체 파츠",
+    matchReason: "블리스터와 교체 파츠 구성이 공식 구성과 맞습니다.",
+    concernReason: "내부 포장이나 교체 파츠 구성이 다릅니다.",
+    weight: 8,
+    essential: false,
+    icon: FileCheck2,
+  },
+  {
+    key: "purchaseProof",
+    title: "구매내역",
+    description: "판매처와 상품명",
+    matchReason: "공식 판매처와 상품명이 선택한 제품과 맞습니다.",
+    concernReason: "판매처나 상품명이 선택한 제품과 맞지 않습니다.",
+    weight: 12,
+    essential: false,
+    icon: Store,
+  },
+];
 
-function toNumber(value: string) {
-  return Number(value.replace(/[^0-9]/g, "")) || 0;
-}
+const initialObservations = Object.fromEntries(
+  evidenceItems.map((item) => [item.key, "missing"]),
+) as Record<EvidenceKey, Observation>;
 
 export default function Home() {
-  const [stage, setStage] = useState<Stage>("identity");
-  const [selectedBrand, setSelectedBrand] = useState<(typeof manufacturers)[number]>("Good Smile Company");
-  const [customBrand, setCustomBrand] = useState("");
-  const [productName, setProductName] = useState("");
-  const [productNumber, setProductNumber] = useState("");
-  const [janCode, setJanCode] = useState("");
-  const [releaseVersion, setReleaseVersion] = useState("");
-  const [price, setPrice] = useState("");
-  const [retailPrice, setRetailPrice] = useState("");
-  const [officialStatus, setOfficialStatus] = useState<LookupStatus>("unknown");
-  const [communityStatus, setCommunityStatus] = useState<LookupStatus>("unknown");
-  const [sellerProof, setSellerProof] = useState("none");
-  const [origin, setOrigin] = useState("unknown");
+  const [stage, setStage] = useState<Stage>("search");
+  const [query, setQuery] = useState("");
+  const [searchOpen, setSearchOpen] = useState(false);
+  const [activeSuggestion, setActiveSuggestion] = useState(0);
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+  const [manualOpen, setManualOpen] = useState(false);
+  const [manualName, setManualName] = useState("");
+  const [manualMaker, setManualMaker] = useState("Good Smile Company");
+  const [manualMakerOther, setManualMakerOther] = useState("");
+  const [manualNumber, setManualNumber] = useState("");
   const [observations, setObservations] = useState(initialObservations);
   const [fileNames, setFileNames] = useState<Partial<Record<EvidenceKey, string>>>({});
   const [filePreviews, setFilePreviews] = useState<Partial<Record<EvidenceKey, string>>>({});
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [toast, setToast] = useState("");
 
-  const brand = selectedBrand === "기타" ? customBrand.trim() : selectedBrand;
+  const filteredProducts = useMemo(() => {
+    const keyword = query.trim().toLowerCase();
+    if (!keyword) return [];
+    return products.filter((product) => {
+      const searchable = [product.name, product.englishName, product.number, ...product.aliases]
+        .join(" ")
+        .toLowerCase();
+      return searchable.includes(keyword);
+    }).slice(0, 5);
+  }, [query]);
+
+  const manualMakerValue = manualMaker === "기타" ? manualMakerOther.trim() : manualMaker;
+  const manualReady = manualName.trim().length > 1 && manualNumber.trim().length > 0 && manualMakerValue.length > 1;
+  const currentProduct: Product | null = selectedProduct ?? (manualReady ? {
+    id: "manual",
+    name: manualName.trim(),
+    englishName: manualName.trim(),
+    aliases: [],
+    number: manualNumber.trim(),
+    maker: manualMakerValue,
+    release: "직접 입력",
+    image: "",
+    officialUrl: "",
+    verified: false,
+  } : null);
 
   const completedCount = Object.values(observations).filter((value) => value !== "missing").length;
   const assessedCount = Object.values(observations).filter((value) => value === "match" || value === "concern").length;
+  const essentialCompleted = evidenceItems.filter((item) => item.essential && observations[item.key] !== "missing").length;
   const matchedItems = evidenceItems.filter((item) => observations[item.key] === "match");
   const concernItems = evidenceItems.filter((item) => observations[item.key] === "concern");
-  const unverifiedItems = evidenceItems.filter((item) => observations[item.key] === "unverified");
-  const missingItems = evidenceItems.filter((item) => observations[item.key] === "missing");
+  const pendingItems = evidenceItems.filter((item) => observations[item.key] === "unverified" || observations[item.key] === "missing");
+  const riskPoints = concernItems.reduce((sum, item) => sum + item.weight, 0);
+  const confidence = Math.min(96, (currentProduct?.verified ? 18 : 8) + completedCount * 8 + assessedCount * 4);
 
-  const priceRatio = useMemo(() => {
-    const asking = toNumber(price);
-    const reference = toNumber(retailPrice);
-    return asking > 0 && reference > 0 ? asking / reference : null;
-  }, [price, retailPrice]);
-
-  const confidence = useMemo(() => {
-    const assessedWeight = evidenceItems.reduce((sum, item) => {
-      const observation = observations[item.key];
-      if (observation === "match" || observation === "concern") return sum + item.weight;
-      if (observation === "unverified") return sum + 1;
-      return sum;
-    }, 0);
-    const sourceWeight = sellerProof === "receipt" ? 9 : sellerProof === "story" ? 3 : 0;
-    const lookupWeight = officialStatus !== "unknown" ? 4 : 0;
-    const communityWeight = communityStatus !== "unknown" ? 3 : 0;
-    return Math.min(96, 12 + assessedWeight + sourceWeight + lookupWeight + communityWeight);
-  }, [observations, sellerProof, officialStatus, communityStatus]);
-
-  const riskPoints = useMemo(() => {
-    const evidenceRisk = concernItems.reduce((sum, item) => sum + item.weight, 0);
-    const priceRisk = priceRatio !== null && priceRatio < 0.55 ? 18 : priceRatio !== null && priceRatio < 0.75 ? 9 : 0;
-    const provenanceRisk = sellerProof === "none" ? 5 : 0;
-    const counterfeitContext = (officialStatus === "reported" ? 3 : 0) + (communityStatus === "reported" ? 3 : 0);
-    return evidenceRisk + priceRisk + provenanceRisk + counterfeitContext;
-  }, [concernItems, priceRatio, sellerProof, officialStatus, communityStatus]);
-
-  const result = completedCount < 5 || assessedCount < 4
-    ? { label: "판단 보류", tone: "neutral", summary: "사진이 더 필요합니다." }
-    : riskPoints >= 22
-      ? { label: "가품 의심", tone: "danger", summary: "기준과 다른 증거가 겹칩니다." }
-      : riskPoints >= 10
-        ? { label: "추가 확인", tone: "caution", summary: "거래 전에 확인할 항목이 남았습니다." }
-        : { label: "진품 가능성 높음", tone: "safe", summary: "확인한 범위에서 큰 차이가 없습니다." };
-
-  const canContinue = brand.length > 1 && productName.trim().length > 1 && productNumber.trim().length > 0;
+  const result = essentialCompleted < 4 || assessedCount < 3
+    ? { label: "판단 보류", tone: "neutral", summary: "핵심 사진을 조금 더 확인해야 합니다." }
+    : riskPoints >= 18
+      ? { label: "가품 의심", tone: "danger", summary: "공식 제품과 다른 점이 여러 곳에서 보입니다." }
+      : riskPoints >= 8
+        ? { label: "추가 확인", tone: "caution", summary: "거래 전에 다시 볼 항목이 있습니다." }
+        : { label: "진품 가능성 높음", tone: "safe", summary: "확인한 사진에서는 큰 차이가 보이지 않습니다." };
 
   const showToast = (message: string) => {
     setToast(message);
-    window.setTimeout(() => setToast(""), 2300);
+    window.setTimeout(() => setToast(""), 2200);
   };
 
-  const copyText = async (text: string, message: string) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      showToast(message);
-    } catch {
-      showToast("복사하지 못했습니다.");
+  const selectProduct = (product: Product) => {
+    setSelectedProduct(product);
+    setQuery(product.name);
+    setSearchOpen(false);
+    setManualOpen(false);
+    setActiveSuggestion(0);
+  };
+
+  const changeQuery = (value: string) => {
+    setQuery(value);
+    if (selectedProduct && value !== selectedProduct.name) setSelectedProduct(null);
+    setSearchOpen(true);
+    setActiveSuggestion(0);
+  };
+
+  const handleSearchKeys = (event: KeyboardEvent<HTMLInputElement>) => {
+    if (!searchOpen || filteredProducts.length === 0) return;
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      setActiveSuggestion((current) => (current + 1) % filteredProducts.length);
     }
-  };
-
-  const sellerMessage = `안녕하세요. 구매 전 확인할 사진을 부탁드립니다.\n① 박스 정·후면 ② 제조사 로고와 라이선스 씰 ③ 바코드·QR ④ 받침대 저작권 각인 ⑤ 본체 정·후면 ⑥ 얼굴·도색 근접 ⑦ 블리스터와 구성품 전체 ⑧ 가능하면 구매내역\n같은 배경에서 오늘 날짜 메모가 보이게 촬영해 주세요.`;
-
-  const loadDemo = () => {
-    setSelectedBrand("Good Smile Company");
-    setCustomBrand("");
-    setProductName("넨도로이드 고죠 사토루");
-    setProductNumber("1528");
-    setJanCode("");
-    setReleaseVersion("초판 · 국내 유통판");
-    setPrice("72,000");
-    setRetailPrice("68,000");
-    setOfficialStatus("reported");
-    setCommunityStatus("reported");
-    setSellerProof("receipt");
-    setOrigin("china_oem");
-    showToast("예시를 채웠습니다.");
-  };
-
-  const loadDemoEvidence = () => {
-    setObservations({
-      boxFront: "match",
-      boxBack: "match",
-      logoSeal: "match",
-      barcode: "match",
-      baseMark: "match",
-      figureFull: "match",
-      facePaint: "match",
-      parts: "unverified",
-      purchaseProof: "match",
-    });
-    setFileNames({
-      boxFront: "box-front.jpg",
-      boxBack: "box-back.jpg",
-      logoSeal: "license-seal.jpg",
-      barcode: "jan-barcode.jpg",
-      baseMark: "base-copyright.jpg",
-      figureFull: "figure-full.jpg",
-      facePaint: "face-closeup.jpg",
-      parts: "blister.jpg",
-      purchaseProof: "official-order.png",
-    });
-    showToast("예시 증거를 채웠습니다.");
+    if (event.key === "ArrowUp") {
+      event.preventDefault();
+      setActiveSuggestion((current) => (current - 1 + filteredProducts.length) % filteredProducts.length);
+    }
+    if (event.key === "Enter") {
+      event.preventDefault();
+      selectProduct(filteredProducts[activeSuggestion]);
+    }
+    if (event.key === "Escape") setSearchOpen(false);
   };
 
   const handleFile = (key: EvidenceKey, event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-    const previousPreview = filePreviews[key];
-    if (previousPreview) URL.revokeObjectURL(previousPreview);
+    const oldPreview = filePreviews[key];
+    if (oldPreview) URL.revokeObjectURL(oldPreview);
     setFileNames((current) => ({ ...current, [key]: file.name }));
     setFilePreviews((current) => ({ ...current, [key]: URL.createObjectURL(file) }));
     if (observations[key] === "missing") {
@@ -340,17 +363,29 @@ export default function Home() {
     });
   };
 
+  const sellerMessage = `안녕하세요. 구매 전에 제품 확인용 사진을 부탁드립니다.\n① 박스 정면 ② 박스 뒷면 ③ 바코드 ④ 받침대 밑면 각인 ⑤ 얼굴 근접\n같은 배경에서 오늘 날짜 메모가 보이게 촬영해 주세요.`;
+
+  const copySellerMessage = async () => {
+    try {
+      await navigator.clipboard.writeText(sellerMessage);
+      showToast("사진 요청 문구를 복사했습니다.");
+    } catch {
+      showToast("복사하지 못했습니다.");
+    }
+  };
+
   const analyze = () => {
     setIsAnalyzing(true);
     window.setTimeout(() => {
       setIsAnalyzing(false);
-      setStage("report");
+      setStage("result");
       window.scrollTo({ top: 0, behavior: "smooth" });
-    }, 700);
+    }, 650);
   };
 
-  const shareReport = async () => {
-    const text = `[FIGSIGNAL] ${productName}\n${result.label} · 자료 충족도 ${confidence}%\n${productNumber} · 증거 ${completedCount}/9\n사진과 입력 정보로 만든 참고 결과이며 정품 보증서가 아닙니다.`;
+  const shareResult = async () => {
+    if (!currentProduct) return;
+    const text = `[FIGSIGNAL] ${currentProduct.name}\n${result.label} · 자료 충족도 ${confidence}%\nNo.${currentProduct.number} · 확인한 사진 ${completedCount}장`;
     if (navigator.share) {
       try {
         await navigator.share({ title: "FIGSIGNAL 판정 결과", text });
@@ -359,26 +394,26 @@ export default function Home() {
         return;
       }
     }
-    await copyText(text, "결과를 복사했습니다.");
+    try {
+      await navigator.clipboard.writeText(text);
+      showToast("결과를 복사했습니다.");
+    } catch {
+      showToast("복사하지 못했습니다.");
+    }
   };
 
   const resetAll = () => {
     Object.values(filePreviews).forEach((preview) => {
       if (preview) URL.revokeObjectURL(preview);
     });
-    setStage("identity");
-    setSelectedBrand("Good Smile Company");
-    setCustomBrand("");
-    setProductName("");
-    setProductNumber("");
-    setJanCode("");
-    setReleaseVersion("");
-    setPrice("");
-    setRetailPrice("");
-    setOfficialStatus("unknown");
-    setCommunityStatus("unknown");
-    setSellerProof("none");
-    setOrigin("unknown");
+    setStage("search");
+    setQuery("");
+    setSelectedProduct(null);
+    setManualOpen(false);
+    setManualName("");
+    setManualMaker("Good Smile Company");
+    setManualMakerOther("");
+    setManualNumber("");
     setObservations(initialObservations);
     setFileNames({});
     setFilePreviews({});
@@ -386,376 +421,213 @@ export default function Home() {
   };
 
   return (
-    <main className="app-shell">
-      <header className="app-header">
-        <button className="wordmark" onClick={resetAll} aria-label="FIGSIGNAL 새 검증">
-          <span className="wordmark-icon"><ShieldCheck size={18} strokeWidth={2.4} /></span>
-          <span>FIGSIGNAL</span>
-        </button>
-        <div className="header-product">
-          {productName ? <><span>{brand}</span><strong>{productName}</strong></> : <span>피규어 검증</span>}
+    <main className="site">
+      <header className="top-header">
+        <div className="top-inner">
+          <button className="logo" onClick={resetAll}>FIGSIGNAL</button>
+          <div className="top-nav"><span>넨도로이드 검증</span><button onClick={resetAll}><Plus size={16} /> 새 검증</button></div>
         </div>
-        <button className="new-record" onClick={resetAll}><Plus size={16} /> 새 검증</button>
       </header>
 
-      <div className="app-body">
-        <aside className="app-sidebar">
-          <nav aria-label="검증 단계">
-            <StageButton
-              active={stage === "identity"}
-              complete={stage !== "identity"}
-              number="01"
-              title="제품 확인"
-              onClick={() => setStage("identity")}
-            />
-            <StageButton
-              active={stage === "evidence"}
-              complete={stage === "report"}
-              disabled={!canContinue}
-              number="02"
-              title="증거 검토"
-              onClick={() => setStage("evidence")}
-            />
-            <StageButton
-              active={stage === "report"}
-              complete={false}
-              disabled={completedCount === 0}
-              number="03"
-              title="판정 결과"
-              onClick={() => setStage("report")}
-            />
-          </nav>
+      <StepBar stage={stage} />
 
-          <div className="record-summary">
-            <span>현재 기록</span>
-            <dl>
-              <div><dt>제품</dt><dd>{productNumber || "—"}</dd></div>
-              <div><dt>증거</dt><dd>{completedCount}/9</dd></div>
-              <div><dt>검토</dt><dd>{assessedCount}개</dd></div>
-            </dl>
+      {stage === "search" && (
+        <section className="search-page page-enter">
+          <div className="intro">
+            <span>FIGURE CHECK</span>
+            <h1>피규어 이름을<br />검색해보세요</h1>
+            <p>제품을 고르면 제조사와 번호를 자동으로 찾습니다.</p>
           </div>
-        </aside>
 
-        <section className="app-content">
-          <MobileProgress stage={stage} />
-
-          {stage === "identity" && (
-            <div className="page enter">
-              <PageHeader
-                eyebrow="새 검증"
-                title="어떤 제품인가요?"
-                action={<button className="text-button" onClick={loadDemo}>예시 채우기</button>}
+          <div className="product-search">
+            <div className={`search-input ${searchOpen ? "focused" : ""}`}>
+              <Search size={22} />
+              <input
+                value={query}
+                onChange={(event) => changeQuery(event.target.value)}
+                onFocus={() => setSearchOpen(true)}
+                onBlur={() => window.setTimeout(() => setSearchOpen(false), 120)}
+                onKeyDown={handleSearchKeys}
+                placeholder="고죠, 프리렌, 덴지..."
+                role="combobox"
+                aria-expanded={searchOpen && query.trim().length > 0}
+                aria-controls="product-suggestions"
+                aria-autocomplete="list"
               />
+              {query && <button className="clear-query" onClick={() => changeQuery("")} aria-label="검색어 지우기"><X size={18} /></button>}
+            </div>
 
-              <div className="form-layout">
-                <div className="form-stack">
-                  <Panel title="제품 정보" icon={Fingerprint}>
-                    <div className="scope-banner">
-                      <div><BadgeCheck size={18} /><span><strong>현재 지원</strong><b>넨도로이드</b></span></div>
-                      <small>공식 제품 페이지가 확인되는 제품만 검증합니다.</small>
-                    </div>
-                    <div className="field-group"><label htmlFor="product-name">제품명</label><input id="product-name" value={productName} onChange={(event) => setProductName(event.target.value)} placeholder="예: 넨도로이드 고죠 사토루" /></div>
-                    <div className="field-row">
-                      <div className="field-group">
-                        <label htmlFor="brand">제조사</label>
-                        <select id="brand" value={selectedBrand} onChange={(event) => setSelectedBrand(event.target.value as (typeof manufacturers)[number])}>
-                          {manufacturers.map((manufacturer) => <option key={manufacturer} value={manufacturer}>{manufacturer}</option>)}
-                        </select>
-                      </div>
-                      <div className="field-group">
-                        <label htmlFor="product-number">넨도로이드 번호</label>
-                        <input id="product-number" value={productNumber} onChange={(event) => setProductNumber(event.target.value.replace(/[^0-9]/g, ""))} placeholder="예: 1528" inputMode="numeric" />
-                        <details className="field-help"><summary>번호는 어디에 있나요?</summary><p>박스 정면의 `Nendoroid` 로고 주변에 있는 No. 숫자입니다. 공식 제품 페이지에서는 제품명 바로 아래에 표시됩니다.</p></details>
-                      </div>
-                    </div>
-                    {selectedBrand === "기타" && <div className="field-group"><label htmlFor="custom-brand">제조사 직접 입력</label><input id="custom-brand" value={customBrand} onChange={(event) => setCustomBrand(event.target.value)} placeholder="박스에 적힌 제조사명" /></div>}
-                    <div className="field-row">
-                      <div className="field-group"><label htmlFor="jan-code">JAN 바코드 <span>선택</span></label><input id="jan-code" value={janCode} onChange={(event) => setJanCode(event.target.value.replace(/[^0-9]/g, ""))} placeholder="박스 뒤 13자리 숫자" inputMode="numeric" /></div>
-                      <div className="field-group"><label htmlFor="release-version">발매판·버전 <span>선택</span></label><input id="release-version" value={releaseVersion} onChange={(event) => setReleaseVersion(event.target.value)} placeholder="초판 · 재판 · 국내 유통판" /></div>
-                    </div>
-                  </Panel>
-
-                  <Panel title="가품 정보" icon={SearchCheck}>
-                    {productName.trim() && <a className="official-search" href={`https://www.goodsmile.com/en/search?search_keyword=${encodeURIComponent(productName.trim())}`} target="_blank" rel="noreferrer"><span><ShieldCheck size={17} /><b>공식 제품 페이지 찾기</b></span><ExternalLink size={15} /></a>}
-                    <div className="lookup-row">
-                      <label>
-                        <span><ShieldCheck size={17} /> GSC 공식 자료</span>
-                        <select value={officialStatus} onChange={(event) => setOfficialStatus(event.target.value as LookupStatus)} aria-label="제조사 공식 자료 조회 결과">
-                          <option value="unknown">조회 전</option>
-                          <option value="reported">가품 사례 있음</option>
-                          <option value="not_reported">현재 보고 없음</option>
-                          <option value="not_found">제품 식별 실패</option>
-                        </select>
-                      </label>
-                      <label>
-                        <span><Globe2 size={17} /> MFC·커뮤니티</span>
-                        <select value={communityStatus} onChange={(event) => setCommunityStatus(event.target.value as LookupStatus)} aria-label="MFC와 커뮤니티 조회 결과">
-                          <option value="unknown">조회 전</option>
-                          <option value="reported">가품 사례 있음</option>
-                          <option value="not_reported">현재 보고 없음</option>
-                          <option value="not_found">제품 식별 실패</option>
-                        </select>
-                      </label>
-                    </div>
-                    {(officialStatus === "not_reported" || communityStatus === "not_reported") && (
-                      <p className="inline-note"><Info size={14} /> 보고가 없다고 가품이 없는 것은 아닙니다.</p>
-                    )}
-                  </Panel>
-
-                  <Panel title="가격과 출처" icon={Store}>
-                    <div className="field-row">
-                      <div className="field-group"><label htmlFor="retail-price">기준가</label><div className="price-input"><input id="retail-price" value={retailPrice} onChange={(event) => setRetailPrice(event.target.value)} placeholder="68,000" inputMode="numeric" /><span>원</span></div></div>
-                      <div className="field-group"><label htmlFor="price">거래가</label><div className="price-input"><input id="price" value={price} onChange={(event) => setPrice(event.target.value)} placeholder="72,000" inputMode="numeric" /><span>원</span></div></div>
-                    </div>
-                    <div className="field-row">
-                      <div className="field-group"><label htmlFor="seller-proof">판매자 출처</label><select id="seller-proof" value={sellerProof} onChange={(event) => setSellerProof(event.target.value)}><option value="none">정보 없음</option><option value="story">구매처 설명</option><option value="receipt">공식 주문내역</option></select></div>
-                      <div className="field-group"><label htmlFor="origin">생산 정보</label><select id="origin" value={origin} onChange={(event) => setOrigin(event.target.value)}><option value="unknown">알 수 없음</option><option value="china_oem">중국 OEM</option><option value="japan">일본 생산</option><option value="other">기타 국가</option></select></div>
-                    </div>
-                    {priceRatio !== null && <PriceSignal ratio={priceRatio} />}
-                    {origin === "china_oem" && <p className="inline-note"><Factory size={14} /> 중국 OEM은 단독 위험 신호로 보지 않습니다.</p>}
-                  </Panel>
-                </div>
-
-                <aside className="side-guide">
-                  <div className="guide-head"><Fingerprint size={19} /><strong>번호 찾는 법</strong></div>
-                  <ol>
-                    <li><span>1</span><p><strong>No.</strong>박스 정면 로고 주변의 숫자</p></li>
-                    <li><span>2</span><p><strong>JAN</strong>박스 뒤나 밑면 바코드의 13자리</p></li>
-                    <li><span>3</span><p><strong>공식 페이지</strong>제품명 아래 번호와 제조사를 대조</p></li>
-                  </ol>
-                  <div className="next-scope"><span>다음 지원</span><strong>경품 인형 택 조회</strong><p>택 번호를 공식 경품 목록과 연결할 수 있는 제조사부터 추가합니다.</p></div>
-                </aside>
+            {searchOpen && query.trim().length > 0 && !selectedProduct && (
+              <div className="suggestions" id="product-suggestions" role="listbox">
+                {filteredProducts.length > 0 ? filteredProducts.map((product, index) => (
+                  <button
+                    key={product.id}
+                    className={activeSuggestion === index ? "active" : ""}
+                    onMouseDown={(event) => event.preventDefault()}
+                    onClick={() => selectProduct(product)}
+                    onMouseEnter={() => setActiveSuggestion(index)}
+                    role="option"
+                    aria-selected={activeSuggestion === index}
+                  >
+                    <ProductImage product={product} size="small" />
+                    <span><strong>{product.name}</strong><small>{product.englishName}</small></span>
+                    <em>No.{product.number}</em>
+                  </button>
+                )) : (
+                  <div className="no-result"><strong>검색 결과가 없어요</strong><button onMouseDown={(event) => event.preventDefault()} onClick={() => { setManualOpen(true); setSearchOpen(false); }}>직접 입력하기</button></div>
+                )}
               </div>
+            )}
+          </div>
 
-              <div className="page-actions end"><button className="primary-button" disabled={!canContinue} onClick={() => setStage("evidence")}>증거 검토 <ArrowRight size={17} /></button></div>
+          {selectedProduct && (
+            <article className="selected-product page-enter">
+              <div className="selected-image"><ProductImage product={selectedProduct} size="large" /></div>
+              <div className="selected-info">
+                <span className="verified-label"><CheckCircle2 size={15} /> 공식 제품 확인</span>
+                <h2>{selectedProduct.name}</h2>
+                <p>{selectedProduct.englishName}</p>
+                <dl>
+                  <div><dt>제품번호</dt><dd>No.{selectedProduct.number}</dd></div>
+                  <div><dt>제조사</dt><dd>{selectedProduct.maker}</dd></div>
+                  <div><dt>발매</dt><dd>{selectedProduct.release}</dd></div>
+                </dl>
+                <div className="selected-links"><a href={selectedProduct.officialUrl} target="_blank" rel="noreferrer">공식 페이지 <ExternalLink size={14} /></a><button onClick={() => { setSelectedProduct(null); setQuery(""); }}>다른 제품 찾기</button></div>
+              </div>
+            </article>
+          )}
+
+          {!selectedProduct && (
+            <div className="manual-area">
+              <button className="manual-toggle" onClick={() => setManualOpen((current) => !current)}><span>검색 결과에 제품이 없나요?</span><ChevronDown className={manualOpen ? "open" : ""} size={18} /></button>
+              {manualOpen && (
+                <div className="manual-form page-enter">
+                  <div className="form-field"><label htmlFor="manual-name">제품명</label><input id="manual-name" value={manualName} onChange={(event) => setManualName(event.target.value)} placeholder="박스에 적힌 제품명" /></div>
+                  <div className="form-row">
+                    <div className="form-field"><label htmlFor="manual-maker">제조사</label><select id="manual-maker" value={manualMaker} onChange={(event) => setManualMaker(event.target.value)}>{manufacturers.map((maker) => <option key={maker}>{maker}</option>)}</select></div>
+                    <div className="form-field"><label htmlFor="manual-number">넨도로이드 번호</label><input id="manual-number" value={manualNumber} onChange={(event) => setManualNumber(event.target.value.replace(/[^0-9]/g, ""))} placeholder="예: 1528" inputMode="numeric" /></div>
+                  </div>
+                  {manualMaker === "기타" && <div className="form-field"><label htmlFor="manual-maker-other">제조사명</label><input id="manual-maker-other" value={manualMakerOther} onChange={(event) => setManualMakerOther(event.target.value)} placeholder="제조사 직접 입력" /></div>}
+                </div>
+              )}
             </div>
           )}
 
-          {stage === "evidence" && (
-            <div className="page enter">
-              <PageHeader
-                eyebrow="증거 검토"
-                title="사진을 기준 자료와 대조하세요"
-                meta={`${assessedCount}개 검토 · ${completedCount}/9 수집`}
-                action={<button className="text-button" onClick={loadDemoEvidence}>예시 채우기</button>}
-              />
+          <div className="photo-answer">
+            <Camera size={21} />
+            <div><strong>사진은 제품을 고를 때 필요 없어요</strong><p>실물 판정 단계에서 핵심 사진만 받습니다.</p></div>
+          </div>
 
-              <div className="request-bar">
-                <div><Camera size={18} /><span><strong>판매자 사진이 부족한가요?</strong><small>필요한 촬영 목록을 바로 보냅니다.</small></span></div>
-                <button onClick={() => copyText(sellerMessage, "요청 문구를 복사했습니다.")}><Clipboard size={14} /> 문구 복사</button>
-              </div>
-
-              <div className="evidence-table">
-                {evidenceGroups.map((group) => (
-                  <section className="evidence-group" key={group}>
-                    <div className="group-label"><span>{group}</span><small>{evidenceItems.filter((item) => item.group === group).length}</small></div>
-                    {evidenceItems.filter((item) => item.group === group).map((item) => {
-                      const Icon = item.icon;
-                      const observation = observations[item.key];
-                      return (
-                        <article className={`evidence-row ${observation}`} key={item.key}>
-                          <div className="evidence-file">
-                            <label className="file-drop">
-                              <input type="file" accept="image/*" onChange={(event) => handleFile(item.key, event)} />
-                              {filePreviews[item.key] ? (
-                                // eslint-disable-next-line @next/next/no-img-element
-                                <img src={filePreviews[item.key]} alt={`${item.title} 업로드 사진`} />
-                              ) : (
-                                <><Icon size={21} /><span>{fileNames[item.key] ? "사진 등록됨" : "사진 추가"}</span></>
-                              )}
-                            </label>
-                          </div>
-                          <div className="evidence-info">
-                            <div><strong>{item.title}</strong><span className={`weight ${item.strength}`}>{item.strength}</span></div>
-                            <p>{item.description}</p>
-                            {fileNames[item.key] && <small>{fileNames[item.key]}</small>}
-                          </div>
-                          <div className="observation-control" aria-label={`${item.title} 비교 결과`}>
-                            <button className={observation === "unverified" ? "active" : ""} onClick={() => setObservations((current) => ({ ...current, [item.key]: "unverified" }))}>미확인</button>
-                            <button className={observation === "match" ? "active match" : ""} onClick={() => setObservations((current) => ({ ...current, [item.key]: "match" }))}><Check size={13} /> 일치</button>
-                            <button className={observation === "concern" ? "active concern" : ""} onClick={() => setObservations((current) => ({ ...current, [item.key]: "concern" }))}><TriangleAlert size={13} /> 차이</button>
-                          </div>
-                          {observation !== "missing" && <button className="clear-evidence" onClick={() => removeEvidence(item.key)} aria-label={`${item.title} 초기화`}><X size={15} /></button>}
-                        </article>
-                      );
-                    })}
-                  </section>
-                ))}
-              </div>
-
-              <div className="seal-note"><BadgeCheck size={17} /><span><strong>씰은 보조 증거입니다.</strong> 복제하거나 옮겨 붙일 수 있어 다른 항목과 함께 봅니다.</span></div>
-
-              <div className="page-actions"><button className="secondary-button" onClick={() => setStage("identity")}><ArrowLeft size={17} /> 제품 정보</button><button className="primary-button" onClick={analyze} disabled={isAnalyzing || completedCount === 0}>{isAnalyzing ? <><LoaderCircle className="spin" size={17} /> 판정 중</> : <>결과 보기 <ArrowRight size={17} /></>}</button></div>
-            </div>
-          )}
-
-          {stage === "report" && (
-            <div className="page report-page enter">
-              <PageHeader eyebrow="판정 결과" title={productName || "이름 없는 제품"} meta={`${brand || "제조사 미입력"} · ${productNumber || "제품번호 미입력"}`} />
-
-              <section className={`verdict ${result.tone}`}>
-                <div className="verdict-status">
-                  <span className="verdict-label">판정</span>
-                  <h1>{result.label}</h1>
-                  <p>{result.summary}</p>
-                </div>
-                <div className="verdict-metrics">
-                  <div><strong>{confidence}%</strong><span>자료 충족도</span></div>
-                  <div><strong>{assessedCount}</strong><span>비교 완료</span></div>
-                  <div><strong>{concernItems.length}</strong><span>차이 발견</span></div>
-                </div>
-              </section>
-
-              <div className="report-layout">
-                <div className="report-main-column">
-                  <section className="report-panel evidence-report">
-                    <div className="report-panel-head">
-                      <div><SearchCheck size={19} /><h2>판정 근거</h2></div>
-                      <span>강한 증거 우선</span>
-                    </div>
-
-                    {matchedItems.length > 0 && (
-                      <EvidenceResultGroup
-                        title="진품 쪽 근거"
-                        tone="positive"
-                        items={matchedItems}
-                        filePreviews={filePreviews}
-                        observations={observations}
-                      />
-                    )}
-                    {concernItems.length > 0 && (
-                      <EvidenceResultGroup
-                        title="가품 의심 근거"
-                        tone="negative"
-                        items={concernItems}
-                        filePreviews={filePreviews}
-                        observations={observations}
-                      />
-                    )}
-                    {(unverifiedItems.length > 0 || missingItems.length > 0) && (
-                      <div className="pending-evidence">
-                        <span>확인 못한 항목</span>
-                        <p>{[...unverifiedItems, ...missingItems].map((item) => item.title).join(" · ")}</p>
-                      </div>
-                    )}
-                  </section>
-
-                  <section className="report-panel context-report">
-                    <div className="report-panel-head"><div><Tag size={19} /><h2>거래 정황</h2></div></div>
-                    <ContextRow
-                      tone={priceRatio !== null && priceRatio < 0.75 ? "negative" : priceRatio === null ? "neutral" : "positive"}
-                      title="가격"
-                      value={priceRatio === null ? "판단할 정보 없음" : `기준가의 ${Math.round(priceRatio * 100)}%`}
-                      detail={priceRatio === null ? "기준가와 거래가를 입력하지 않았습니다." : priceRatio < 0.55 ? "시세보다 매우 낮아 출처 확인이 필요합니다." : priceRatio < 0.75 ? "낮은 가격의 이유를 확인해야 합니다." : "비정상적으로 낮은 가격은 아닙니다."}
-                    />
-                    <ContextRow
-                      tone={sellerProof === "receipt" ? "positive" : sellerProof === "none" ? "negative" : "neutral"}
-                      title="판매자 출처"
-                      value={sellerProof === "receipt" ? "공식 주문내역" : sellerProof === "story" ? "구매처 설명" : "자료 없음"}
-                      detail={sellerProof === "receipt" ? "판매처와 상품명이 맞는지 증거에 반영했습니다." : "구매내역을 받으면 판정 근거가 강해집니다."}
-                    />
-                    <ContextRow
-                      tone="neutral"
-                      title="생산 정보"
-                      value={origin === "china_oem" ? "중국 OEM" : origin === "japan" ? "일본 생산" : origin === "other" ? "기타 국가" : "알 수 없음"}
-                      detail="생산국만으로 진품과 가품을 나누지 않습니다."
-                    />
-                  </section>
-                </div>
-
-                <aside className="report-side-column">
-                  <section className="source-card">
-                    <div className="report-panel-head"><div><Globe2 size={18} /><h2>외부 기록</h2></div></div>
-                    <SourceRow title="제조사 공식" status={officialStatus} />
-                    <SourceRow title="MFC·커뮤니티" status={communityStatus} />
-                    {(officialStatus === "reported" || communityStatus === "reported") && <p className="source-warning"><Info size={14} /> 같은 제품의 가품 사례가 있다는 뜻입니다. 현재 매물의 직접 증거는 아닙니다.</p>}
-                  </section>
-
-                  <section className="source-order">
-                    <span>근거 우선순위</span>
-                    <ol>
-                      <li><b>1</b> 제조사 공식 자료</li>
-                      <li><b>2</b> 정확한 SKU·구매내역</li>
-                      <li><b>3</b> MFC 비교 사진</li>
-                      <li><b>4</b> 외관·가격 정황</li>
-                    </ol>
-                  </section>
-                </aside>
-              </div>
-
-              <div className="page-actions report-actions"><button className="secondary-button" onClick={() => setStage("evidence")}><ArrowLeft size={17} /> 증거 수정</button><button className="secondary-button" onClick={shareReport}><Share2 size={17} /> 결과 공유</button><button className="primary-button" onClick={resetAll}><RotateCcw size={16} /> 새 검증</button></div>
-              <p className="disclaimer">사진과 입력 정보를 바탕으로 한 참고 결과이며 정품 보증서가 아닙니다.</p>
-            </div>
-          )}
+          <button className="black-button full" disabled={!currentProduct} onClick={() => { setStage("photos"); window.scrollTo({ top: 0, behavior: "smooth" }); }}>이 제품 확인하기 <ArrowRight size={18} /></button>
         </section>
-      </div>
+      )}
 
-      {toast && <div className="toast" role="status"><CheckCircle2 size={17} /> {toast}</div>}
+      {stage === "photos" && currentProduct && (
+        <section className="photos-page page-enter">
+          <PageBack onClick={() => setStage("search")} label="제품 다시 선택" />
+          <header className="simple-heading"><span>사진 확인</span><h1>핵심 사진만 올려주세요</h1><p>다섯 장이면 1차 판정이 가능합니다.</p></header>
+
+          <ProductStrip product={currentProduct} />
+
+          <div className="photo-topline"><div><strong>필수 사진</strong><span>{essentialCompleted}/5</span></div><button onClick={copySellerMessage}><Clipboard size={14} /> 판매자에게 요청</button></div>
+          <div className="photo-grid">
+            {evidenceItems.filter((item) => item.essential).map((item) => (
+              <EvidenceCard key={item.key} item={item} observation={observations[item.key]} fileName={fileNames[item.key]} preview={filePreviews[item.key]} onFile={handleFile} onObserve={(value) => setObservations((current) => ({ ...current, [item.key]: value }))} onRemove={removeEvidence} />
+            ))}
+          </div>
+
+          <details className="optional-photos">
+            <summary><span><Plus size={15} /> 추가 사진</span><small>있으면 판정이 더 선명해져요</small><ChevronDown size={17} /></summary>
+            <div className="photo-grid optional-grid">
+              {evidenceItems.filter((item) => !item.essential).map((item) => (
+                <EvidenceCard key={item.key} item={item} observation={observations[item.key]} fileName={fileNames[item.key]} preview={filePreviews[item.key]} onFile={handleFile} onObserve={(value) => setObservations((current) => ({ ...current, [item.key]: value }))} onRemove={removeEvidence} />
+              ))}
+            </div>
+          </details>
+
+          <div className="photo-note"><Info size={16} /><span>라이선스 씰은 복제되거나 발매판마다 달라질 수 있어 단독으로 판단하지 않습니다.</span></div>
+          <button className="black-button full" disabled={completedCount === 0 || isAnalyzing} onClick={analyze}>{isAnalyzing ? <><LoaderCircle className="spin" size={18} /> 확인 중</> : <>판정 결과 보기 <ArrowRight size={18} /></>}</button>
+        </section>
+      )}
+
+      {stage === "result" && currentProduct && (
+        <section className="result-page page-enter">
+          <PageBack onClick={() => setStage("photos")} label="사진 수정" />
+          <article className={`verdict-card ${result.tone}`}>
+            <div className="verdict-product"><ProductImage product={currentProduct} size="medium" /><span><small>No.{currentProduct.number}</small><strong>{currentProduct.name}</strong><em>{currentProduct.maker}</em></span></div>
+            <div className="verdict-copy"><span>FIGSIGNAL 판정</span><h1>{result.label}</h1><p>{result.summary}</p></div>
+            <div className="verdict-numbers"><div><strong>{confidence}%</strong><span>자료 충족도</span></div><div><strong>{completedCount}</strong><span>확인 사진</span></div><div><strong>{concernItems.length}</strong><span>차이 발견</span></div></div>
+          </article>
+
+          <section className="reason-section">
+            <header><h2>판정 근거</h2><span>사진별 비교 결과</span></header>
+            {concernItems.length > 0 && <ReasonGroup title="다른 점" tone="negative" items={concernItems} previews={filePreviews} observations={observations} />}
+            {matchedItems.length > 0 && <ReasonGroup title="비슷한 점" tone="positive" items={matchedItems} previews={filePreviews} observations={observations} />}
+            {pendingItems.length > 0 && <div className="pending-line"><CircleHelp size={16} /><span><strong>확인하지 못한 항목</strong>{pendingItems.map((item) => item.title).join(" · ")}</span></div>}
+          </section>
+
+          <section className="lookup-source">
+            <div><ShieldCheck size={19} /><span><strong>{currentProduct.verified ? "공식 제품 정보 확인됨" : "직접 입력한 제품"}</strong><small>{currentProduct.verified ? `${currentProduct.maker} · No.${currentProduct.number}` : "공식 제품 페이지를 추가로 확인하세요."}</small></span></div>
+            {currentProduct.officialUrl && <a href={currentProduct.officialUrl} target="_blank" rel="noreferrer">공식 페이지 <ExternalLink size={14} /></a>}
+          </section>
+
+          <div className="result-actions"><button className="line-button" onClick={shareResult}><Share2 size={17} /> 공유</button><button className="black-button" onClick={resetAll}><RotateCcw size={16} /> 새 검증</button></div>
+          <p className="disclaimer">사진과 입력 정보로 만든 참고 결과이며 정품 보증서가 아닙니다.</p>
+        </section>
+      )}
+
+      {toast && <div className="toast" role="status"><Check size={16} /> {toast}</div>}
     </main>
   );
 }
 
-function StageButton({ active, complete, disabled, number, title, onClick }: { active: boolean; complete: boolean; disabled?: boolean; number: string; title: string; onClick: () => void }) {
+function StepBar({ stage }: { stage: Stage }) {
+  const active = stage === "search" ? 1 : stage === "photos" ? 2 : 3;
+  const labels = ["제품 찾기", "사진 확인", "판정 결과"];
+  return <div className="step-wrap"><div className="step-bar">{labels.map((label, index) => <div className={`${active === index + 1 ? "active" : ""} ${active > index + 1 ? "done" : ""}`} key={label}><span>{active > index + 1 ? <Check size={12} /> : index + 1}</span><p>{label}</p></div>)}</div></div>;
+}
+
+function ProductImage({ product, size }: { product: Product; size: "small" | "medium" | "large" }) {
+  if (!product.image) return <div className={`product-image placeholder ${size}`}><ImageIcon size={size === "large" ? 40 : 22} /></div>;
+  return <div className={`product-image ${size}`}><img src={product.image} alt={`${product.name} 공식 제품 이미지`} /></div>;
+}
+
+function ProductStrip({ product }: { product: Product }) {
+  return <article className="product-strip"><ProductImage product={product} size="medium" /><div><span>{product.verified ? "공식 제품" : "직접 입력"}</span><strong>{product.name}</strong><p>No.{product.number} · {product.maker}</p></div>{product.officialUrl && <a href={product.officialUrl} target="_blank" rel="noreferrer" aria-label="공식 제품 페이지"><ExternalLink size={17} /></a>}</article>;
+}
+
+function PageBack({ onClick, label }: { onClick: () => void; label: string }) {
+  return <button className="page-back" onClick={onClick}><ArrowLeft size={17} /> {label}</button>;
+}
+
+function EvidenceCard({ item, observation, fileName, preview, onFile, onObserve, onRemove }: {
+  item: EvidenceItem;
+  observation: Observation;
+  fileName?: string;
+  preview?: string;
+  onFile: (key: EvidenceKey, event: ChangeEvent<HTMLInputElement>) => void;
+  onObserve: (value: Observation) => void;
+  onRemove: (key: EvidenceKey) => void;
+}) {
+  const Icon = item.icon;
   return (
-    <button className={`stage-button ${active ? "active" : ""}`} disabled={disabled} onClick={onClick}>
-      <span className="stage-index">{complete ? <Check size={14} /> : number}</span>
-      <span>{title}</span>
-      <ChevronRight size={15} />
-    </button>
+    <article className={`photo-card ${observation}`}>
+      <label className="photo-upload">
+        <input type="file" accept="image/*" onChange={(event) => onFile(item.key, event)} />
+        {preview ? <img src={preview} alt={`${item.title} 업로드 사진`} /> : <div><Icon size={26} /><span>사진 추가</span></div>}
+      </label>
+      <div className="photo-card-copy"><div><strong>{item.title}</strong>{fileName && <button onClick={() => onRemove(item.key)} aria-label={`${item.title} 삭제`}><X size={14} /></button>}</div><p>{item.description}</p></div>
+      {observation !== "missing" && <div className="compare-buttons"><span>공식 이미지와</span><button className={observation === "match" ? "active match" : ""} onClick={() => onObserve("match")}><Check size={12} /> 비슷해요</button><button className={observation === "concern" ? "active concern" : ""} onClick={() => onObserve("concern")}><TriangleAlert size={12} /> 달라요</button><button className={observation === "unverified" ? "active" : ""} onClick={() => onObserve("unverified")}>모르겠어요</button></div>}
+    </article>
   );
 }
 
-function MobileProgress({ stage }: { stage: Stage }) {
-  const active = stage === "identity" ? 1 : stage === "evidence" ? 2 : 3;
-  return <div className="mobile-progress"><span>{active}/3</span><div><i style={{ width: `${(active / 3) * 100}%` }} /></div><strong>{stage === "identity" ? "제품 확인" : stage === "evidence" ? "증거 검토" : "판정 결과"}</strong></div>;
-}
-
-function PageHeader({ eyebrow, title, meta, action }: { eyebrow: string; title: string; meta?: string; action?: React.ReactNode }) {
-  return <header className="page-header"><div><span>{eyebrow}</span><h1>{title}</h1>{meta && <p>{meta}</p>}</div>{action}</header>;
-}
-
-function Panel({ title, icon: Icon, children }: { title: string; icon: typeof Camera; children: React.ReactNode }) {
-  return <section className="form-panel"><div className="panel-title"><Icon size={17} /><h2>{title}</h2></div><div className="panel-body">{children}</div></section>;
-}
-
-function PriceSignal({ ratio }: { ratio: number }) {
-  const tone = ratio < 0.55 ? "danger" : ratio < 0.75 ? "warning" : "safe";
-  const text = ratio < 0.55 ? "매우 낮은 가격" : ratio < 0.75 ? "낮은 가격" : "가격 범위 보통";
-  return <div className={`price-signal ${tone}`}><Tag size={14} /><strong>기준가의 {Math.round(ratio * 100)}%</strong><span>{text}</span></div>;
-}
-
-function EvidenceResultGroup({ title, tone, items, filePreviews, observations }: {
+function ReasonGroup({ title, tone, items, previews, observations }: {
   title: string;
   tone: "positive" | "negative";
   items: EvidenceItem[];
-  filePreviews: Partial<Record<EvidenceKey, string>>;
+  previews: Partial<Record<EvidenceKey, string>>;
   observations: Record<EvidenceKey, Observation>;
 }) {
-  return (
-    <div className={`result-group ${tone}`}>
-      <div className="result-group-title"><span>{tone === "positive" ? <CheckCircle2 size={17} /> : <TriangleAlert size={17} />}{title}</span><b>{items.length}</b></div>
-      <div className="result-evidence-list">
-        {items.map((item) => (
-          <article className="result-evidence" key={item.key}>
-            <div className="result-thumb">
-              {filePreviews[item.key] ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={filePreviews[item.key]} alt={`${item.title} 증거 사진`} />
-              ) : <ImageIcon size={19} />}
-            </div>
-            <div><span><strong>{item.title}</strong><em>{item.strength}</em></span><p>{observations[item.key] === "match" ? item.matchReason : item.concernReason}</p></div>
-          </article>
-        ))}
-      </div>
-    </div>
-  );
-}
-
-function ContextRow({ tone, title, value, detail }: { tone: "positive" | "negative" | "neutral"; title: string; value: string; detail: string }) {
-  return <div className="context-row"><span className={`context-dot ${tone}`} /> <div><span>{title}<strong>{value}</strong></span><p>{detail}</p></div></div>;
-}
-
-function SourceRow({ title, status }: { title: string; status: LookupStatus }) {
-  const tone = status === "reported" ? "negative" : status === "not_reported" ? "positive" : "neutral";
-  return <div className="source-row"><span className={`context-dot ${tone}`} /><div><strong>{title}</strong><span>{sourceLabels[status]}</span></div>{status === "reported" ? <TriangleAlert size={15} /> : status === "not_reported" ? <Check size={15} /> : <CircleHelp size={15} />}</div>;
+  return <div className={`reason-group ${tone}`}><div className="reason-title"><span>{tone === "positive" ? <CheckCircle2 size={16} /> : <TriangleAlert size={16} />}{title}</span><b>{items.length}</b></div><div>{items.map((item) => <article className="reason-row" key={item.key}><div className="reason-thumb">{previews[item.key] ? <img src={previews[item.key]} alt={`${item.title} 증거`} /> : <ImageIcon size={18} />}</div><span><strong>{item.title}</strong><p>{observations[item.key] === "match" ? item.matchReason : item.concernReason}</p></span></article>)}</div></div>;
 }
