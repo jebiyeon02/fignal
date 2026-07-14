@@ -337,7 +337,6 @@ export async function POST(request: Request) {
         contents: [{ role: "user", parts: content }],
         generationConfig: {
           maxOutputTokens: 2200,
-          thinkingConfig: { thinkingLevel: "low" },
           responseFormat: {
             text: {
               mimeType: "APPLICATION_JSON",
