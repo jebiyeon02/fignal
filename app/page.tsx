@@ -68,6 +68,19 @@ type EvidenceItem = {
   icon: typeof Camera;
 };
 
+type CounterfeitCase = {
+  id: string;
+  productId: string;
+  title: string;
+  summary: string;
+  images: string[];
+  signals: Array<{
+    evidenceKey: EvidenceKey;
+    label: string;
+  }>;
+  sourceUrl: string;
+};
+
 const products: Product[] = [
   {
     id: "nendoroid-1528",
@@ -140,6 +153,97 @@ const products: Product[] = [
     image: "https://www.goodsmile.com/gsc-webrevo-sdk-storage-prd/product/image/5625/wWBNap4JA0KV9mETDQhyCgS6cPdft8sH.jpg",
     officialUrl: "https://www.goodsmile.com/en/product/5625/Nendoroid%2BBeam%2BKirby",
     verified: true,
+  },
+  {
+    id: "nendoroid-1538",
+    name: "넨도로이드 하츠네 미쿠 심포니 5주년 Ver.",
+    englishName: "Nendoroid Hatsune Miku: Symphony 5th Anniversary Ver.",
+    aliases: ["미쿠", "하츠네 미쿠", "심포니", "miku", "hatsune miku", "symphony"],
+    number: "1538",
+    maker: "Good Smile Company",
+    release: "2021.08 · 2026.02 재판",
+    image: "https://www.goodsmile.com/gsc-webrevo-sdk-storage-prd/product/image/8255/M8E6AUuzmL7bqS5ix1TPacgD2GRyNtHs.jpg",
+    officialUrl: "https://www.goodsmile.com/en/product/8255/Nendoroid%2BHatsune%2BMiku%2BSymphony%2B5th%2BAnniversary%2BVer.",
+    verified: true,
+  },
+  {
+    id: "nendoroid-676",
+    name: "넨도로이드 나카하라 츄야",
+    englishName: "Nendoroid Chuya Nakahara",
+    aliases: ["츄야", "나카하라 츄야", "chuya", "nakahara", "문호 스트레이독스"],
+    number: "676",
+    maker: "ORANGE ROUGE",
+    release: "2017.09 · 2026.08 재판",
+    image: "https://www.goodsmile.com/gsc-webrevo-sdk-storage-prd/product/image/3691/Y6C02p5nSUGr4b9AkvzFd3HWhe1aBqmT.jpg",
+    officialUrl: "https://www.goodsmile.com/en/product/3691/Nendoroid%20Chuya%20Nakahara",
+    verified: true,
+  },
+  {
+    id: "nendoroid-1279",
+    name: "넨도로이드 헌터",
+    englishName: "Nendoroid Hunter",
+    aliases: ["헌터", "hunter", "블러드본", "bloodborne"],
+    number: "1279",
+    maker: "Good Smile Company",
+    release: "2020 발매 · 2022 재판",
+    image: "https://www.goodsmile.com/gsc-webrevo-sdk-storage-prd/product/image/product/20200214/9276/67699/large/27a94ea1d504a23202b77329faff2048.jpg",
+    officialUrl: "https://www.goodsmile.com/en/product/6983/Nendoroid%2BHunter",
+    verified: true,
+  },
+];
+
+const counterfeitCases: CounterfeitCase[] = [
+  {
+    id: "miku-symphony-package",
+    productId: "nendoroid-1538",
+    title: "로고와 창 인쇄가 빠진 패키지",
+    summary: "같은 제품에서 정식 패키지와 크기가 다르고, 전면 창의 제품명 박과 제조사 표기가 없는 가품이 확인된 적이 있습니다.",
+    images: ["https://support.goodsmile.com/hc/article_attachments/44334484961433"],
+    signals: [
+      { evidenceKey: "boxFront", label: "제조사·브랜드 로고가 없음" },
+      { evidenceKey: "boxFront", label: "투명 창의 제품명 박 인쇄가 없음" },
+      { evidenceKey: "boxBack", label: "저작권 표기가 없음" },
+      { evidenceKey: "boxFront", label: "정식 패키지와 상자 크기가 다름" },
+    ],
+    sourceUrl: "https://support.goodsmile.com/hc/en-us/articles/39729124039449-Bootleg-Information-Nendoroid-series",
+  },
+  {
+    id: "chuya-package-and-face",
+    productId: "nendoroid-676",
+    title: "표기 누락과 얼굴 구조 차이",
+    summary: "같은 제품에서 패키지 로고와 저작권 문구가 빠지고, 얼굴 파츠 구조와 받침대 표기가 정식 제품과 다른 가품이 확인된 적이 있습니다.",
+    images: [
+      "https://support.goodsmile.com/hc/article_attachments/44334648842905",
+      "https://support.goodsmile.com/hc/article_attachments/44334751485337",
+      "https://support.goodsmile.com/hc/article_attachments/44334026072473",
+      "https://support.goodsmile.com/hc/article_attachments/44334073891097",
+    ],
+    signals: [
+      { evidenceKey: "boxFront", label: "패키지의 제조사·브랜드 로고가 없음" },
+      { evidenceKey: "boxBack", label: "패키지의 저작권 표기가 없음" },
+      { evidenceKey: "facePaint", label: "얼굴 파츠 구조가 정식 제품과 다름" },
+      { evidenceKey: "baseMark", label: "받침대 바닥의 저작권 표기가 없음" },
+    ],
+    sourceUrl: "https://support.goodsmile.com/hc/en-us/articles/39729124039449-Bootleg-Information-Nendoroid-series",
+  },
+  {
+    id: "hunter-parts-and-base",
+    productId: "nendoroid-1279",
+    title: "머리 구조와 소품 도색 차이",
+    summary: "같은 제품에서 머리 파츠 구조, 권총 도색, 램프의 투명도와 받침대 저작권 표기가 다른 가품이 확인된 적이 있습니다.",
+    images: [
+      "https://support.goodsmile.com/hc/article_attachments/44334073892505",
+      "https://support.goodsmile.com/hc/article_attachments/44334073901209",
+      "https://support.goodsmile.com/hc/article_attachments/44334026086169",
+      "https://support.goodsmile.com/hc/article_attachments/44335146586905",
+    ],
+    signals: [
+      { evidenceKey: "facePaint", label: "머리 파츠의 결합 구조가 다름" },
+      { evidenceKey: "parts", label: "헌터 권총의 도색이 다름" },
+      { evidenceKey: "parts", label: "램프 내부 색과 투명도가 다름" },
+      { evidenceKey: "baseMark", label: "받침대 바닥의 저작권 표기가 없음" },
+    ],
+    sourceUrl: "https://support.goodsmile.com/hc/en-us/articles/39729124039449-Bootleg-Information-Nendoroid-series",
   },
 ];
 
@@ -320,15 +424,19 @@ export default function Home() {
   const matchedItems = evidenceItems.filter((item) => observations[item.key] === "match");
   const concernItems = evidenceItems.filter((item) => observations[item.key] === "concern");
   const pendingItems = evidenceItems.filter((item) => observations[item.key] === "unverified" || observations[item.key] === "missing");
+  const productCases = counterfeitCases.filter((item) => item.productId === currentProduct?.id);
+  const matchedCaseSignals = productCases.flatMap((item) => item.signals)
+    .filter((signal) => observations[signal.evidenceKey] === "concern");
+  const hasKnownCaseOverlap = matchedCaseSignals.length > 0;
   const riskPoints = concernItems.reduce((sum, item) => sum + item.weight, 0);
   const confidence = Math.min(96, (currentProduct?.verified ? 18 : 8) + completedCount * 8 + assessedCount * 4);
 
   const result = essentialCompleted < 4 || assessedCount < 3
     ? { label: "판단 보류", tone: "neutral", summary: "핵심 사진을 조금 더 확인해야 합니다." }
     : riskPoints >= 18
-      ? { label: "가품 의심", tone: "danger", summary: "공식 제품과 다른 점이 여러 곳에서 보입니다." }
+      ? { label: "가품 의심", tone: "danger", summary: hasKnownCaseOverlap ? "확인한 차이 중 알려진 가품 사례와 겹치는 특징이 있습니다." : "공식 제품과 다른 점이 여러 곳에서 보입니다." }
       : riskPoints >= 8
-        ? { label: "추가 확인", tone: "caution", summary: "거래 전에 다시 볼 항목이 있습니다." }
+        ? { label: "추가 확인", tone: "caution", summary: hasKnownCaseOverlap ? "알려진 가품 사례와 겹치는 항목을 거래 전에 다시 확인하세요." : "거래 전에 다시 볼 항목이 있습니다." }
         : { label: "진품 가능성 높음", tone: "safe", summary: "확인한 사진에서는 큰 차이가 보이지 않습니다." };
 
   const showToast = (message: string) => {
@@ -480,7 +588,7 @@ export default function Home() {
                 onFocus={() => setSearchOpen(true)}
                 onBlur={() => window.setTimeout(() => setSearchOpen(false), 120)}
                 onKeyDown={handleSearchKeys}
-                placeholder="고죠, 프리렌, 덴지..."
+                placeholder="미쿠, 츄야, 헌터..."
                 role="combobox"
                 aria-expanded={searchOpen && query.trim().length > 0}
                 aria-controls="product-suggestions"
@@ -596,6 +704,10 @@ export default function Home() {
             <div className="verdict-numbers"><div><strong>{confidence}%</strong><span>자료 충족도</span></div><div><strong>{completedCount}</strong><span>확인 사진</span></div><div><strong>{concernItems.length}</strong><span>차이 발견</span></div></div>
           </article>
 
+          {productCases.length > 0 && (
+            <CounterfeitCaseSection cases={productCases} observations={observations} />
+          )}
+
           <section className="reason-section">
             <header><h2>판정 근거</h2><span>사진별 비교 결과</span></header>
             {concernItems.length > 0 && <ReasonGroup title="다른 점" tone="negative" items={concernItems} previews={filePreviews} observations={observations} />}
@@ -656,6 +768,65 @@ function EvidenceCard({ item, observation, fileName, preview, onFile, onObserve,
       <div className="photo-card-copy"><div><strong>{item.title}</strong>{fileName && <button onClick={() => onRemove(item.key)} aria-label={`${item.title} 삭제`}><X size={14} /></button>}</div><p>{item.description}</p></div>
       {observation !== "missing" && <div className="compare-buttons"><span>공식 이미지와</span><button className={observation === "match" ? "active match" : ""} onClick={() => onObserve("match")}><Check size={12} /> 비슷해요</button><button className={observation === "concern" ? "active concern" : ""} onClick={() => onObserve("concern")}><TriangleAlert size={12} /> 달라요</button><button className={observation === "unverified" ? "active" : ""} onClick={() => onObserve("unverified")}>모르겠어요</button></div>}
     </article>
+  );
+}
+
+function CounterfeitCaseSection({ cases, observations }: {
+  cases: CounterfeitCase[];
+  observations: Record<EvidenceKey, Observation>;
+}) {
+  const overlapCount = cases.flatMap((item) => item.signals)
+    .filter((signal) => observations[signal.evidenceKey] === "concern").length;
+
+  return (
+    <section className="case-section">
+      <header>
+        <div><TriangleAlert size={18} /><h2>확인된 가품 사례</h2></div>
+        <span>{overlapCount > 0 ? `현재 사진과 ${overlapCount}개 특징 겹침` : `${cases.length}건 등록`}</span>
+      </header>
+
+      {cases.map((item) => {
+        const overlappingSignals = item.signals.filter((signal) => observations[signal.evidenceKey] === "concern");
+        const hasOverlap = overlappingSignals.length > 0;
+
+        return (
+          <article className={`case-card ${hasOverlap ? "overlap" : ""}`} key={item.id}>
+            <div className={`case-images count-${Math.min(item.images.length, 4)}`}>
+              {item.images.map((image, index) => (
+                <img src={image} alt={`실제 가품 사례 사진 ${index + 1}`} key={image} />
+              ))}
+            </div>
+            <div className="case-copy">
+              <span className={`case-status ${hasOverlap ? "matched" : ""}`}>
+                {hasOverlap ? "현재 매물과 겹치는 사례" : "비교 참고 사례"}
+              </span>
+              <h3>{item.title}</h3>
+              <p>{item.summary}</p>
+              <ul>
+                {item.signals.map((signal) => {
+                  const signalMatches = observations[signal.evidenceKey] === "concern";
+                  return (
+                    <li className={signalMatches ? "matched" : ""} key={`${signal.evidenceKey}-${signal.label}`}>
+                      {signalMatches ? <TriangleAlert size={13} /> : <span />}
+                      <strong>{signal.label}</strong>
+                      {signalMatches && <em>겹침</em>}
+                    </li>
+                  );
+                })}
+              </ul>
+              {hasOverlap && (
+                <div className="case-conclusion">
+                  <strong>가품 쪽 근거로 확인 필요</strong>
+                  <p>사진에서 `달라요`로 표시한 항목이 알려진 사례의 특징과 겹칩니다.</p>
+                </div>
+              )}
+            </div>
+          </article>
+        );
+      })}
+
+      <p className="case-note">사례와 모양이 다르다고 정품이라는 뜻은 아닙니다. 사진과 실물을 함께 비교하세요.</p>
+    </section>
   );
 }
 
