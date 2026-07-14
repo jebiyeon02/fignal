@@ -129,6 +129,12 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .product-strip > a { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 50%; color: #777; text-decoration: none; }
 .product-strip > a:hover { background: #f2f2f2; color: #222; }
 
+.paste-tip { min-height: 60px; display: flex; align-items: center; gap: 11px; padding: 12px 14px; margin: -12px 0 30px; border-radius: 10px; background: #f4f4f4; color: #555; }
+.paste-tip > svg { flex: 0 0 auto; }
+.paste-tip > span { display: grid; gap: 3px; }
+.paste-tip strong { font-size: 10px; }
+.paste-tip small { color: #888; font-size: 9px; }
+
 .photo-topline { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
 .photo-topline > div { display: flex; align-items: baseline; gap: 8px; }
 .photo-topline strong { font-size: 14px; }

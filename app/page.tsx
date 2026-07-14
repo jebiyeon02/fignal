@@ -30,7 +30,7 @@ import {
   TriangleAlert,
   X,
 } from "lucide-react";
-import { ChangeEvent, KeyboardEvent, useMemo, useState } from "react";
+import { ChangeEvent, KeyboardEvent, useEffect, useMemo, useState } from "react";
 
 type Stage = "search" | "photos" | "result";
 type Observation = "missing" | "unverified" | "match" | "concern";
@@ -255,6 +255,38 @@ export default function Home() {
   const [filePreviews, setFilePreviews] = useState<Partial<Record<EvidenceKey, string>>>({});
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [toast, setToast] = useState("");
+
+  useEffect(() => {
+    if (stage !== "photos") return;
+
+    const pasteImage = (event: ClipboardEvent) => {
+      const clipboardFile = Array.from(event.clipboardData?.items ?? [])
+        .find((item) => item.type.startsWith("image/"))
+        ?.getAsFile();
+      if (!clipboardFile) return;
+
+      event.preventDefault();
+      const nextItem = evidenceItems.find((item) => observations[item.key] === "missing");
+      if (!nextItem) {
+        setToast("빈 사진 칸이 없습니다.");
+        window.setTimeout(() => setToast(""), 2200);
+        return;
+      }
+
+      const extension = clipboardFile.type.split("/")[1]?.replace("jpeg", "jpg") || "png";
+      const namedFile = new File([clipboardFile], `clipboard-${Date.now()}.${extension}`, { type: clipboardFile.type });
+      const oldPreview = filePreviews[nextItem.key];
+      if (oldPreview) URL.revokeObjectURL(oldPreview);
+      setFileNames((current) => ({ ...current, [nextItem.key]: namedFile.name }));
+      setFilePreviews((current) => ({ ...current, [nextItem.key]: URL.createObjectURL(namedFile) }));
+      setObservations((current) => ({ ...current, [nextItem.key]: "unverified" }));
+      setToast(`${nextItem.title}에 이미지를 붙였습니다.`);
+      window.setTimeout(() => setToast(""), 2200);
+    };
+
+    document.addEventListener("paste", pasteImage);
+    return () => document.removeEventListener("paste", pasteImage);
+  }, [stage, observations, filePreviews]);
 
   const filteredProducts = useMemo(() => {
     const keyword = query.trim().toLowerCase();
@@ -529,6 +561,11 @@ export default function Home() {
 
           <ProductStrip product={currentProduct} />
 
+          <div className="paste-tip">
+            <Clipboard size={18} />
+            <span><strong>이미지 붙여넣기</strong><small>사진을 복사한 뒤 ⌘V 또는 Ctrl+V · 빈 칸부터 자동으로 들어갑니다.</small></span>
+          </div>
+
           <div className="photo-topline"><div><strong>필수 사진</strong><span>{essentialCompleted}/5</span></div><button onClick={copySellerMessage}><Clipboard size={14} /> 판매자에게 요청</button></div>
           <div className="photo-grid">
             {evidenceItems.filter((item) => item.essential).map((item) => (
@@ -572,7 +609,7 @@ export default function Home() {
           </section>
 
           <div className="result-actions"><button className="line-button" onClick={shareResult}><Share2 size={17} /> 공유</button><button className="black-button" onClick={resetAll}><RotateCcw size={16} /> 새 검증</button></div>
-          <p className="disclaimer">사진과 입력 정보로 만든 참고 결과이며 정품 보증서가 아닙니다.</p>
+          <p className="disclaimer">현재 결과는 AI 자동 판독이 아니라 사용자가 표시한 사진 비교를 정리한 참고 의견이며 정품 보증서가 아닙니다.</p>
         </section>
       )}
 
