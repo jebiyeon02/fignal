@@ -442,11 +442,27 @@ export default function Home() {
   const [userOverrides, setUserOverrides] = useState<Partial<Record<EvidenceKey, Observation>>>({});
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [toast, setToast] = useState("");
+  const [criteriaOpen, setCriteriaOpen] = useState(false);
+  const [pasteTarget, setPasteTarget] = useState<EvidenceKey | null>(null);
 
   const showToast = useCallback((message: string) => {
     setToast(message);
     window.setTimeout(() => setToast(""), 2200);
   }, []);
+
+  useEffect(() => {
+    if (!criteriaOpen) return;
+    const previousOverflow = document.body.style.overflow;
+    const closeOnEscape = (event: globalThis.KeyboardEvent) => {
+      if (event.key === "Escape") setCriteriaOpen(false);
+    };
+    document.body.style.overflow = "hidden";
+    document.addEventListener("keydown", closeOnEscape);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", closeOnEscape);
+    };
+  }, [criteriaOpen]);
 
   const storeEvidenceFile = useCallback(async (key: EvidenceKey, file: File) => {
     try {
@@ -471,7 +487,7 @@ export default function Home() {
   }, [showToast]);
 
   useEffect(() => {
-    if (stage !== "photos") return;
+    if (stage !== "photos" || criteriaOpen) return;
 
     const pasteImage = (event: ClipboardEvent) => {
       const clipboardFile = Array.from(event.clipboardData?.items ?? [])
@@ -480,23 +496,25 @@ export default function Home() {
       if (!clipboardFile) return;
 
       event.preventDefault();
-      const nextItem = evidenceItems.find((item) => observations[item.key] === "missing");
-      if (!nextItem) {
-        setToast("빈 사진 칸이 없습니다.");
-        window.setTimeout(() => setToast(""), 2200);
+      const targetItem = evidenceItems.find((item) => item.key === pasteTarget);
+      if (!targetItem) {
+        showToast("먼저 붙여넣을 사진 칸을 선택해 주세요.");
         return;
       }
 
       const extension = clipboardFile.type.split("/")[1]?.replace("jpeg", "jpg") || "png";
       const namedFile = new File([clipboardFile], `clipboard-${Date.now()}.${extension}`, { type: clipboardFile.type });
-      void storeEvidenceFile(nextItem.key, namedFile).then((stored) => {
-        if (stored) showToast(`${nextItem.title}에 이미지를 붙였습니다.`);
+      const replacing = observations[targetItem.key] !== "missing";
+      void storeEvidenceFile(targetItem.key, namedFile).then((stored) => {
+        if (!stored) return;
+        setPasteTarget(null);
+        showToast(`${targetItem.title} 사진을 ${replacing ? "바꿨습니다" : "붙였습니다"}.`);
       });
     };
 
     document.addEventListener("paste", pasteImage);
     return () => document.removeEventListener("paste", pasteImage);
-  }, [stage, observations, showToast, storeEvidenceFile]);
+  }, [criteriaOpen, observations, pasteTarget, showToast, stage, storeEvidenceFile]);
 
   const filteredProducts = useMemo(() => {
     const keyword = query.trim().toLowerCase();
@@ -568,6 +586,7 @@ export default function Home() {
       setAnalysisError("");
       setReviewedEvidence({});
       setUserOverrides({});
+      setPasteTarget(null);
     }
     setSelectedProduct(product);
     setQuery(product.name);
@@ -603,6 +622,7 @@ export default function Home() {
   const handleFile = (key: EvidenceKey, event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
+    setPasteTarget(null);
     void storeEvidenceFile(key, file);
     event.target.value = "";
   };
@@ -744,6 +764,7 @@ export default function Home() {
     setAnalysisError("");
     setReviewedEvidence({});
     setUserOverrides({});
+    setPasteTarget(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -752,7 +773,11 @@ export default function Home() {
       <header className="top-header">
         <div className="top-inner">
           <button className="logo" onClick={resetAll}>FIGSIGNAL</button>
-          <div className="top-nav"><span>넨도로이드 검증</span><button onClick={resetAll}><Plus size={16} /> 새 검증</button></div>
+          <div className="top-nav">
+            <span>넨도로이드 검증</span>
+            <button onClick={() => setCriteriaOpen(true)}><FileCheck2 size={16} /> 판정 기준</button>
+            <button onClick={resetAll}><Plus size={16} /> 새 검증</button>
+          </div>
         </div>
       </header>
 
@@ -867,15 +892,19 @@ export default function Home() {
 
           <ProductStrip product={currentProduct} />
 
-          <div className="paste-tip">
+          <div className={`paste-tip ${pasteTarget ? "active" : ""}`}>
             <Clipboard size={18} />
-            <span><strong>이미지 붙여넣기</strong><small>사진을 복사한 뒤 ⌘V 또는 Ctrl+V · 빈 칸부터 자동으로 들어갑니다.</small></span>
+            {pasteTarget ? (
+              <span><strong>{evidenceItems.find((item) => item.key === pasteTarget)?.title} 선택됨</strong><small>이미지를 복사한 뒤 ⌘V 또는 Ctrl+V를 누르세요.</small></span>
+            ) : (
+              <span><strong>붙여넣을 사진 칸을 먼저 선택하세요</strong><small>각 사진 카드의 ‘이 칸에 붙여넣기’를 누른 뒤 ⌘V 또는 Ctrl+V</small></span>
+            )}
           </div>
 
           <div className="photo-topline"><div><strong>필수 사진</strong><span>{essentialCompleted}/5</span></div><button onClick={copySellerMessage}><Clipboard size={14} /> 판매자에게 요청</button></div>
           <div className="photo-grid">
             {evidenceItems.filter((item) => item.essential).map((item) => (
-              <EvidenceCard key={item.key} item={item} observation={observations[item.key]} fileName={fileNames[item.key]} preview={filePreviews[item.key]} onFile={handleFile} onRemove={removeEvidence} />
+              <EvidenceCard key={item.key} item={item} observation={observations[item.key]} fileName={fileNames[item.key]} preview={filePreviews[item.key]} selected={pasteTarget === item.key} onFile={handleFile} onRemove={removeEvidence} onSelect={setPasteTarget} />
             ))}
           </div>
 
@@ -883,7 +912,7 @@ export default function Home() {
             <summary><span><Plus size={15} /> 추가 사진</span><small>있으면 판정이 더 선명해져요</small><ChevronDown size={17} /></summary>
             <div className="photo-grid optional-grid">
               {evidenceItems.filter((item) => !item.essential).map((item) => (
-                <EvidenceCard key={item.key} item={item} observation={observations[item.key]} fileName={fileNames[item.key]} preview={filePreviews[item.key]} onFile={handleFile} onRemove={removeEvidence} />
+                <EvidenceCard key={item.key} item={item} observation={observations[item.key]} fileName={fileNames[item.key]} preview={filePreviews[item.key]} selected={pasteTarget === item.key} onFile={handleFile} onRemove={removeEvidence} onSelect={setPasteTarget} />
               ))}
             </div>
           </details>
@@ -929,6 +958,7 @@ export default function Home() {
         </section>
       )}
 
+      {criteriaOpen && <VerificationCriteriaDialog onClose={() => setCriteriaOpen(false)} />}
       {toast && <div className="toast" role="status"><Check size={16} /> {toast}</div>}
     </main>
   );
@@ -953,24 +983,105 @@ function PageBack({ onClick, label }: { onClick: () => void; label: string }) {
   return <button className="page-back" onClick={onClick}><ArrowLeft size={17} /> {label}</button>;
 }
 
-function EvidenceCard({ item, observation, fileName, preview, onFile, onRemove }: {
+function EvidenceCard({ item, observation, fileName, preview, selected, onFile, onRemove, onSelect }: {
   item: EvidenceItem;
   observation: Observation;
   fileName?: string;
   preview?: string;
+  selected: boolean;
   onFile: (key: EvidenceKey, event: ChangeEvent<HTMLInputElement>) => void;
   onRemove: (key: EvidenceKey) => void;
+  onSelect: (key: EvidenceKey | null) => void;
 }) {
   const Icon = item.icon;
   return (
-    <article className={`photo-card ${observation}`}>
+    <article className={`photo-card ${observation} ${selected ? "paste-selected" : ""}`}>
       <label className="photo-upload">
         <input type="file" accept="image/*" onChange={(event) => onFile(item.key, event)} />
         {preview ? <img src={preview} alt={`${item.title} 업로드 사진`} /> : <div><Icon size={26} /><span>사진 추가</span></div>}
       </label>
       <div className="photo-card-copy"><div><strong>{item.title}</strong>{fileName && <button onClick={() => onRemove(item.key)} aria-label={`${item.title} 삭제`}><X size={14} /></button>}</div><p>{item.description}</p></div>
       {observation !== "missing" && <div className="photo-ready"><ShieldCheck size={13} /> AI 분석 대기</div>}
+      <button
+        type="button"
+        className={`paste-target-button ${selected ? "selected" : ""}`}
+        onClick={() => onSelect(selected ? null : item.key)}
+        aria-pressed={selected}
+      >
+        <Clipboard size={13} /> {selected ? "붙여넣을 위치로 선택됨" : "이 칸에 붙여넣기"}
+      </button>
     </article>
+  );
+}
+
+function VerificationCriteriaDialog({ onClose }: { onClose: () => void }) {
+  const verdicts = [
+    { label: "진품 가능성 높음", tone: "safe", description: "핵심 사진이 충분하고 공식 정보와 뚜렷한 차이가 보이지 않을 때" },
+    { label: "판정이 애매함", tone: "caution", description: "일치·차이 근거가 섞이거나 중요한 표기를 선명하게 읽지 못할 때" },
+    { label: "가품 가능성 높음", tone: "danger", description: "공식 제품과 다른 특징이 여러 곳에서 확인되거나 알려진 가품 사례와 겹칠 때" },
+    { label: "사진이 더 필요함", tone: "neutral", description: "박스·각인·얼굴 등 핵심 사진이 부족해 비교 근거가 충분하지 않을 때" },
+  ];
+
+  return (
+    <div className="criteria-backdrop" onMouseDown={onClose}>
+      <aside className="criteria-dialog" role="dialog" aria-modal="true" aria-labelledby="criteria-title" onMouseDown={(event) => event.stopPropagation()}>
+        <header className="criteria-header">
+          <div><span>AUTHENTICITY STANDARD</span><h2 id="criteria-title">사용 중인 판정 기준</h2><p>현재 넨도로이드 검증에 실제로 반영되는 기준입니다.</p></div>
+          <button autoFocus onClick={onClose} aria-label="판정 기준 닫기"><X size={20} /></button>
+        </header>
+
+        <div className="criteria-body">
+          <section className="criteria-section">
+            <div className="criteria-section-title"><h3>사진에서 확인하는 항목</h3><span>{evidenceItems.length}개</span></div>
+            <div className="criteria-list">
+              {evidenceItems.map((item) => {
+                const Icon = item.icon;
+                return (
+                  <article key={item.key}>
+                    <div className="criteria-icon"><Icon size={18} /></div>
+                    <div>
+                      <strong>{item.title}</strong>
+                      <p>{item.description}</p>
+                      <small><b>일치</b>{item.matchReason}</small>
+                      <small className="concern"><b>차이</b>{item.concernReason}</small>
+                    </div>
+                    <em>{item.essential ? "핵심" : "보조"}</em>
+                  </article>
+                );
+              })}
+            </div>
+          </section>
+
+          <section className="criteria-section">
+            <div className="criteria-section-title"><h3>함께 비교하는 정보</h3></div>
+            <ul className="criteria-rules">
+              <li><span>01</span><p><strong>공식 제품 정보</strong>제품명·제조사·제품번호와 공식 전체 외형 이미지를 대조합니다.</p></li>
+              <li><span>02</span><p><strong>알려진 가품 사례</strong>같은 제품의 사례가 있을 때만 실제로 겹치는 모양과 표기를 비교합니다.</p></li>
+              <li><span>03</span><p><strong>사용자가 올린 원본 사진</strong>사진에서 직접 확인되는 내용만 근거로 사용하고 보이지 않는 부분은 추측하지 않습니다.</p></li>
+            </ul>
+          </section>
+
+          <section className="criteria-section">
+            <div className="criteria-section-title"><h3>판정 원칙</h3></div>
+            <div className="principle-box">
+              <p>JAN·라이선스 씰·박스 한 장만으로는 진품을 판정하지 않습니다.</p>
+              <p>글자나 각인이 흐리면 일치로 처리하지 않고 확인 불가로 남깁니다.</p>
+              <p>재판·유통 지역에 따른 패키지 차이가 있을 수 있어 여러 근거를 함께 봅니다.</p>
+              <p>표시되는 퍼센트는 정품 확률이 아니라 사진과 자료의 충족도입니다.</p>
+            </div>
+          </section>
+
+          <section className="criteria-section">
+            <div className="criteria-section-title"><h3>결과가 나뉘는 방식</h3></div>
+            <div className="verdict-standard-list">
+              {verdicts.map((verdict) => <article className={verdict.tone} key={verdict.label}><strong>{verdict.label}</strong><p>{verdict.description}</p></article>)}
+            </div>
+          </section>
+        </div>
+
+        <footer className="criteria-footer"><Info size={14} /><span>AI 시각 분석과 사용자 확인을 돕는 참고 기준이며 제조사의 정품 보증을 대신하지 않습니다.</span></footer>
+      </aside>
+    </div>
   );
 }
 
