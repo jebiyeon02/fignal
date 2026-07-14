@@ -31,6 +31,7 @@ import {
   X,
 } from "lucide-react";
 import { ChangeEvent, KeyboardEvent, useEffect, useMemo, useState } from "react";
+import { expandedProducts } from "./catalog";
 
 type Stage = "search" | "photos" | "result";
 type Observation = "missing" | "unverified" | "match" | "concern";
@@ -81,7 +82,7 @@ type CounterfeitCase = {
   sourceUrl: string;
 };
 
-const products: Product[] = [
+const curatedProducts: Product[] = [
   {
     id: "nendoroid-1528",
     name: "넨도로이드 고죠 사토루",
@@ -191,6 +192,12 @@ const products: Product[] = [
     verified: true,
   },
 ];
+
+const products: Product[] = [...curatedProducts, ...expandedProducts].filter(
+  (product, index, allProducts) => allProducts.findIndex((item) => item.id === product.id) === index,
+);
+
+const catalogShortcuts = ["귀멸의 칼날", "주술회전", "체인소맨", "나루토", "블리치"];
 
 const counterfeitCases: CounterfeitCase[] = [
   {
@@ -400,8 +407,9 @@ export default function Home() {
         .join(" ")
         .toLowerCase();
       return searchable.includes(keyword);
-    }).slice(0, 5);
+    }).slice(0, 30);
   }, [query]);
+  const isOnePieceQuery = /원피스|one\s*piece/i.test(query);
 
   const manualMakerValue = manualMaker === "기타" ? manualMakerOther.trim() : manualMaker;
   const manualReady = manualName.trim().length > 1 && manualNumber.trim().length > 0 && manualMakerValue.length > 1;
@@ -576,7 +584,7 @@ export default function Home() {
           <div className="intro">
             <span>FIGURE CHECK</span>
             <h1>피규어 이름을<br />검색해보세요</h1>
-            <p>제품을 고르면 제조사와 번호를 자동으로 찾습니다.</p>
+            <p>공식 제품 {products.length}개 · 제품을 고르면 제조사와 번호를 자동으로 찾습니다.</p>
           </div>
 
           <div className="product-search">
@@ -599,25 +607,36 @@ export default function Home() {
 
             {searchOpen && query.trim().length > 0 && !selectedProduct && (
               <div className="suggestions" id="product-suggestions" role="listbox">
-                {filteredProducts.length > 0 ? filteredProducts.map((product, index) => (
-                  <button
-                    key={product.id}
-                    className={activeSuggestion === index ? "active" : ""}
-                    onMouseDown={(event) => event.preventDefault()}
-                    onClick={() => selectProduct(product)}
-                    onMouseEnter={() => setActiveSuggestion(index)}
-                    role="option"
-                    aria-selected={activeSuggestion === index}
-                  >
-                    <ProductImage product={product} size="small" />
-                    <span><strong>{product.name}</strong><small>{product.englishName}</small></span>
-                    <em>No.{product.number}</em>
-                  </button>
-                )) : (
-                  <div className="no-result"><strong>검색 결과가 없어요</strong><button onMouseDown={(event) => event.preventDefault()} onClick={() => { setManualOpen(true); setSearchOpen(false); }}>직접 입력하기</button></div>
+                {filteredProducts.length > 0 ? <>
+                  <div className="suggestion-summary"><span>검색 결과</span><strong>{filteredProducts.length}{filteredProducts.length === 30 ? "+" : ""}개</strong></div>
+                  <div className="suggestion-list">
+                    {filteredProducts.map((product, index) => (
+                      <button
+                        key={product.id}
+                        className={activeSuggestion === index ? "active" : ""}
+                        onMouseDown={(event) => event.preventDefault()}
+                        onClick={() => selectProduct(product)}
+                        onMouseEnter={() => setActiveSuggestion(index)}
+                        role="option"
+                        aria-selected={activeSuggestion === index}
+                      >
+                        <ProductImage product={product} size="small" />
+                        <span><strong>{product.name}</strong><small>{product.englishName}</small></span>
+                        <em>No.{product.number}</em>
+                      </button>
+                    ))}
+                  </div>
+                </> : (
+                  <div className="no-result"><strong>{isOnePieceQuery ? "공식 원피스 넨도로이드는 아직 확인되지 않았어요" : "검색 결과가 없어요"}</strong><button onMouseDown={(event) => event.preventDefault()} onClick={() => { setManualOpen(true); setSearchOpen(false); }}>직접 입력하기</button></div>
                 )}
               </div>
             )}
+          </div>
+
+          <div className="catalog-shortcuts" aria-label="인기 작품 바로가기">
+            {catalogShortcuts.map((shortcut) => (
+              <button key={shortcut} onClick={() => changeQuery(shortcut)}>{shortcut}</button>
+            ))}
           </div>
 
           {selectedProduct && (

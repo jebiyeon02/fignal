@@ -61,16 +61,22 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .search-input input::placeholder { color: #aaa; font-weight: 450; }
 .clear-query { width: 30px; height: 30px; display: grid; place-items: center; border: 0; border-radius: 50%; background: #f2f2f2; color: #888; cursor: pointer; }
 .suggestions { position: absolute; top: 70px; left: 0; right: 0; overflow: hidden; border: 1px solid #ddd; border-radius: 12px; background: #fff; box-shadow: 0 16px 38px rgba(0,0,0,.12); }
-.suggestions > button { width: 100%; min-height: 84px; display: grid; grid-template-columns: 60px 1fr auto; align-items: center; gap: 14px; padding: 10px 15px; border: 0; border-bottom: 1px solid #f0f0f0; background: #fff; text-align: left; cursor: pointer; }
-.suggestions > button:last-child { border-bottom: 0; }
-.suggestions > button:hover, .suggestions > button.active { background: #f8f8f8; }
-.suggestions > button > span { min-width: 0; }
+.suggestion-summary { height: 38px; display: flex; align-items: center; justify-content: space-between; padding: 0 15px; border-bottom: 1px solid #eee; background: #fafafa; color: #999; font-size: 9px; }
+.suggestion-summary strong { color: #555; font-size: 9px; }
+.suggestion-list { max-height: min(520px, 62vh); overflow-y: auto; overscroll-behavior: contain; }
+.suggestion-list > button { width: 100%; min-height: 84px; display: grid; grid-template-columns: 60px 1fr auto; align-items: center; gap: 14px; padding: 10px 15px; border: 0; border-bottom: 1px solid #f0f0f0; background: #fff; text-align: left; cursor: pointer; }
+.suggestion-list > button:last-child { border-bottom: 0; }
+.suggestion-list > button:hover, .suggestion-list > button.active { background: #f8f8f8; }
+.suggestion-list > button > span { min-width: 0; }
 .suggestions strong { display: block; overflow: hidden; font-size: 13px; font-weight: 650; text-overflow: ellipsis; white-space: nowrap; }
 .suggestions small { display: block; margin-top: 4px; overflow: hidden; color: #999; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
 .suggestions em { color: #777; font-size: 10px; font-style: normal; }
 .no-result { display: flex; align-items: center; justify-content: space-between; padding: 22px 18px; }
 .no-result strong { font-size: 12px; }
 .no-result button { padding: 7px 9px; border: 0; border-bottom: 1px solid #333; background: transparent; font-size: 10px; cursor: pointer; }
+.catalog-shortcuts { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; }
+.catalog-shortcuts button { padding: 8px 11px; border: 1px solid #e2e2e2; border-radius: 999px; background: #fff; color: #777; font-size: 9px; cursor: pointer; }
+.catalog-shortcuts button:hover { border-color: #999; color: #222; }
 
 .product-image { overflow: hidden; background: #f4f4f4; }
 .product-image img { width: 100%; height: 100%; display: block; object-fit: cover; }
@@ -274,7 +280,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
   .product-search { margin-top: 30px; }
   .search-input { height: 56px; }
   .suggestions { top: 64px; }
-  .suggestions > button { grid-template-columns: 52px 1fr auto; min-height: 76px; padding: 8px 10px; }
+  .suggestion-list > button { grid-template-columns: 52px 1fr auto; min-height: 76px; padding: 8px 10px; }
   .product-image.small { width: 50px; height: 56px; }
   .selected-product { grid-template-columns: 1fr; }
   .selected-image { height: 340px; min-height: 0; }
