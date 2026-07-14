@@ -186,6 +186,8 @@ function extractGeminiOutputText(payload: unknown) {
 }
 
 export async function POST(request: Request) {
+  const diagnosticMode = request.headers.get("x-figsignal-diagnostic") === "gemini-format-v1";
+
   if (isRateLimited(request)) {
     return jsonError("잠시 후 다시 분석해 주세요.", 429, "RATE_LIMITED");
   }
@@ -373,6 +375,20 @@ export async function POST(request: Request) {
     }
     if (upstream.status === 429) {
       return jsonError("AI 요청이 많습니다. 잠시 후 다시 시도해 주세요.", 429, "AI_BUSY");
+    }
+    if (diagnosticMode) {
+      return Response.json(
+        {
+          error: "AI가 사진을 분석하지 못했습니다. 잠시 후 다시 시도해 주세요.",
+          code: "AI_ANALYSIS_FAILED",
+          diagnostic: {
+            httpStatus: upstream.status,
+            upstreamStatus,
+            message: upstreamMessage.replaceAll(apiKey, "[redacted]").slice(0, 500),
+          },
+        },
+        { status: 502, headers: { "Cache-Control": "no-store" } },
+      );
     }
     return jsonError("AI가 사진을 분석하지 못했습니다. 잠시 후 다시 시도해 주세요.", 502, "AI_ANALYSIS_FAILED");
   }
