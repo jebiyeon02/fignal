@@ -271,43 +271,40 @@ export async function POST(request: Request) {
   }
 
   const schema = {
-    type: "object",
-    additionalProperties: false,
+    type: "OBJECT",
     properties: {
-      verdict: { type: "string", enum: ["likely_authentic", "needs_review", "counterfeit_suspected", "insufficient_photos"] },
-      confidence: { type: "integer", minimum: 0, maximum: 100 },
-      summary: { type: "string" },
+      verdict: { type: "STRING", enum: ["likely_authentic", "needs_review", "counterfeit_suspected", "insufficient_photos"] },
+      confidence: { type: "INTEGER" },
+      summary: { type: "STRING" },
       findings: {
-        type: "array",
+        type: "ARRAY",
         items: {
-          type: "object",
-          additionalProperties: false,
+          type: "OBJECT",
           properties: {
-            key: { type: "string", enum: evidenceKeys },
-            status: { type: "string", enum: ["match", "concern", "unclear"] },
-            title: { type: "string" },
-            reason: { type: "string" },
-            visibleEvidence: { type: "string" },
-            userAction: { type: "string" },
+            key: { type: "STRING", enum: evidenceKeys },
+            status: { type: "STRING", enum: ["match", "concern", "unclear"] },
+            title: { type: "STRING" },
+            reason: { type: "STRING" },
+            visibleEvidence: { type: "STRING" },
+            userAction: { type: "STRING" },
           },
           required: ["key", "status", "title", "reason", "visibleEvidence", "userAction"],
         },
       },
       caseMatches: {
-        type: "array",
+        type: "ARRAY",
         items: {
-          type: "object",
-          additionalProperties: false,
+          type: "OBJECT",
           properties: {
-            caseId: { type: "string" },
-            similarity: { type: "string", enum: ["high", "medium", "low"] },
-            reason: { type: "string" },
-            evidenceKeys: { type: "array", items: { type: "string", enum: evidenceKeys } },
+            caseId: { type: "STRING" },
+            similarity: { type: "STRING", enum: ["high", "medium", "low"] },
+            reason: { type: "STRING" },
+            evidenceKeys: { type: "ARRAY", items: { type: "STRING", enum: evidenceKeys } },
           },
           required: ["caseId", "similarity", "reason", "evidenceKeys"],
         },
       },
-      caveat: { type: "string" },
+      caveat: { type: "STRING" },
     },
     required: ["verdict", "confidence", "summary", "findings", "caseMatches", "caveat"],
   };
@@ -338,12 +335,8 @@ export async function POST(request: Request) {
         generationConfig: {
           temperature: 0.1,
           maxOutputTokens: 2200,
-          responseFormat: {
-            text: {
-              mimeType: "APPLICATION_JSON",
-              schema,
-            },
-          },
+          responseMimeType: "application/json",
+          responseSchema: schema,
           thinkingConfig: { thinkingBudget: 512 },
         },
       }),
