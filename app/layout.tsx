@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "피그시그널 — 피규어 위조 위험 교차검증",
-  description: "제품판, 제조사 공식 자료, MFC, 판매자 사진과 가격을 교차검증해 중고 피규어 거래 위험을 확인하세요.",
+  title: "FIGSIGNAL — 피규어 검증",
+  description: "제품 정보와 사진 증거를 대조해 중고 피규어의 진품 가능성과 가품 위험을 확인합니다.",
   icons: {
     icon: "/favicon.svg",
     shortcut: "/favicon.svg",
