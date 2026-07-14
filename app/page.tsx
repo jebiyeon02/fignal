@@ -540,17 +540,17 @@ export default function Home() {
   const hasUserOverride = Object.keys(userOverrides).length > 0;
 
   const calculatedResult = essentialCompleted < 4 || assessedCount < 3
-    ? { label: "판단 보류", tone: "neutral", summary: "핵심 사진을 조금 더 확인해야 합니다." }
+    ? { label: "사진이 더 필요함", tone: "neutral", summary: "핵심 사진을 조금 더 확인해야 합니다." }
     : riskPoints >= 18
-      ? { label: "가품 의심", tone: "danger", summary: hasKnownCaseOverlap ? "확인한 차이 중 알려진 가품 사례와 겹치는 특징이 있습니다." : "공식 제품과 다른 점이 여러 곳에서 보입니다." }
+      ? { label: "가품 가능성 높음", tone: "danger", summary: hasKnownCaseOverlap ? "확인한 차이 중 알려진 가품 사례와 겹치는 특징이 있습니다." : "공식 제품과 다른 점이 여러 곳에서 보입니다." }
       : riskPoints >= 8
-        ? { label: "추가 확인", tone: "caution", summary: hasKnownCaseOverlap ? "알려진 가품 사례와 겹치는 항목을 거래 전에 다시 확인하세요." : "거래 전에 다시 볼 항목이 있습니다." }
+        ? { label: "판정이 애매함", tone: "caution", summary: hasKnownCaseOverlap ? "알려진 가품 사례와 겹치는 항목을 거래 전에 다시 확인하세요." : "거래 전에 다시 볼 항목이 있습니다." }
         : { label: "진품 가능성 높음", tone: "safe", summary: "확인한 사진에서는 큰 차이가 보이지 않습니다." };
   const aiVerdict = aiAnalysis ? {
     likely_authentic: { label: "진품 가능성 높음", tone: "safe", summary: aiAnalysis.summary },
-    needs_review: { label: "추가 확인", tone: "caution", summary: aiAnalysis.summary },
-    counterfeit_suspected: { label: "가품 의심", tone: "danger", summary: aiAnalysis.summary },
-    insufficient_photos: { label: "판단 보류", tone: "neutral", summary: aiAnalysis.summary },
+    needs_review: { label: "판정이 애매함", tone: "caution", summary: aiAnalysis.summary },
+    counterfeit_suspected: { label: "가품 가능성 높음", tone: "danger", summary: aiAnalysis.summary },
+    insufficient_photos: { label: "사진이 더 필요함", tone: "neutral", summary: aiAnalysis.summary },
   }[aiAnalysis.verdict] : null;
   const result = hasUserOverride ? {
     ...calculatedResult,
@@ -863,7 +863,7 @@ export default function Home() {
       {stage === "photos" && currentProduct && (
         <section className="photos-page page-enter">
           <PageBack onClick={() => setStage("search")} label="제품 다시 선택" />
-          <header className="simple-heading"><span>AI 1차 분석</span><h1>핵심 사진만 올려주세요</h1><p>사진이 많을수록 비교할 수 있는 근거가 늘어납니다.</p></header>
+          <header className="simple-heading"><span>AI 분석</span><h1>핵심 사진만 올려주세요</h1><p>사진이 많을수록 비교할 수 있는 근거가 늘어납니다.</p></header>
 
           <ProductStrip product={currentProduct} />
 
@@ -890,7 +890,7 @@ export default function Home() {
 
           <div className="photo-note"><Info size={16} /><span>라이선스 씰은 복제되거나 발매판마다 달라질 수 있어 단독으로 판단하지 않습니다.</span></div>
           {analysisError && <div className="analysis-error" role="alert"><TriangleAlert size={17} /><span><strong>분석을 시작하지 못했어요</strong>{analysisError}</span></div>}
-          <button className="black-button full" disabled={completedCount === 0 || isAnalyzing} onClick={analyze}>{isAnalyzing ? <><LoaderCircle className="spin" size={18} /> 사진 분석 중</> : <><ShieldCheck size={18} /> AI로 1차 분석</>}</button>
+          <button className="black-button full" disabled={completedCount === 0 || isAnalyzing} onClick={analyze}>{isAnalyzing ? <><LoaderCircle className="spin" size={18} /> 사진 분석 중</> : <><ShieldCheck size={18} /> AI로 분석</>}</button>
         </section>
       )}
 
@@ -899,7 +899,7 @@ export default function Home() {
           <PageBack onClick={() => setStage("photos")} label="사진 수정" />
           <article className={`verdict-card ${result.tone}`}>
             <div className="verdict-product"><ProductImage product={currentProduct} size="medium" /><span><small>No.{currentProduct.number}</small><strong>{currentProduct.name}</strong><em>{currentProduct.maker}</em></span></div>
-            <div className="verdict-copy"><span>{hasUserOverride ? "사용자 확인 반영" : "AI 1차 판정"}</span><h1>{result.label}</h1><p>{result.summary}</p></div>
+            <div className="verdict-copy"><span>{hasUserOverride ? "사용자 확인 반영" : "AI 판정"}</span><h1>{result.label}</h1><p>{result.summary}</p></div>
             <div className="verdict-numbers"><div><strong>{confidence}%</strong><span>자료 충족도</span></div><div><strong>{completedCount}</strong><span>분석 사진</span></div><div><strong>{reviewedCount}/{aiAnalysis?.findings.length ?? assessedCount}</strong><span>사용자 확인</span></div></div>
           </article>
 
