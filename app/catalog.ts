@@ -13,6 +13,29 @@ export type CatalogProduct = {
 
 export const expandedProducts: CatalogProduct[] = [
   {
+    id: "nendoroid-1151",
+    name: "넨도로이드 하츠네 미쿠 매지컬 미라이 2018 Ver.",
+    englishName: "Nendoroid Hatsune Miku: Magical Mirai 2018 Ver.",
+    aliases: [
+      "하츠네 미쿠",
+      "미쿠",
+      "매지컬 미라이 2018",
+      "매지컬미라이 2018",
+      "마지미라 2018",
+      "Hatsune Miku",
+      "Magical Mirai 2018",
+      "Character Vocal Series 01",
+      "보컬로이드",
+      "Vocaloid",
+    ],
+    number: "1151",
+    maker: "Good Smile Company",
+    release: "2020.02",
+    image: "https://storage.googleapis.com/gsc-webrevo-sdk-storage-prd/product/image/product/20190703/8513/61839/large/c97e3af94173ba2e9decf91ea62400e2.jpg",
+    officialUrl: "https://www.goodsmile.com/en/product/6221/Nendoroid%2BHatsune%2BMiku%2BMagical%2BMirai%2B2018%2BVer",
+    verified: true,
+  },
+  {
     id: "nendoroid-2069",
     name: "넨도로이드 고토 히토리",
     englishName: "Nendoroid Hitori Gotoh",
