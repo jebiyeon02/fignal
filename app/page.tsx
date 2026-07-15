@@ -373,13 +373,12 @@ const initialObservations = Object.fromEntries(
   evidenceItems.map((item) => [item.key, "missing"]),
 ) as Record<EvidenceKey, Observation>;
 
-const supportedImageTypes = new Set(["image/jpeg", "image/png", "image/webp", "image/gif"]);
+const supportedImageTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
 
 async function prepareImageFile(file: File) {
-  if (!supportedImageTypes.has(file.type)) {
-    throw new Error("JPG, PNG, WEBP, GIF 사진만 올릴 수 있습니다.");
+  if (!file.type.startsWith("image/")) {
+    throw new Error("이미지 파일만 올릴 수 있습니다.");
   }
-  if (file.type === "image/gif") return file;
 
   let bitmap: ImageBitmap;
   try {
@@ -406,9 +405,63 @@ async function prepareImageFile(file: File) {
   bitmap.close();
 
   const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.84));
-  if (!blob || (scale === 1 && blob.size >= file.size)) return file;
+  if (!blob) {
+    if (supportedImageTypes.has(file.type)) return file;
+    throw new Error("이 사진 형식을 변환하지 못했습니다.");
+  }
+  if (supportedImageTypes.has(file.type) && scale === 1 && blob.size >= file.size) return file;
   const baseName = file.name.replace(/\.[^.]+$/, "") || "figure-photo";
   return new File([blob], `${baseName}.jpg`, { type: "image/jpeg" });
+}
+
+function fileFromImageBlob(blob: Blob) {
+  if (!blob.type.startsWith("image/")) return null;
+  const subtype = blob.type.split("/")[1]?.split("+")[0]?.replace("jpeg", "jpg").replace(/[^a-z0-9]/gi, "") || "png";
+  return new File([blob], `clipboard-${Date.now()}.${subtype}`, { type: blob.type });
+}
+
+async function fileFromClipboardSource(source: string) {
+  const trimmed = source.trim();
+  if (!trimmed || (!trimmed.startsWith("data:image/") && !/^https?:\/\//i.test(trimmed))) return null;
+  try {
+    const response = await fetch(trimmed, { credentials: "omit", referrerPolicy: "no-referrer" });
+    if (!response.ok) return null;
+    return fileFromImageBlob(await response.blob());
+  } catch {
+    return null;
+  }
+}
+
+async function readClipboardImage() {
+  if (!navigator.clipboard?.read) return null;
+  const clipboardItems = await navigator.clipboard.read();
+
+  for (const item of clipboardItems) {
+    const imageType = item.types.find((type) => type.startsWith("image/"));
+    if (!imageType) continue;
+    const file = fileFromImageBlob(await item.getType(imageType));
+    if (file) return file;
+  }
+
+  for (const item of clipboardItems) {
+    if (item.types.includes("text/html")) {
+      const html = await (await item.getType("text/html")).text();
+      const source = new DOMParser().parseFromString(html, "text/html").querySelector("img")?.getAttribute("src");
+      if (source) {
+        const file = await fileFromClipboardSource(source);
+        if (file) return file;
+      }
+    }
+
+    const textType = ["text/uri-list", "text/plain"].find((type) => item.types.includes(type));
+    if (textType) {
+      const source = await (await item.getType(textType)).text();
+      const file = await fileFromClipboardSource(source.split("\n").find((line) => !line.startsWith("#")) ?? "");
+      if (file) return file;
+    }
+  }
+
+  return null;
 }
 
 function isAiAnalysis(value: unknown): value is AiAnalysis {
@@ -443,7 +496,6 @@ export default function Home() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [toast, setToast] = useState("");
   const [criteriaOpen, setCriteriaOpen] = useState(false);
-  const [pasteTarget, setPasteTarget] = useState<EvidenceKey | null>(null);
 
   const showToast = useCallback((message: string) => {
     setToast(message);
@@ -464,7 +516,7 @@ export default function Home() {
     };
   }, [criteriaOpen]);
 
-  const storeEvidenceFile = useCallback(async (key: EvidenceKey, file: File) => {
+  const storeEvidenceFile = useCallback(async (key: EvidenceKey, file: File, silent = false) => {
     try {
       const prepared = await prepareImageFile(file);
       const nextPreview = URL.createObjectURL(prepared);
@@ -481,40 +533,10 @@ export default function Home() {
       setUserOverrides({});
       return true;
     } catch (error) {
-      showToast(error instanceof Error ? error.message : "사진을 추가하지 못했습니다.");
+      if (!silent) showToast(error instanceof Error ? error.message : "사진을 추가하지 못했습니다.");
       return false;
     }
   }, [showToast]);
-
-  useEffect(() => {
-    if (stage !== "photos" || criteriaOpen) return;
-
-    const pasteImage = (event: ClipboardEvent) => {
-      const clipboardFile = Array.from(event.clipboardData?.items ?? [])
-        .find((item) => item.type.startsWith("image/"))
-        ?.getAsFile();
-      if (!clipboardFile) return;
-
-      event.preventDefault();
-      const targetItem = evidenceItems.find((item) => item.key === pasteTarget);
-      if (!targetItem) {
-        showToast("먼저 붙여넣을 사진 칸을 선택해 주세요.");
-        return;
-      }
-
-      const extension = clipboardFile.type.split("/")[1]?.replace("jpeg", "jpg") || "png";
-      const namedFile = new File([clipboardFile], `clipboard-${Date.now()}.${extension}`, { type: clipboardFile.type });
-      const replacing = observations[targetItem.key] !== "missing";
-      void storeEvidenceFile(targetItem.key, namedFile).then((stored) => {
-        if (!stored) return;
-        setPasteTarget(null);
-        showToast(`${targetItem.title} 사진을 ${replacing ? "바꿨습니다" : "붙였습니다"}.`);
-      });
-    };
-
-    document.addEventListener("paste", pasteImage);
-    return () => document.removeEventListener("paste", pasteImage);
-  }, [criteriaOpen, observations, pasteTarget, showToast, stage, storeEvidenceFile]);
 
   const filteredProducts = useMemo(() => {
     const keyword = query.trim().toLowerCase();
@@ -586,7 +608,6 @@ export default function Home() {
       setAnalysisError("");
       setReviewedEvidence({});
       setUserOverrides({});
-      setPasteTarget(null);
     }
     setSelectedProduct(product);
     setQuery(product.name);
@@ -622,44 +643,16 @@ export default function Home() {
   const handleFile = (key: EvidenceKey, event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
-    setPasteTarget(null);
     void storeEvidenceFile(key, file);
     event.target.value = "";
   };
 
   const pasteFromClipboard = async (key: EvidenceKey) => {
-    const item = evidenceItems.find((candidate) => candidate.key === key);
-    if (!item) return;
-    setPasteTarget(key);
-
-    if (!navigator.clipboard?.read) {
-      showToast("브라우저가 자동 붙여넣기를 지원하지 않아요. ⌘V 또는 Ctrl+V를 눌러주세요.");
-      return;
-    }
-
     try {
-      const clipboardItems = await navigator.clipboard.read();
-      const clipboardItem = clipboardItems.find((candidate) => candidate.types.some((type) => type.startsWith("image/")));
-      const imageType = clipboardItem?.types.find((type) => type.startsWith("image/"));
-      if (!clipboardItem || !imageType) {
-        setPasteTarget(null);
-        showToast("클립보드에 복사된 이미지가 없어요.");
-        return;
-      }
-
-      const blob = await clipboardItem.getType(imageType);
-      const extension = imageType.split("/")[1]?.replace("jpeg", "jpg") || "png";
-      const file = new File([blob], `clipboard-${Date.now()}.${extension}`, { type: imageType });
-      const replacing = observations[key] !== "missing";
-      const stored = await storeEvidenceFile(key, file);
-      if (!stored) {
-        setPasteTarget(null);
-        return;
-      }
-      setPasteTarget(null);
-      showToast(`${item.title} 사진을 ${replacing ? "바꿨습니다" : "붙였습니다"}.`);
+      const file = await readClipboardImage();
+      if (file) await storeEvidenceFile(key, file, true);
     } catch {
-      showToast("브라우저가 자동 붙여넣기를 막았어요. ⌘V 또는 Ctrl+V를 눌러주세요.");
+      return;
     }
   };
 
@@ -800,7 +793,6 @@ export default function Home() {
     setAnalysisError("");
     setReviewedEvidence({});
     setUserOverrides({});
-    setPasteTarget(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -928,19 +920,10 @@ export default function Home() {
 
           <ProductStrip product={currentProduct} />
 
-          <div className={`paste-tip ${pasteTarget ? "active" : ""}`}>
-            <Clipboard size={18} />
-            {pasteTarget ? (
-              <span><strong>{evidenceItems.find((item) => item.key === pasteTarget)?.title} 선택됨</strong><small>자동 붙여넣기가 막힌 경우 ⌘V 또는 Ctrl+V를 눌러주세요.</small></span>
-            ) : (
-              <span><strong>클립보드 이미지를 바로 붙여넣을 수 있어요</strong><small>이미지를 복사한 뒤 원하는 사진 칸의 ‘붙여넣기’ 버튼을 누르세요.</small></span>
-            )}
-          </div>
-
           <div className="photo-topline"><div><strong>필수 사진</strong><span>{essentialCompleted}/5</span></div><button onClick={copySellerMessage}><Clipboard size={14} /> 판매자에게 요청</button></div>
           <div className="photo-grid">
             {evidenceItems.filter((item) => item.essential).map((item) => (
-              <EvidenceCard key={item.key} item={item} observation={observations[item.key]} fileName={fileNames[item.key]} preview={filePreviews[item.key]} selected={pasteTarget === item.key} onFile={handleFile} onRemove={removeEvidence} onPaste={pasteFromClipboard} />
+              <EvidenceCard key={item.key} item={item} observation={observations[item.key]} fileName={fileNames[item.key]} preview={filePreviews[item.key]} onFile={handleFile} onRemove={removeEvidence} onPaste={pasteFromClipboard} />
             ))}
           </div>
 
@@ -948,7 +931,7 @@ export default function Home() {
             <summary><span><Plus size={15} /> 추가 사진</span><small>있으면 판정이 더 선명해져요</small><ChevronDown size={17} /></summary>
             <div className="photo-grid optional-grid">
               {evidenceItems.filter((item) => !item.essential).map((item) => (
-                <EvidenceCard key={item.key} item={item} observation={observations[item.key]} fileName={fileNames[item.key]} preview={filePreviews[item.key]} selected={pasteTarget === item.key} onFile={handleFile} onRemove={removeEvidence} onPaste={pasteFromClipboard} />
+                <EvidenceCard key={item.key} item={item} observation={observations[item.key]} fileName={fileNames[item.key]} preview={filePreviews[item.key]} onFile={handleFile} onRemove={removeEvidence} onPaste={pasteFromClipboard} />
               ))}
             </div>
           </details>
@@ -1019,19 +1002,18 @@ function PageBack({ onClick, label }: { onClick: () => void; label: string }) {
   return <button className="page-back" onClick={onClick}><ArrowLeft size={17} /> {label}</button>;
 }
 
-function EvidenceCard({ item, observation, fileName, preview, selected, onFile, onRemove, onPaste }: {
+function EvidenceCard({ item, observation, fileName, preview, onFile, onRemove, onPaste }: {
   item: EvidenceItem;
   observation: Observation;
   fileName?: string;
   preview?: string;
-  selected: boolean;
   onFile: (key: EvidenceKey, event: ChangeEvent<HTMLInputElement>) => void;
   onRemove: (key: EvidenceKey) => void;
   onPaste: (key: EvidenceKey) => void;
 }) {
   const Icon = item.icon;
   return (
-    <article className={`photo-card ${observation} ${selected ? "paste-selected" : ""}`}>
+    <article className={`photo-card ${observation}`}>
       <label className="photo-upload">
         <input type="file" accept="image/*" onChange={(event) => onFile(item.key, event)} />
         {preview ? <img src={preview} alt={`${item.title} 업로드 사진`} /> : <div><Icon size={26} /><span>사진 추가</span></div>}
@@ -1040,11 +1022,11 @@ function EvidenceCard({ item, observation, fileName, preview, selected, onFile, 
       {observation !== "missing" && <div className="photo-ready"><ShieldCheck size={13} /> AI 분석 대기</div>}
       <button
         type="button"
-        className={`paste-target-button ${selected ? "selected" : ""}`}
+        className="paste-target-button"
         onClick={() => void onPaste(item.key)}
         aria-label={`${item.title}에 클립보드 이미지 붙여넣기`}
       >
-        <Clipboard size={13} /> {selected ? "다시 붙여넣기" : "붙여넣기"}
+        <Clipboard size={13} /> 붙여넣기
       </button>
     </article>
   );
