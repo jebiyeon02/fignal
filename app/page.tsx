@@ -220,7 +220,7 @@ const products: Product[] = [...curatedProducts, ...expandedProducts].filter(
   (product, index, allProducts) => allProducts.findIndex((item) => item.id === product.id) === index,
 );
 
-const catalogShortcuts = ["귀멸의 칼날", "주술회전", "체인소맨", "나루토", "블리치"];
+const catalogShortcuts = ["봇치 더 록", "귀멸의 칼날", "주술회전", "체인소맨", "나루토", "블리치"];
 
 const counterfeitCases: CounterfeitCase[] = [
   {
