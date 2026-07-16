@@ -32,18 +32,15 @@ import {
 } from "lucide-react";
 import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { expandedProducts } from "./catalog";
+import {
+  counterfeitCases,
+  type CounterfeitCase,
+  type CounterfeitEvidenceKey,
+} from "./counterfeit-cases";
 
 type Stage = "search" | "photos" | "result";
 type Observation = "missing" | "unverified" | "match" | "concern";
-type EvidenceKey =
-  | "boxFront"
-  | "boxBack"
-  | "barcode"
-  | "baseMark"
-  | "facePaint"
-  | "figureFull"
-  | "parts"
-  | "purchaseProof";
+type EvidenceKey = CounterfeitEvidenceKey;
 
 type Product = {
   id: string;
@@ -67,19 +64,6 @@ type EvidenceItem = {
   weight: number;
   essential: boolean;
   icon: typeof Camera;
-};
-
-type CounterfeitCase = {
-  id: string;
-  productId: string;
-  title: string;
-  summary: string;
-  images: string[];
-  signals: Array<{
-    evidenceKey: EvidenceKey;
-    label: string;
-  }>;
-  sourceUrl: string;
 };
 
 type AiFinding = {
@@ -221,61 +205,6 @@ const products: Product[] = [...curatedProducts, ...expandedProducts].filter(
 );
 
 const catalogShortcuts = ["봇치 더 록", "귀멸의 칼날", "주술회전", "체인소맨", "나루토", "블리치"];
-
-const counterfeitCases: CounterfeitCase[] = [
-  {
-    id: "miku-symphony-package",
-    productId: "nendoroid-1538",
-    title: "로고와 창 인쇄가 빠진 패키지",
-    summary: "같은 제품에서 정식 패키지와 크기가 다르고, 전면 창의 제품명 박과 제조사 표기가 없는 가품이 확인된 적이 있습니다.",
-    images: ["https://support.goodsmile.com/hc/article_attachments/44334484961433"],
-    signals: [
-      { evidenceKey: "boxFront", label: "제조사·브랜드 로고가 없음" },
-      { evidenceKey: "boxFront", label: "투명 창의 제품명 박 인쇄가 없음" },
-      { evidenceKey: "boxBack", label: "저작권 표기가 없음" },
-      { evidenceKey: "boxFront", label: "정식 패키지와 상자 크기가 다름" },
-    ],
-    sourceUrl: "https://support.goodsmile.com/hc/en-us/articles/39729124039449-Bootleg-Information-Nendoroid-series",
-  },
-  {
-    id: "chuya-package-and-face",
-    productId: "nendoroid-676",
-    title: "표기 누락과 얼굴 구조 차이",
-    summary: "같은 제품에서 패키지 로고와 저작권 문구가 빠지고, 얼굴 파츠 구조와 받침대 표기가 정식 제품과 다른 가품이 확인된 적이 있습니다.",
-    images: [
-      "https://support.goodsmile.com/hc/article_attachments/44334648842905",
-      "https://support.goodsmile.com/hc/article_attachments/44334751485337",
-      "https://support.goodsmile.com/hc/article_attachments/44334026072473",
-      "https://support.goodsmile.com/hc/article_attachments/44334073891097",
-    ],
-    signals: [
-      { evidenceKey: "boxFront", label: "패키지의 제조사·브랜드 로고가 없음" },
-      { evidenceKey: "boxBack", label: "패키지의 저작권 표기가 없음" },
-      { evidenceKey: "facePaint", label: "얼굴 파츠 구조가 정식 제품과 다름" },
-      { evidenceKey: "baseMark", label: "받침대 바닥의 저작권 표기가 없음" },
-    ],
-    sourceUrl: "https://support.goodsmile.com/hc/en-us/articles/39729124039449-Bootleg-Information-Nendoroid-series",
-  },
-  {
-    id: "hunter-parts-and-base",
-    productId: "nendoroid-1279",
-    title: "머리 구조와 소품 도색 차이",
-    summary: "같은 제품에서 머리 파츠 구조, 권총 도색, 램프의 투명도와 받침대 저작권 표기가 다른 가품이 확인된 적이 있습니다.",
-    images: [
-      "https://support.goodsmile.com/hc/article_attachments/44334073892505",
-      "https://support.goodsmile.com/hc/article_attachments/44334073901209",
-      "https://support.goodsmile.com/hc/article_attachments/44334026086169",
-      "https://support.goodsmile.com/hc/article_attachments/44335146586905",
-    ],
-    signals: [
-      { evidenceKey: "facePaint", label: "머리 파츠의 결합 구조가 다름" },
-      { evidenceKey: "parts", label: "헌터 권총의 도색이 다름" },
-      { evidenceKey: "parts", label: "램프 내부 색과 투명도가 다름" },
-      { evidenceKey: "baseMark", label: "받침대 바닥의 저작권 표기가 없음" },
-    ],
-    sourceUrl: "https://support.goodsmile.com/hc/en-us/articles/39729124039449-Bootleg-Information-Nendoroid-series",
-  },
-];
 
 const manufacturers = [
   "Good Smile Company",
@@ -706,12 +635,14 @@ export default function Home() {
       officialUrl: currentProduct.officialUrl,
       verified: currentProduct.verified,
     }));
-    formData.set("cases", JSON.stringify(productCases.map(({ id, title, summary, images, signals }) => ({
+    formData.set("cases", JSON.stringify(productCases.map(({ id, title, summary, images, signals, sourceType, sourceName }) => ({
       id,
       title,
       summary,
       images,
       signals,
+      sourceType,
+      sourceName,
     }))));
     Object.entries(files).forEach(([key, file]) => {
       if (file) formData.set(`evidence:${key}`, file);
@@ -1159,7 +1090,7 @@ function CounterfeitCaseSection({ cases, observations }: {
   return (
     <section className="case-section">
       <header>
-        <div><TriangleAlert size={18} /><h2>확인된 가품 사례</h2></div>
+        <div><TriangleAlert size={18} /><h2>공식·커뮤니티 가품 사례</h2></div>
         <span>{overlapCount > 0 ? `현재 사진과 ${overlapCount}개 특징 겹침` : `${cases.length}건 등록`}</span>
       </header>
 
@@ -1171,13 +1102,21 @@ function CounterfeitCaseSection({ cases, observations }: {
           <article className={`case-card ${hasOverlap ? "overlap" : ""}`} key={item.id}>
             <div className={`case-images count-${Math.min(item.images.length, 4)}`}>
               {item.images.map((image, index) => (
-                <img src={image} alt={`실제 가품 사례 사진 ${index + 1}`} key={image} />
+                <img src={image} alt={`정품·가품 비교 사례 사진 ${index + 1}`} key={image} />
               ))}
             </div>
             <div className="case-copy">
               <span className={`case-status ${hasOverlap ? "matched" : ""}`}>
                 {hasOverlap ? "현재 매물과 겹치는 사례" : "비교 참고 사례"}
               </span>
+              <div className="case-meta">
+                <span className={`case-source ${item.sourceType}`}>
+                  {item.sourceType === "official" ? "공식 제조사 자료" : "커뮤니티 확인 사례"}
+                </span>
+                <a className="case-source-link" href={item.sourceUrl} target="_blank" rel="noreferrer">
+                  {item.sourceName} 원문 <ExternalLink size={11} />
+                </a>
+              </div>
               <h3>{item.title}</h3>
               <p>{item.summary}</p>
               <ul>
@@ -1203,7 +1142,7 @@ function CounterfeitCaseSection({ cases, observations }: {
         );
       })}
 
-      <p className="case-note">사례와 모양이 다르다고 정품이라는 뜻은 아닙니다. 사진과 실물을 함께 비교하세요.</p>
+      <p className="case-note">사례는 판정 근거 중 하나입니다. 모양이 다르다고 정품이라는 뜻은 아니므로 사진과 실물을 함께 비교하세요.</p>
     </section>
   );
 }

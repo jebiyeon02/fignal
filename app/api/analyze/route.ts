@@ -18,6 +18,8 @@ const supportedImageTypes = new Set([
 
 const referenceImageHosts = new Set([
   "www.goodsmile.com",
+  "images.goodsmile.info",
+  "partner.goodsmile.info",
   "support.goodsmile.com",
 ]);
 
@@ -51,6 +53,8 @@ type CasePayload = {
   summary: string;
   images: string[];
   signals: Array<{ evidenceKey: EvidenceKey; label: string }>;
+  sourceType?: "official" | "community";
+  sourceName?: string;
 };
 
 type GeminiPart =
@@ -266,7 +270,7 @@ export async function POST(request: Request) {
 
   for (const counterfeitCase of cases.slice(0, 3)) {
     content.push({
-      text: `[알려진 가품 사례 ${counterfeitCase.id}] ${counterfeitCase.title}\n${counterfeitCase.summary}\n특징: ${counterfeitCase.signals.map((signal) => signal.label).join(", ")}`,
+      text: `[알려진 가품 사례 ${counterfeitCase.id}] ${counterfeitCase.title}\n출처: ${counterfeitCase.sourceName ?? "등록 자료"} (${counterfeitCase.sourceType ?? "출처 유형 미표기"})\n${counterfeitCase.summary}\n특징: ${counterfeitCase.signals.map((signal) => signal.label).join(", ")}`,
     });
     for (const image of counterfeitCase.images.filter(isAllowedReferenceUrl).slice(0, 2)) {
       referenceRequests.push(fetchReferenceImage(`[가품 사례 이미지 ${counterfeitCase.id}]`, image));

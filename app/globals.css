@@ -248,6 +248,12 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .case-copy { min-width: 0; padding: 4px 0; }
 .case-status { display: inline-flex; padding: 5px 7px; border-radius: 5px; background: #f2f2f2; color: #777; font-size: 8px; font-weight: 700; }
 .case-status.matched { background: var(--red-bg); color: var(--red); }
+.case-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
+.case-source { display: inline-flex; align-items: center; padding: 4px 6px; border-radius: 4px; font-size: 7px; font-weight: 700; }
+.case-source.official { background: var(--green-bg); color: var(--green); }
+.case-source.community { background: #f0f0f0; color: #666; }
+.case-source-link { display: inline-flex; align-items: center; gap: 4px; color: #888; font-size: 8px; text-decoration: none; }
+.case-source-link:hover { color: #222; text-decoration: underline; text-underline-offset: 3px; }
 .case-copy h3 { margin: 15px 0 0; font-size: 18px; letter-spacing: -.025em; }
 .case-copy > p { margin: 9px 0 0; color: #777; font-size: 10px; line-height: 1.65; }
 .case-copy ul { display: grid; gap: 8px; padding: 14px 0 0; margin: 16px 0 0; border-top: 1px solid #eee; list-style: none; }
