@@ -95,7 +95,7 @@ test("counterfeit suspicion requires an observed concern", () => {
   assert.equal(result?.verdict, "needs_review");
 });
 
-test("unknown case ids and incomplete findings are rejected", () => {
+test("unknown case ids are discarded without losing valid image findings", () => {
   const unknownCase = output({
     caseMatches: [{
       caseId: "invented-case",
@@ -104,7 +104,10 @@ test("unknown case ids and incomplete findings are rejected", () => {
       evidenceKeys: ["boxFront"],
     }],
   });
-  assert.equal(normalizeAnalysisOutput(unknownCase, context), null);
+  assert.deepEqual(normalizeAnalysisOutput(unknownCase, context)?.caseMatches, []);
+});
+
+test("incomplete findings are rejected", () => {
   assert.equal(normalizeAnalysisOutput(output({ findings: [finding("boxFront")] }), context), null);
 });
 

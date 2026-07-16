@@ -20,9 +20,10 @@ test("response schema requires exactly one finding per uploaded photo", () => {
   assert.deepEqual(schema.properties.caseMatches.items.properties.caseId.enum, ["case-1"]);
 });
 
-test("response schema forbids case matches when no registered case is available", () => {
+test("response schema asks for an empty case list without an invalid zero-item constraint", () => {
   const schema = buildAnalysisResponseSchema(["boxBack"], []);
-  assert.equal(schema.properties.caseMatches.maxItems, 0);
+  assert.equal("maxItems" in schema.properties.caseMatches, false);
+  assert.match(schema.properties.caseMatches.description, /빈 배열/);
 });
 
 test("Gemini generation config enforces structured JSON with enough output room", () => {

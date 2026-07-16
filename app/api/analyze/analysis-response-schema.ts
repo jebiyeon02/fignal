@@ -44,9 +44,10 @@ export function buildAnalysisResponseSchema(
       },
       caseMatches: {
         type: "array",
-        minItems: 0,
-        maxItems: uniqueCaseIds.length,
-        description: "서버가 제공한 동일 제품 사례와 구체적으로 겹칠 때만 작성",
+        ...(uniqueCaseIds.length > 0 ? { maxItems: uniqueCaseIds.length } : {}),
+        description: uniqueCaseIds.length > 0
+          ? "서버가 제공한 동일 제품 사례와 구체적으로 겹칠 때만 작성"
+          : "등록 사례가 없으므로 빈 배열로 작성",
         items: {
           type: "object",
           additionalProperties: false,

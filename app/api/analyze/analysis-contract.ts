@@ -170,8 +170,7 @@ export function normalizeAnalysisOutput(
 
   const allowedCaseIdSet = new Set(context.allowedCaseIds);
   const caseMatches = value.caseMatches.map((match) => normalizeCaseMatch(match, uploadedKeySet, allowedCaseIdSet));
-  if (caseMatches.some((match) => match === null)) return null;
-  const normalizedCaseMatches = caseMatches as AnalysisCaseMatch[];
+  const normalizedCaseMatches = caseMatches.filter((match): match is AnalysisCaseMatch => match !== null);
   if (new Set(normalizedCaseMatches.map((match) => match.caseId)).size !== normalizedCaseMatches.length) return null;
 
   let verdict = verdictValue as AnalysisVerdict;
