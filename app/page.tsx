@@ -30,6 +30,7 @@ import {
   Store,
   TriangleAlert,
   X,
+  ZoomIn,
 } from "lucide-react";
 import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { expandedProducts } from "./catalog";
@@ -1095,68 +1096,156 @@ function CounterfeitCaseSection({ cases, observations, aiMatches }: {
   observations: Record<EvidenceKey, Observation>;
   aiMatches: AiAnalysis["caseMatches"];
 }) {
+  const [preview, setPreview] = useState<{ caseId: string; imageIndex: number } | null>(null);
   const overlapCount = cases.flatMap((item) => item.signals)
     .filter((signal) => observations[signal.evidenceKey] === "concern").length;
   const aiMatchCount = aiMatches.filter((match) => match.similarity !== "low" && cases.some((item) => item.id === match.caseId)).length;
+  const previewCase = preview ? cases.find((item) => item.id === preview.caseId) : null;
+
+  const movePreview = useCallback((direction: -1 | 1) => {
+    setPreview((current) => {
+      if (!current) return current;
+      const currentCase = cases.find((item) => item.id === current.caseId);
+      if (!currentCase || currentCase.images.length < 2) return current;
+      return {
+        ...current,
+        imageIndex: (current.imageIndex + direction + currentCase.images.length) % currentCase.images.length,
+      };
+    });
+  }, [cases]);
+
+  useEffect(() => {
+    if (!preview) return;
+    const previousOverflow = document.body.style.overflow;
+    const handleKeyDown = (event: globalThis.KeyboardEvent) => {
+      if (event.key === "Escape") setPreview(null);
+      if (event.key === "ArrowLeft") movePreview(-1);
+      if (event.key === "ArrowRight") movePreview(1);
+    };
+    document.body.style.overflow = "hidden";
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.body.style.overflow = previousOverflow;
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [movePreview, preview]);
 
   return (
-    <section className="case-section">
-      <header>
-        <div><TriangleAlert size={18} /><h2>공식·커뮤니티 가품 사례</h2></div>
-        <span>{aiMatchCount > 0 ? `AI가 ${aiMatchCount}건의 유사 사례 확인` : overlapCount > 0 ? `현재 사진과 ${overlapCount}개 특징 겹침` : `${cases.length}건 등록`}</span>
-      </header>
+    <>
+      <section className="case-section">
+        <header>
+          <div><TriangleAlert size={18} /><h2>공식·커뮤니티 가품 사례</h2></div>
+          <span>{aiMatchCount > 0 ? `AI가 ${aiMatchCount}건의 유사 사례 확인` : overlapCount > 0 ? `현재 사진과 ${overlapCount}개 특징 겹침` : `${cases.length}건 등록`}</span>
+        </header>
 
-      {cases.map((item) => {
-        const overlappingSignals = item.signals.filter((signal) => observations[signal.evidenceKey] === "concern");
-        const aiMatch = aiMatches.find((match) => match.caseId === item.id && match.similarity !== "low");
-        const hasOverlap = overlappingSignals.length > 0 || Boolean(aiMatch);
+        {cases.map((item) => {
+          const overlappingSignals = item.signals.filter((signal) => observations[signal.evidenceKey] === "concern");
+          const aiMatch = aiMatches.find((match) => match.caseId === item.id && match.similarity !== "low");
+          const hasOverlap = overlappingSignals.length > 0 || Boolean(aiMatch);
 
-        return (
-          <article className={`case-card ${hasOverlap ? "overlap" : ""}`} key={item.id}>
-            <div className={`case-images count-${Math.min(item.images.length, 4)}`}>
-              {item.images.map((image, index) => (
-                <img src={image} alt={`정품·가품 비교 사례 사진 ${index + 1}`} key={image} />
-              ))}
-            </div>
-            <div className="case-copy">
-              <span className={`case-status ${hasOverlap ? "matched" : ""}`}>
-                {aiMatch ? "AI가 유사 특징을 찾은 사례" : hasOverlap ? "현재 매물과 겹치는 사례" : "비교 참고 사례"}
-              </span>
-              <div className="case-meta">
-                <span className={`case-source ${item.sourceType}`}>
-                  {item.sourceType === "official" ? "공식 제조사 자료" : "실물 비교 사례"}
-                </span>
-                <a className="case-source-link" href={item.sourceUrl} target="_blank" rel="noreferrer">
-                  {item.sourceName} 원문 <ExternalLink size={11} />
-                </a>
+          return (
+            <article className={`case-card ${hasOverlap ? "overlap" : ""}`} key={item.id}>
+              <div className={`case-images count-${Math.min(item.images.length, 4)}`}>
+                {item.images.map((image, index) => (
+                  <button
+                    type="button"
+                    className="case-image-button"
+                    onClick={() => setPreview({ caseId: item.id, imageIndex: index })}
+                    aria-label={`${item.title} 비교 사진 ${index + 1} 크게 보기`}
+                    key={`${image}-${index}`}
+                  >
+                    <img src={image} alt={`${item.title} 비교 사진 ${index + 1}`} loading="lazy" />
+                    <span>{index + 1}</span>
+                    <ZoomIn size={16} />
+                  </button>
+                ))}
               </div>
-              <h3>{item.title}</h3>
-              <p>{item.summary}</p>
-              <ul>
-                {item.signals.map((signal) => {
-                  const signalMatches = observations[signal.evidenceKey] === "concern" || Boolean(aiMatch?.evidenceKeys.includes(signal.evidenceKey));
-                  return (
-                    <li className={signalMatches ? "matched" : ""} key={`${signal.evidenceKey}-${signal.label}`}>
-                      {signalMatches ? <TriangleAlert size={13} /> : <span />}
-                      <strong>{signal.label}</strong>
-                      {signalMatches && <em>겹침</em>}
-                    </li>
-                  );
-                })}
-              </ul>
-              {hasOverlap && (
-                <div className="case-conclusion">
-                  <strong>{aiMatch ? "AI가 찾은 사례 근거" : "가품 쪽 근거로 확인 필요"}</strong>
-                  <p>{aiMatch?.reason ?? "사진에서 `달라요`로 표시한 항목이 알려진 사례의 특징과 겹칩니다."}</p>
+              <div className="case-copy">
+                <span className={`case-status ${hasOverlap ? "matched" : ""}`}>
+                  {aiMatch ? "AI가 유사 특징을 찾은 사례" : hasOverlap ? "현재 매물과 겹치는 사례" : "비교 참고 사례"}
+                </span>
+                <div className="case-meta">
+                  <span className={`case-source ${item.sourceType}`}>
+                    {item.sourceType === "official" ? "공식 제조사 자료" : "실물 비교 사례"}
+                  </span>
+                  <a className="case-source-link" href={item.sourceUrl} target="_blank" rel="noreferrer">
+                    {item.sourceName} 원문 <ExternalLink size={11} />
+                  </a>
                 </div>
+                <h3>{item.title}</h3>
+                <p>{item.summary}</p>
+                <ul>
+                  {item.signals.map((signal) => {
+                    const signalMatches = observations[signal.evidenceKey] === "concern" || Boolean(aiMatch?.evidenceKeys.includes(signal.evidenceKey));
+                    return (
+                      <li className={signalMatches ? "matched" : ""} key={`${signal.evidenceKey}-${signal.label}`}>
+                        {signalMatches ? <TriangleAlert size={13} /> : <span />}
+                        <strong>{signal.label}</strong>
+                        {signalMatches && <em>겹침</em>}
+                      </li>
+                    );
+                  })}
+                </ul>
+                {hasOverlap && (
+                  <div className="case-conclusion">
+                    <strong>{aiMatch ? "AI가 찾은 사례 근거" : "가품 쪽 근거로 확인 필요"}</strong>
+                    <p>{aiMatch?.reason ?? "사진에서 `달라요`로 표시한 항목이 알려진 사례의 특징과 겹칩니다."}</p>
+                  </div>
+                )}
+              </div>
+            </article>
+          );
+        })}
+
+        <p className="case-note">사례는 판정 근거 중 하나입니다. 모양이 다르다고 정품이라는 뜻은 아니므로 사진과 실물을 함께 비교하세요.</p>
+      </section>
+
+      {preview && previewCase && (
+        <div className="case-lightbox-backdrop" onMouseDown={() => setPreview(null)}>
+          <section
+            className="case-lightbox"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="case-lightbox-title"
+            onMouseDown={(event) => event.stopPropagation()}
+          >
+            <header>
+              <div>
+                <span>비교 사진 {preview.imageIndex + 1} / {previewCase.images.length}</span>
+                <h2 id="case-lightbox-title">{previewCase.title}</h2>
+              </div>
+              <button type="button" autoFocus onClick={() => setPreview(null)} aria-label="비교 사진 닫기"><X size={20} /></button>
+            </header>
+            <div className="case-lightbox-stage">
+              {previewCase.images.length > 1 && (
+                <button type="button" className="case-lightbox-arrow previous" onClick={() => movePreview(-1)} aria-label="이전 비교 사진"><ArrowLeft size={22} /></button>
+              )}
+              <img src={previewCase.images[preview.imageIndex]} alt={`${previewCase.title} 비교 사진 ${preview.imageIndex + 1} 확대`} />
+              {previewCase.images.length > 1 && (
+                <button type="button" className="case-lightbox-arrow next" onClick={() => movePreview(1)} aria-label="다음 비교 사진"><ArrowRight size={22} /></button>
               )}
             </div>
-          </article>
-        );
-      })}
-
-      <p className="case-note">사례는 판정 근거 중 하나입니다. 모양이 다르다고 정품이라는 뜻은 아니므로 사진과 실물을 함께 비교하세요.</p>
-    </section>
+            {previewCase.images.length > 1 && (
+              <footer aria-label="비교 사진 목록">
+                {previewCase.images.map((image, index) => (
+                  <button
+                    type="button"
+                    className={preview.imageIndex === index ? "active" : ""}
+                    onClick={() => setPreview({ caseId: previewCase.id, imageIndex: index })}
+                    aria-label={`비교 사진 ${index + 1} 보기`}
+                    aria-current={preview.imageIndex === index ? "true" : undefined}
+                    key={`${image}-preview-${index}`}
+                  >
+                    <img src={image} alt="" />
+                    <span>{index + 1}</span>
+                  </button>
+                ))}
+              </footer>
+            )}
+          </section>
+        </div>
+      )}
+    </>
   );
 }
 
