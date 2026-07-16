@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { headers } from "next/headers";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -12,14 +13,35 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "FIGSIGNAL — 피규어 검증",
-  description: "제품명을 검색하고 핵심 사진을 비교해 넨도로이드의 진품 가능성과 가품 위험을 확인합니다.",
-  icons: {
-    icon: "/favicon.svg",
-    shortcut: "/favicon.svg",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const requestHeaders = await headers();
+  const host = requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host");
+  const protocol = requestHeaders.get("x-forwarded-proto") ?? "https";
+  const socialImage = host ? `${protocol}://${host}/og.png` : undefined;
+  const title = "FIGSIGNAL — 피규어 검증";
+  const description = "사례 비교, 추가 검토, 사진 보완과 지원 범위를 구분해 피규어 검증의 다음 행동을 안내합니다.";
+
+  return {
+    title,
+    description,
+    icons: {
+      icon: "/favicon.svg",
+      shortcut: "/favicon.svg",
+    },
+    openGraph: {
+      title,
+      description,
+      type: "website",
+      images: socialImage ? [{ url: socialImage, width: 1672, height: 941, alt: "FIGSIGNAL 피규어 검증 서비스" }] : [],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: socialImage ? [socialImage] : [],
+    },
+  };
+}
 
 export default function RootLayout({
   children,
