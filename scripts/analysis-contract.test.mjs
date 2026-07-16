@@ -38,10 +38,10 @@ test("server calculates evidence completeness and replaces model claims", () => 
   assert.match(result?.caveat ?? "", /정품 보증이나 제조사 판정이 아닙니다/);
 });
 
-test("safe verdict is downgraded when any finding is a concern", () => {
+test("one concern forces counterfeit suspicion", () => {
   const findings = uploadedKeys.map((key) => finding(key, key === "barcode" ? "concern" : "match"));
   const result = normalizeAnalysisOutput(output({ findings }), context);
-  assert.equal(result?.verdict, "needs_review");
+  assert.equal(result?.verdict, "counterfeit_suspected");
 });
 
 test("clearly garbled packaging text forces counterfeit suspicion", () => {
@@ -55,14 +55,29 @@ test("clearly garbled packaging text forces counterfeit suspicion", () => {
   assert.equal(result?.verdict, "counterfeit_suspected");
 });
 
-test("a limited text anomaly requires review but does not force a counterfeit verdict", () => {
+test("a clearly visible limited text anomaly still forces a high-risk verdict", () => {
   const findings = uploadedKeys.map((key) => ({
     ...finding(key),
     ...(key === "boxBack" ? { textIntegrity: "limited_anomaly" } : {}),
   }));
   const result = normalizeAnalysisOutput(output({ findings }), context);
 
-  assert.equal(result?.verdict, "needs_review");
+  assert.equal(result?.verdict, "counterfeit_suspected");
+});
+
+test("an intrinsic base-mark anomaly overrides other unreadable evidence", () => {
+  const findings = uploadedKeys.map((key) => ({
+    ...finding(key, key === "boxBack" ? "unclear" : key === "baseMark" ? "concern" : "match"),
+    ...(key === "boxBack" ? { textIntegrity: "unclear" } : {}),
+    ...(key === "baseMark" ? {
+      title: "받침대 각인의 무관한 테스트 문구",
+      visibleEvidence: "저작권 각인 하단에 MOCK TEST DATA가 선명하게 보입니다.",
+    } : {}),
+  }));
+  const result = normalizeAnalysisOutput(output({ verdict: "insufficient_photos", findings }), context);
+
+  assert.equal(result?.verdict, "counterfeit_suspected");
+  assert.match(result?.summary ?? "", /하나 이상의 명확한/);
 });
 
 test("unreadable essential evidence forces insufficient photos", () => {

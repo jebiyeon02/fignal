@@ -9,7 +9,12 @@ import {
   normalizeAnalysisOutput,
   type EvidenceKey,
 } from "./analysis-contract";
-import { buildNendoroidAnalysisPrompt } from "./analysis-prompt";
+import { analysisPromptVersion, buildNendoroidAnalysisPrompt } from "./analysis-prompt";
+import {
+  buildAnalysisResponseSchema,
+  buildGeminiAnalysisGenerationConfig,
+  extractGeminiCandidate,
+} from "./analysis-response-schema";
 import { nendoroidAnalysisDomainKnowledge } from "./domain-knowledge";
 
 const MAX_FILES = 8;
@@ -93,24 +98,6 @@ async function fileToGeminiPart(file: File): Promise<GeminiPart> {
       data: bytesToBase64(bytes),
     },
   };
-}
-
-function extractGeminiOutputText(payload: unknown) {
-  if (!payload || typeof payload !== "object") return null;
-  const record = payload as Record<string, unknown>;
-  const candidates = Array.isArray(record.candidates) ? record.candidates : [];
-  const firstCandidate = candidates[0];
-  if (!firstCandidate || typeof firstCandidate !== "object") return null;
-  const content = (firstCandidate as Record<string, unknown>).content;
-  if (!content || typeof content !== "object") return null;
-  const parts = (content as Record<string, unknown>).parts;
-  if (!Array.isArray(parts)) return null;
-
-  const text = parts
-    .map((part) => part && typeof part === "object" ? (part as Record<string, unknown>).text : null)
-    .filter((value): value is string => typeof value === "string")
-    .join("");
-  return text || null;
 }
 
 function parseGeminiJson(text: string) {
@@ -218,45 +205,10 @@ export async function POST(request: Request) {
     content.push(await fileToGeminiPart(item.file));
   }
 
-  const schema = {
-    type: "object",
-    additionalProperties: false,
-    properties: {
-      verdict: { type: "string", enum: ["no_obvious_risk_signals", "needs_review", "counterfeit_suspected", "insufficient_photos"] },
-      findings: {
-        type: "array",
-        items: {
-          type: "object",
-          additionalProperties: false,
-          properties: {
-            key: { type: "string", enum: evidenceKeys },
-            status: { type: "string", enum: ["match", "concern", "unclear"] },
-            textIntegrity: { type: "string", enum: ["not_applicable", "coherent", "limited_anomaly", "garbled", "unclear"] },
-            title: { type: "string" },
-            reason: { type: "string" },
-            visibleEvidence: { type: "string" },
-            userAction: { type: "string" },
-          },
-          required: ["key", "status", "textIntegrity", "title", "reason", "visibleEvidence", "userAction"],
-        },
-      },
-      caseMatches: {
-        type: "array",
-        items: {
-          type: "object",
-          additionalProperties: false,
-          properties: {
-            caseId: { type: "string" },
-            similarity: { type: "string", enum: ["high", "medium", "low"] },
-            reason: { type: "string" },
-            evidenceKeys: { type: "array", items: { type: "string", enum: evidenceKeys } },
-          },
-          required: ["caseId", "similarity", "reason", "evidenceKeys"],
-        },
-      },
-    },
-    required: ["verdict", "findings", "caseMatches"],
-  };
+  const schema = buildAnalysisResponseSchema(
+    uploaded.map((item) => item.key),
+    cases.map((counterfeitCase) => counterfeitCase.id),
+  );
 
   const prompt = buildNendoroidAnalysisPrompt(nendoroidAnalysisDomainKnowledge, schema);
 
@@ -272,9 +224,7 @@ export async function POST(request: Request) {
       body: JSON.stringify({
         systemInstruction: { parts: [{ text: prompt }] },
         contents: [{ role: "user", parts: content }],
-        generationConfig: {
-          maxOutputTokens: 1400,
-        },
+        generationConfig: buildGeminiAnalysisGenerationConfig(schema),
       }),
       signal: AbortSignal.timeout(60_000),
     });
@@ -306,7 +256,11 @@ export async function POST(request: Request) {
     return jsonError("AI가 사진을 분석하지 못했습니다. 잠시 후 다시 시도해 주세요.", 502, "AI_ANALYSIS_FAILED");
   }
 
-  const outputText = extractGeminiOutputText(upstreamPayload);
+  const candidate = extractGeminiCandidate(upstreamPayload);
+  if (candidate.finishReason === "MAX_TOKENS") {
+    return jsonError("AI 분석 응답이 길어 완료되지 않았습니다. 다시 분석해 주세요.", 502, "AI_OUTPUT_TRUNCATED");
+  }
+  const outputText = candidate.text;
   if (!outputText) {
     return jsonError("AI 분석 결과를 읽지 못했습니다.", 502, "EMPTY_AI_RESULT");
   }
@@ -319,7 +273,7 @@ export async function POST(request: Request) {
     });
     if (!analysis) throw new Error("Invalid analysis contract");
     return Response.json(
-      { analysis },
+      { analysis, meta: { promptVersion: analysisPromptVersion } },
       { headers: { "Cache-Control": "no-store" } },
     );
   } catch {

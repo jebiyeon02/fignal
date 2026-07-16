@@ -507,7 +507,6 @@ export default function Home() {
   const matchedCaseSignals = aiProductCases.flatMap((item) => item.signals)
     .filter((signal) => observations[signal.evidenceKey] === "concern");
   const hasKnownCaseOverlap = matchedCaseSignals.length > 0;
-  const riskPoints = concernItems.reduce((sum, item) => sum + item.weight, 0);
   const localEvidencePoints = Object.values(observations).reduce(
     (sum, observation) => sum + (observation === "match" || observation === "concern" ? 1 : observation === "unverified" ? 0.5 : 0),
     0,
@@ -520,6 +519,8 @@ export default function Home() {
     supported: Boolean(currentProduct?.verified),
     evidenceReady,
     analysisNeedsPhotos: aiAnalysis?.verdict === "insufficient_photos",
+    analysisNeedsReview: aiAnalysis?.verdict === "needs_review",
+    hasRiskSignals: concernItems.length > 0,
     hasComparisonCases: aiProductCases.length > 0,
   });
   const reviewPathResult = reviewPathCopy[reviewPath];
@@ -534,13 +535,11 @@ export default function Home() {
       : [];
   });
 
-  const calculatedResult = essentialCompleted < 4 || assessedCount < 3
-    ? { label: "사진이 더 필요함", tone: "neutral", summary: "핵심 사진을 조금 더 확인해야 합니다." }
-    : riskPoints >= 18
-      ? { label: "가품 가능성 높음", tone: "danger", summary: hasKnownCaseOverlap ? "확인한 차이 중 알려진 가품 사례와 겹치는 특징이 있습니다." : "공식 제품과 다른 점이 여러 곳에서 보입니다." }
-      : riskPoints >= 8
-        ? { label: "판정이 애매함", tone: "caution", summary: hasKnownCaseOverlap ? "알려진 가품 사례와 겹치는 항목을 거래 전에 다시 확인하세요." : "거래 전에 다시 볼 항목이 있습니다." }
-        : { label: "뚜렷한 위험 신호 미확인", tone: "safe", summary: "확인한 사진에서 뚜렷한 가품 위험 신호는 보이지 않습니다. 정품 확인을 뜻하지는 않습니다." };
+  const calculatedResult = concernItems.length > 0
+    ? { label: "가품 가능성 높음", tone: "danger", summary: hasKnownCaseOverlap ? "명확한 비정상 신호가 알려진 가품 사례의 특징과 겹칩니다." : "하나 이상의 명확한 비정상 신호가 확인됐습니다." }
+    : essentialCompleted < 4 || assessedCount < 3
+      ? { label: "사진이 더 필요함", tone: "neutral", summary: "핵심 사진을 조금 더 확인해야 합니다." }
+      : { label: "뚜렷한 위험 신호 미확인", tone: "safe", summary: "확인한 사진에서 뚜렷한 가품 위험 신호는 보이지 않습니다. 정품 확인을 뜻하지는 않습니다." };
   const aiVerdict = aiAnalysis ? {
     no_obvious_risk_signals: { label: "뚜렷한 위험 신호 미확인", tone: "safe", summary: aiAnalysis.summary },
     needs_review: { label: "판정이 애매함", tone: "caution", summary: aiAnalysis.summary },
@@ -916,8 +915,8 @@ export default function Home() {
           <div className={`review-route-preview ${aiProductCases.length > 0 ? "known" : "new"}`}>
             {aiProductCases.length > 0 ? <FileCheck2 size={18} /> : <MessageCircle size={18} />}
             <span>
-              <strong>{aiProductCases.length > 0 ? `제품별 비교 사례 ${aiProductCases.length}건` : "제품별 비교 사례가 아직 없습니다"}</strong>
-              <small>{aiProductCases.length > 0 ? "사진 분석 후 등록 사례와 공통점과 차이점을 보여드립니다." : "범용 기준으로 먼저 분석하고 공유 가능한 추가 검토 요청서를 만듭니다."}</small>
+              <strong>{aiProductCases.length > 0 ? `제품별 비교 사례 ${aiProductCases.length}건` : "범용 전문가 패턴으로 분석"}</strong>
+              <small>{aiProductCases.length > 0 ? "사진 분석 후 등록 사례와 공통점과 차이점을 보여드립니다." : "제품별 사례가 없어도 공식·검수 사례에서 정리한 범용 위험 패턴으로 결론을 냅니다."}</small>
             </span>
           </div>
 
@@ -964,6 +963,7 @@ export default function Home() {
             product={currentProduct}
             comparisonCaseCount={aiProductCases.length}
             matchedCaseCount={aiAnalysis?.caseMatches.length ?? 0}
+            riskSignalCount={concernItems.length}
             photoActions={photoActions}
             reviewRequestShared={reviewRequestShared}
             onAddPhotos={() => { setStage("photos"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
@@ -1012,6 +1012,7 @@ function ReviewPathSection({
   product,
   comparisonCaseCount,
   matchedCaseCount,
+  riskSignalCount,
   photoActions,
   reviewRequestShared,
   onAddPhotos,
@@ -1022,12 +1023,22 @@ function ReviewPathSection({
   product: Product;
   comparisonCaseCount: number;
   matchedCaseCount: number;
+  riskSignalCount: number;
   photoActions: Array<{ key: EvidenceKey; title: string; description: string }>;
   reviewRequestShared: boolean;
   onAddPhotos: () => void;
   onShareReviewRequest: () => void;
   onSelectAnotherProduct: () => void;
 }) {
+  if (path === "risk_detected") {
+    return (
+      <section className="review-path-panel risk-detected">
+        <div className="review-path-heading"><TriangleAlert size={21} /><span><strong>명확한 비정상 신호 {riskSignalCount}개를 감지했어요</strong><small>제품별 비교 사례가 없어도 이 신호는 최종 위험 판정에 반영됩니다.</small></span></div>
+        <p>아래 항목에서 사진에 실제로 보인 내용과 위험 판단 이유를 확인하세요. 이 결과는 가품 확정이 아니라 거래를 중단하고 판매자·제조사 확인을 우선하라는 높은 위험 경고입니다.</p>
+      </section>
+    );
+  }
+
   if (path === "case_comparison") {
     return (
       <section className="review-path-panel comparison">
@@ -1040,14 +1051,23 @@ function ReviewPathSection({
   if (path === "additional_review") {
     return (
       <section className="review-path-panel additional">
-        <div className="review-path-heading"><MessageCircle size={21} /><span><strong>이 제품의 첫 검토 사례를 만들 수 있어요</strong><small>범용 기준 분석은 끝났지만 제품별 비교 근거는 아직 없습니다.</small></span></div>
+        <div className="review-path-heading"><MessageCircle size={21} /><span><strong>판본 또는 근거를 한 번 더 확인해 주세요</strong><small>명확한 비정상 신호는 없지만 서로 충돌하는 정보가 남아 있습니다.</small></span></div>
         <ol className="review-path-steps">
-          <li><span>1</span><p><strong>1차 분석 완료</strong>공식 제품 정보와 사진에서 보이는 범용 위험 신호를 정리했습니다.</p></li>
+          <li><span>1</span><p><strong>1차 분석 완료</strong>공식 제품 정보와 범용·제품별 위험 신호를 모두 확인했습니다.</p></li>
           <li><span>2</span><p><strong>추가 의견 요청</strong>아래 요청서를 커뮤니티 또는 전문가에게 공유해 검토를 이어갈 수 있습니다.</p></li>
           <li><span>3</span><p><strong>사례로 축적</strong>확인된 근거는 이후 같은 제품을 검토할 때 사용할 수 있습니다.</p></li>
         </ol>
         <button className="line-button review-request-button" onClick={onShareReviewRequest}><Share2 size={16} /> {reviewRequestShared ? "검토 요청서 다시 공유" : "검토 요청서 공유"}</button>
-        {reviewRequestShared && <p className="review-request-state"><CheckCircle2 size={14} /> 요청서를 공유했습니다. 검토 결과가 확인되기 전까지 최종 결론은 보류됩니다.</p>}
+        {reviewRequestShared && <p className="review-request-state"><CheckCircle2 size={14} /> 요청서를 공유했습니다. 충돌한 근거가 해소되면 다시 분석하세요.</p>}
+      </section>
+    );
+  }
+
+  if (path === "general_analysis") {
+    return (
+      <section className="review-path-panel comparison">
+        <div className="review-path-heading"><ShieldCheck size={21} /><span><strong>범용 전문가 패턴으로 분석했어요</strong><small>제품별 사례 부재를 결론 보류 조건으로 사용하지 않았습니다.</small></span></div>
+        <p>공식 가품 사례에서 반복된 포장 문자, 각인, 부품 분할, 연결부, 나사·자석, 도색·재질 패턴과 정상 공정 편차를 함께 적용했습니다.</p>
       </section>
     );
   }
@@ -1131,8 +1151,8 @@ function EvidenceCard({ item, observation, fileName, preview, onFile, onRemove, 
 function VerificationCriteriaDialog({ onClose }: { onClose: () => void }) {
   const verdicts = [
     { label: "뚜렷한 위험 신호 미확인", tone: "safe", description: "핵심 사진에서 현재 알려진 가품 위험 신호가 보이지 않을 때. 정품 확인을 뜻하지 않음" },
-    { label: "판정이 애매함", tone: "caution", description: "일치·차이 근거가 섞이거나 중요한 표기를 선명하게 읽지 못할 때" },
-    { label: "가품 가능성 높음", tone: "danger", description: "공식 제품과 다른 특징이 여러 곳에서 확인되거나 알려진 가품 사례와 겹칠 때" },
+    { label: "판정이 애매함", tone: "caution", description: "명확한 비정상은 없지만 판본 정보나 서로 충돌하는 근거가 남을 때" },
+    { label: "가품 가능성 높음", tone: "danger", description: "사진에서 명확한 비정상 신호가 하나 이상 확인될 때. 제품별 사례 유무와 무관" },
     { label: "사진이 더 필요함", tone: "neutral", description: "박스·각인·얼굴 등 핵심 사진이 부족해 비교 근거가 충분하지 않을 때" },
   ];
 

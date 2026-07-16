@@ -70,8 +70,8 @@ const packagingEvidenceKeySet = new Set<string>(["boxFront", "boxBack", "barcode
 
 const resultSummaries: Record<AnalysisVerdict, string> = {
   no_obvious_risk_signals: "제공된 사진에서 뚜렷한 가품 위험 신호는 확인되지 않았습니다.",
-  needs_review: "일치하는 점과 확인이 필요한 점이 함께 있어 추가 검토가 필요합니다.",
-  counterfeit_suspected: "제공된 사진에서 가품 위험 신호로 볼 수 있는 차이가 관찰됐습니다.",
+  needs_review: "명확한 비정상 신호는 없지만 판본 또는 근거가 충돌해 추가 검토가 필요합니다.",
+  counterfeit_suspected: "제공된 사진에서 하나 이상의 명확한 가품 위험 신호가 관찰됐습니다.",
   insufficient_photos: "핵심 표기를 충분히 읽지 못해 위험 신호를 판단하기 어렵습니다.",
 };
 
@@ -176,17 +176,13 @@ export function normalizeAnalysisOutput(
 
   let verdict = verdictValue as AnalysisVerdict;
   const concernCount = normalizedFindings.filter((finding) => finding.status === "concern").length;
-  const hasGarbledPackagingText = normalizedFindings.some(
-    (finding) => packagingEvidenceKeySet.has(finding.key) && finding.textIntegrity === "garbled",
-  );
   const readableEssentialCount = normalizedFindings.filter(
     (finding) => essentialEvidenceKeys.includes(finding.key as (typeof essentialEvidenceKeys)[number])
       && finding.status !== "unclear",
   ).length;
 
-  if (readableEssentialCount < 4) verdict = "insufficient_photos";
-  else if (hasGarbledPackagingText) verdict = "counterfeit_suspected";
-  else if (verdict === "no_obvious_risk_signals" && concernCount > 0) verdict = "needs_review";
+  if (concernCount > 0) verdict = "counterfeit_suspected";
+  else if (readableEssentialCount < 4) verdict = "insufficient_photos";
   else if (verdict === "counterfeit_suspected" && concernCount === 0) verdict = "needs_review";
 
   return {
