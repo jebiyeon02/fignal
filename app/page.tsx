@@ -17,6 +17,7 @@ import {
   Image as ImageIcon,
   Info,
   LoaderCircle,
+  MessageCircle,
   PackageCheck,
   Plus,
   RotateCcw,
@@ -32,6 +33,7 @@ import {
 } from "lucide-react";
 import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { expandedProducts } from "./catalog";
+import { communityMentions, type CommunityMention } from "./community-mentions";
 import {
   counterfeitCases,
   type CounterfeitCase,
@@ -500,6 +502,7 @@ export default function Home() {
   const concernItems = evidenceItems.filter((item) => observations[item.key] === "concern");
   const pendingItems = evidenceItems.filter((item) => observations[item.key] === "unverified" || observations[item.key] === "missing");
   const productCases = counterfeitCases.filter((item) => item.productId === currentProduct?.id);
+  const productCommunityMentions = communityMentions.filter((item) => item.productId === currentProduct?.id);
   const matchedCaseSignals = productCases.flatMap((item) => item.signals)
     .filter((signal) => observations[signal.evidenceKey] === "concern");
   const hasKnownCaseOverlap = matchedCaseSignals.length > 0;
@@ -899,6 +902,10 @@ export default function Home() {
             <CounterfeitCaseSection cases={productCases} observations={observations} aiMatches={aiAnalysis?.caseMatches ?? []} />
           )}
 
+          {productCommunityMentions.length > 0 && (
+            <CommunityMentionsSection mentions={productCommunityMentions} />
+          )}
+
           {pendingItems.some((item) => observations[item.key] === "missing") && <div className="pending-line"><CircleHelp size={16} /><span><strong>올리지 않은 사진</strong>{pendingItems.filter((item) => observations[item.key] === "missing").map((item) => item.title).join(" · ")}</span></div>}
 
           <section className="lookup-source">
@@ -1150,5 +1157,63 @@ function CounterfeitCaseSection({ cases, observations, aiMatches }: {
 
       <p className="case-note">사례는 판정 근거 중 하나입니다. 모양이 다르다고 정품이라는 뜻은 아니므로 사진과 실물을 함께 비교하세요.</p>
     </section>
+  );
+}
+
+const communitySignalLabels: Record<string, string> = {
+  packaging: "패키지",
+  paint: "도색·마감",
+  joint: "관절",
+  mold: "조형·몰드",
+  face: "얼굴 인쇄",
+  price: "가격",
+  logo: "로고",
+  barcode: "바코드·JAN",
+  base: "받침대",
+  copyright: "저작권 표기",
+  blister: "내부 포장",
+};
+
+function CommunityMentionsSection({ mentions }: { mentions: CommunityMention[] }) {
+  return (
+    <details className="community-mentions">
+      <summary>
+        <span className="community-summary-title">
+          <MessageCircle size={18} />
+          <span><strong>관련 커뮤니티 언급</strong><small>검증 전 참고자료 {mentions.length}건</small></span>
+        </span>
+        <span className="community-impact">판정 미반영</span>
+        <ChevronDown className="community-chevron" size={17} />
+      </summary>
+      <div className="community-mentions-body">
+        <p className="community-caution"><Info size={15} /> 커뮤니티 게시물의 주장과 질문은 사실 확인 전 자료입니다. AI 판정과 점수에는 사용하지 않았으며, 제품이 같은지 확인된 원문만 참고용으로 연결했습니다.</p>
+        <div className="community-mention-list">
+          {mentions.map((mention) => {
+            const signalLabels = [...new Set(mention.signalTags.map((tag) => communitySignalLabels[tag]).filter(Boolean))];
+            const publishedDate = mention.sourcePublishedAt?.slice(0, 10).replaceAll("-", ".");
+            return (
+              <article key={mention.mentionId}>
+                <div className="community-mention-meta">
+                  <span className={`community-status ${mention.status}`}>{mention.statusLabel}</span>
+                  <span>검증 전</span>
+                </div>
+                <h3>{mention.publicTitle}</h3>
+                <p>{mention.publicSummary}</p>
+                {(signalLabels.length > 0 || mention.imageReferenceCount > 0) && (
+                  <div className="community-mention-signals">
+                    {signalLabels.map((label) => <span key={label}>{label} 언급</span>)}
+                    {mention.imageReferenceCount > 0 && <span>원문 이미지 {mention.imageReferenceCount}장</span>}
+                  </div>
+                )}
+                <div className="community-mention-source">
+                  <span>{publishedDate ?? "게시일 미확인"}</span>
+                  <a href={mention.sourceUrl} target="_blank" rel="noreferrer">외부 커뮤니티 원문 <ExternalLink size={12} /></a>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </div>
+    </details>
   );
 }

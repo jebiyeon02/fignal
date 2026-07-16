@@ -268,6 +268,36 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .case-conclusion p { margin: 4px 0 0; color: #75534f; font-size: 8px; line-height: 1.5; }
 .case-note { margin: 11px 0 0; color: #aaa; font-size: 8px; text-align: right; }
 
+.community-mentions { margin-top: 30px; border: 1px solid #e2e2e2; border-radius: 12px; background: #fff; }
+.community-mentions > summary { min-height: 74px; display: flex; align-items: center; gap: 12px; padding: 16px 18px; list-style: none; cursor: pointer; }
+.community-mentions > summary::-webkit-details-marker { display: none; }
+.community-summary-title { min-width: 0; flex: 1; display: flex; align-items: center; gap: 11px; }
+.community-summary-title > svg { flex: 0 0 auto; color: #555; }
+.community-summary-title > span { min-width: 0; display: grid; gap: 4px; }
+.community-summary-title strong { font-size: 13px; }
+.community-summary-title small { color: #999; font-size: 9px; }
+.community-impact { flex: 0 0 auto; padding: 5px 7px; border-radius: 5px; background: #f1f1f1; color: #777; font-size: 8px; font-weight: 700; }
+.community-chevron { flex: 0 0 auto; color: #888; transition: transform .18s ease; }
+.community-mentions[open] .community-chevron { transform: rotate(180deg); }
+.community-mentions-body { padding: 0 18px 18px; border-top: 1px solid #eee; }
+.community-caution { display: flex; align-items: flex-start; gap: 8px; padding: 12px 13px; margin: 16px 0 0; background: #f7f7f7; color: #777; font-size: 9px; line-height: 1.55; }
+.community-caution svg { flex: 0 0 auto; margin-top: 1px; }
+.community-mention-list { margin-top: 6px; }
+.community-mention-list article { padding: 18px 2px; border-bottom: 1px solid #eee; }
+.community-mention-list article:last-child { padding-bottom: 2px; border-bottom: 0; }
+.community-mention-meta { display: flex; align-items: center; gap: 7px; }
+.community-mention-meta > span:last-child { color: #aaa; font-size: 8px; }
+.community-status { padding: 4px 6px; border-radius: 4px; background: #f1f1f1; color: #666; font-size: 8px; font-weight: 700; }
+.community-status.community_catalog_asserted, .community-status.author_asserted { background: var(--amber-bg); color: var(--amber); }
+.community-mention-list h3 { margin: 10px 0 0; font-size: 13px; }
+.community-mention-list article > p { margin: 6px 0 0; color: #777; font-size: 9px; line-height: 1.6; }
+.community-mention-signals { display: flex; flex-wrap: wrap; gap: 5px; margin-top: 11px; }
+.community-mention-signals span { padding: 5px 7px; border-radius: 999px; background: #f4f4f4; color: #777; font-size: 8px; }
+.community-mention-source { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-top: 13px; }
+.community-mention-source > span { color: #aaa; font-size: 8px; }
+.community-mention-source a { display: inline-flex; align-items: center; gap: 5px; color: #555; font-size: 9px; font-weight: 650; text-decoration: none; }
+.community-mention-source a:hover { color: #111; text-decoration: underline; text-underline-offset: 3px; }
+
 .reason-section { margin-top: 46px; }
 .reason-section > header { display: flex; align-items: baseline; justify-content: space-between; padding-bottom: 13px; border-bottom: 2px solid #222; }
 .reason-section h2 { margin: 0; font-size: 17px; }
@@ -383,6 +413,10 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
   .case-copy { padding: 0; }
   .case-section > header { align-items: flex-end; }
   .case-section > header > span { max-width: 130px; text-align: right; }
+  .community-mentions > summary { padding: 15px 14px; }
+  .community-mentions-body { padding: 0 14px 14px; }
+  .community-impact { display: none; }
+  .community-mention-source { align-items: flex-start; }
   .lookup-source { align-items: flex-start; }
   .criteria-header { padding: 26px 22px 22px; }
   .criteria-header h2 { font-size: 25px; }

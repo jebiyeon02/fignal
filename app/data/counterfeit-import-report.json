@@ -25,5 +25,15 @@
     "not_image": 1,
     "unverified": 10
   },
-  "imageFailureCount": 8
+  "imageFailureCount": 8,
+  "fullSourceCaseCount": 1008,
+  "communityCandidateCount": 959,
+  "linkedCommunityMentionCount": 25,
+  "linkedCommunityProductCount": 21,
+  "unlinkedCommunityMentionCount": 934,
+  "invalidCommunitySourceUrlCount": 0,
+  "communityMentionStatusCounts": {
+    "community_catalog_asserted": 10,
+    "unverified_question": 15
+  }
 }

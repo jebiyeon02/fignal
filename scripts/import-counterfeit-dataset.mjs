@@ -4,10 +4,17 @@ import { createHash } from "node:crypto";
 import { readFile, mkdir, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import ts from "typescript";
 
 const AUTO_LABELS = new Set(["official_confirmed", "side_by_side_author_asserted"]);
 const REVIEW_LABELS = new Set(["community_catalog_asserted", "author_asserted"]);
 const EXCLUDED_LABELS = new Set(["uncertain", "unreviewed_community_question", "community_reference"]);
+const COMMUNITY_LABELS = new Set([
+  "community_catalog_asserted",
+  "author_asserted",
+  "unreviewed_community_question",
+  "community_reference",
+]);
 
 const scriptDirectory = path.dirname(fileURLToPath(import.meta.url));
 const defaultMapPath = path.join(scriptDirectory, "counterfeit-product-map.json");
@@ -77,6 +84,229 @@ function normalizeUrl(value) {
   } catch {
     return null;
   }
+}
+
+function normalizeSearchText(value) {
+  return String(value ?? "")
+    .normalize("NFKC")
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function propertyString(object, key) {
+  const property = object.properties.find((candidate) => {
+    if (!ts.isPropertyAssignment(candidate)) return false;
+    if (ts.isIdentifier(candidate.name) || ts.isStringLiteral(candidate.name)) return candidate.name.text === key;
+    return false;
+  });
+  if (!property || !ts.isPropertyAssignment(property)) return null;
+  if (ts.isStringLiteral(property.initializer) || ts.isNoSubstitutionTemplateLiteral(property.initializer)) {
+    return property.initializer.text;
+  }
+  return null;
+}
+
+export function extractCatalogProductsFromTs(sourceText, fileName = "catalog.ts") {
+  const sourceFile = ts.createSourceFile(
+    fileName,
+    sourceText,
+    ts.ScriptTarget.Latest,
+    true,
+    fileName.endsWith("x") ? ts.ScriptKind.TSX : ts.ScriptKind.TS,
+  );
+  const products = [];
+
+  function visit(node) {
+    if (
+      ts.isVariableDeclaration(node)
+      && ts.isIdentifier(node.name)
+      && new Set(["expandedProducts", "curatedProducts"]).has(node.name.text)
+      && node.initializer
+      && ts.isArrayLiteralExpression(node.initializer)
+    ) {
+      for (const element of node.initializer.elements) {
+        if (!ts.isObjectLiteralExpression(element)) continue;
+        const product = {
+          id: propertyString(element, "id"),
+          name: propertyString(element, "name"),
+          englishName: propertyString(element, "englishName"),
+          number: propertyString(element, "number"),
+        };
+        if (product.id && product.name && product.englishName && product.number) products.push(product);
+      }
+    }
+    ts.forEachChild(node, visit);
+  }
+
+  visit(sourceFile);
+  return products;
+}
+
+function productIdentityNames(product) {
+  const values = [product.name, product.englishName]
+    .flatMap((value) => [value, value.replace(/^\s*(?:넨도로이드|nendoroid)\s*/iu, "")])
+    .map(normalizeSearchText)
+    .filter((value) => value.length >= 4);
+  return [...new Set(values)].sort((left, right) => right.length - left.length);
+}
+
+function explicitlyMentionedNumbers(title) {
+  const numbers = new Set();
+  const patterns = [
+    /(?:nendoroid|nendo|넨도로이드|넨도|no\.?|#)\s*#?\s*(\d{1,4})(?!\d)/giu,
+    /(\d{1,4})\s*(?:번\s*)?(?:nendoroid|nendo|넨도로이드|넨도)/giu,
+  ];
+  for (const pattern of patterns) {
+    for (const match of title.matchAll(pattern)) numbers.add(String(Number(match[1])));
+  }
+  return [...numbers];
+}
+
+function matchByName(title, catalogProducts, allowedIds = null) {
+  const normalizedTitle = normalizeSearchText(title);
+  const containsIdentity = (identity) => (
+    normalizedTitle === identity
+    || normalizedTitle.startsWith(`${identity} `)
+    || normalizedTitle.endsWith(` ${identity}`)
+    || normalizedTitle.includes(` ${identity} `)
+  );
+  const matches = catalogProducts
+    .filter((product) => !allowedIds || allowedIds.has(product.id))
+    .flatMap((product) => productIdentityNames(product)
+      .filter(containsIdentity)
+      .map((identity) => ({ product, length: identity.length })))
+    .sort((left, right) => right.length - left.length);
+  if (matches.length === 0) return null;
+  const longest = matches[0].length;
+  const products = [...new Map(matches.filter((match) => match.length === longest).map((match) => [match.product.id, match.product])).values()];
+  return products.length === 1 ? products[0] : null;
+}
+
+function hasUnmatchedVariantMarker(title, product) {
+  const normalizedTitle = normalizeSearchText(title);
+  const matchedIdentity = productIdentityNames(product).find((identity) => (
+    normalizedTitle === identity
+    || normalizedTitle.startsWith(`${identity} `)
+    || normalizedTitle.endsWith(` ${identity}`)
+    || normalizedTitle.includes(` ${identity} `)
+  ));
+  if (!matchedIdentity) return false;
+  const remaining = normalizedTitle.replace(matchedIdentity, " ").replace(/\s+/g, " ").trim();
+  return /(?:^|\s)(?:(?:19|20)\d{2}|\d+(?:st|nd|rd|th)|anniversary|edition|version|ver|주년|에디션|버전)(?:\s|$)/iu.test(remaining);
+}
+
+export function matchCommunityProduct(row, catalogProducts, productMap = {}) {
+  const mapped = productMap[row.case_id] ?? [];
+  if (mapped.length === 1) {
+    const product = catalogProducts.find((candidate) => candidate.id === mapped[0].productId);
+    if (product) return { product, basis: "curated_mapping" };
+  }
+
+  const title = row.product_or_post_title ?? "";
+  const mentionedNumbers = explicitlyMentionedNumbers(title);
+  for (const number of mentionedNumbers) {
+    const candidates = catalogProducts.filter((product) => String(Number(product.number)) === number);
+    if (candidates.length === 1) return { product: candidates[0], basis: "number" };
+    if (candidates.length > 1) {
+      const byName = matchByName(title, catalogProducts, new Set(candidates.map((product) => product.id)));
+      if (byName) return { product: byName, basis: "number_and_name" };
+    }
+  }
+  if (mentionedNumbers.length > 0) return null;
+
+  const byName = matchByName(title, catalogProducts);
+  return byName && !hasUnmatchedVariantMarker(title, byName) ? { product: byName, basis: "name" } : null;
+}
+
+function communityPresentation(labelStrength) {
+  if (labelStrength === "community_catalog_asserted") {
+    return {
+      status: "community_catalog_asserted",
+      statusLabel: "커뮤니티 분류",
+      publicTitle: "동일 제품의 가품 분류 사례",
+      publicSummary: "외부 커뮤니티에서 가품 사례로 분류했지만 제조사나 독립 검수자가 확인한 자료는 아닙니다.",
+    };
+  }
+  if (labelStrength === "author_asserted") {
+    return {
+      status: "author_asserted",
+      statusLabel: "작성자 주장",
+      publicTitle: "동일 제품의 가품 주장 사례",
+      publicSummary: "게시물 작성자가 가품이라고 설명한 자료이며 제조사 확인이나 독립 검수는 거치지 않았습니다.",
+    };
+  }
+  if (labelStrength === "community_reference") {
+    return {
+      status: "community_reference",
+      statusLabel: "일반 참고",
+      publicTitle: "정품·가품 판별 참고자료",
+      publicSummary: "커뮤니티의 일반 판별 참고자료이며 현재 제품이나 매물의 진위를 증명하지 않습니다.",
+    };
+  }
+  return {
+    status: "unverified_question",
+    statusLabel: "정품 여부 질문",
+    publicTitle: "동일 제품의 정품 여부 질문 사례",
+    publicSummary: "동일 제품의 정품 여부를 묻는 게시물이 있었지만 결론과 근거는 검증되지 않았습니다.",
+  };
+}
+
+export function buildCommunityMentions(allCaseRows, catalogProducts, productMap = {}) {
+  const candidates = allCaseRows.filter((row) => COMMUNITY_LABELS.has(row.label_strength));
+  const mentionsByKey = new Map();
+  const statusCounts = {};
+  let invalidSourceUrlCount = 0;
+
+  for (const row of candidates) {
+    const sourceUrl = normalizeUrl(row.source_url);
+    if (!sourceUrl) {
+      invalidSourceUrlCount += 1;
+      continue;
+    }
+    const match = matchCommunityProduct(row, catalogProducts, productMap);
+    if (!match) continue;
+    const presentation = communityPresentation(row.label_strength);
+    const key = `${match.product.id}|${sourceUrl.href}`;
+    if (mentionsByKey.has(key)) continue;
+    const mention = {
+      mentionId: `mention_${sha256(`${row.case_id}|${match.product.id}`).slice(0, 20)}`,
+      sourceCaseId: row.case_id,
+      productId: match.product.id,
+      productName: match.product.name,
+      nendoroidNumber: match.product.number,
+      ...presentation,
+      sourceUrl: sourceUrl.href,
+      sourcePublishedAt: row.published_date || null,
+      signalTags: row.signal_tags.split("|").filter(Boolean),
+      imageReferenceCount: Number(row.image_count || 0),
+      rightsStatus: row.rights_status || "unknown_link_only",
+      exactMatchBasis: match.basis,
+      verdictImpact: "none",
+      requiresHumanReview: true,
+    };
+    mentionsByKey.set(key, mention);
+    statusCounts[mention.status] = (statusCounts[mention.status] ?? 0) + 1;
+  }
+
+  const mentions = [...mentionsByKey.values()].sort((left, right) => (
+    left.productId.localeCompare(right.productId)
+    || String(right.sourcePublishedAt ?? "").localeCompare(String(left.sourcePublishedAt ?? ""))
+    || left.mentionId.localeCompare(right.mentionId)
+  ));
+  return {
+    mentions,
+    report: {
+      fullSourceCaseCount: allCaseRows.length,
+      communityCandidateCount: candidates.length,
+      linkedCommunityMentionCount: mentions.length,
+      linkedCommunityProductCount: new Set(mentions.map((mention) => mention.productId)).size,
+      unlinkedCommunityMentionCount: candidates.length - mentions.length - invalidSourceUrlCount,
+      invalidCommunitySourceUrlCount: invalidSourceUrlCount,
+      communityMentionStatusCounts: statusCounts,
+    },
+  };
 }
 
 export function imageDedupeKey(value) {
@@ -166,7 +396,15 @@ async function mapWithConcurrency(items, limit, mapper) {
   return results;
 }
 
-export async function buildEvidenceDataset({ caseRows, imageRows, uniqueImageRows, productMap, checkLinks = false }) {
+export async function buildEvidenceDataset({
+  caseRows,
+  allCaseRows = caseRows,
+  imageRows,
+  uniqueImageRows,
+  productMap,
+  catalogProducts = [],
+  checkLinks = false,
+}) {
   const candidateIds = new Set(caseRows.map((row) => row.case_id));
   const candidateImageRows = imageRows.filter((row) => candidateIds.has(row.case_id));
   const uniqueByOriginalUrl = new Map(uniqueImageRows.map((row) => [row.image_url, row]));
@@ -308,6 +546,7 @@ export async function buildEvidenceDataset({ caseRows, imageRows, uniqueImageRow
   const imageStatusCounts = Object.fromEntries(
     [...new Set(images.map((image) => image.linkStatus))].sort().map((status) => [status, images.filter((image) => image.linkStatus === status).length]),
   );
+  const community = buildCommunityMentions(allCaseRows, catalogProducts, productMap);
   const report = {
     schemaVersion: 1,
     inputCaseCount: caseRows.length,
@@ -329,6 +568,7 @@ export async function buildEvidenceDataset({ caseRows, imageRows, uniqueImageRow
     hashDeferredBecauseRightsUnknownCount: images.length,
     imageStatusCounts,
     imageFailureCount: images.filter((image) => new Set(["broken", "not_image", "access_restricted"]).has(image.linkStatus)).length,
+    ...community.report,
   };
 
   const generatedAt = caseRows.map((row) => row.retrieved_at).filter(Boolean).sort().at(-1) ?? new Date().toISOString();
@@ -336,7 +576,7 @@ export async function buildEvidenceDataset({ caseRows, imageRows, uniqueImageRow
     dataset: {
       schemaVersion: 1,
       generatedAt,
-      sourceFiles: ["candidate_counterfeit_cases.csv", "image_manifest.csv", "unique_image_manifest.csv", "labeling_guide.md"],
+      sourceFiles: ["cases.csv", "candidate_counterfeit_cases.csv", "image_manifest.csv", "unique_image_manifest.csv", "labeling_guide.md"],
       cases: registeredCases,
       images,
     },
@@ -344,6 +584,12 @@ export async function buildEvidenceDataset({ caseRows, imageRows, uniqueImageRow
       schemaVersion: 1,
       generatedAt,
       cases: reviewQueue,
+    },
+    communityMentions: {
+      schemaVersion: 1,
+      generatedAt,
+      verdictImpact: "none",
+      mentions: community.mentions,
     },
     report: { generatedAt, ...report },
   };
@@ -369,17 +615,26 @@ function parseArguments(argv) {
 
 async function main() {
   const options = parseArguments(process.argv.slice(2));
-  const [caseText, imageText, uniqueImageText, mapText] = await Promise.all([
+  const [caseText, allCaseText, imageText, uniqueImageText, mapText, catalogText, pageText] = await Promise.all([
     readFile(path.join(options.dataset, "candidate_counterfeit_cases.csv"), "utf8"),
+    readFile(path.join(options.dataset, "cases.csv"), "utf8"),
     readFile(path.join(options.dataset, "image_manifest.csv"), "utf8"),
     readFile(path.join(options.dataset, "unique_image_manifest.csv"), "utf8"),
     readFile(options.map, "utf8"),
+    readFile(path.resolve(scriptDirectory, "../app/catalog.ts"), "utf8"),
+    readFile(path.resolve(scriptDirectory, "../app/page.tsx"), "utf8"),
   ]);
+  const catalogProducts = [
+    ...extractCatalogProductsFromTs(catalogText, "catalog.ts"),
+    ...extractCatalogProductsFromTs(pageText, "page.tsx"),
+  ].filter((product, index, allProducts) => allProducts.findIndex((candidate) => candidate.id === product.id) === index);
   const result = await buildEvidenceDataset({
     caseRows: parseCsv(caseText),
+    allCaseRows: parseCsv(allCaseText),
     imageRows: parseCsv(imageText),
     uniqueImageRows: parseCsv(uniqueImageText),
     productMap: JSON.parse(mapText),
+    catalogProducts,
     checkLinks: options.checkLinks,
   });
 
@@ -388,6 +643,7 @@ async function main() {
     await Promise.all([
       writeFile(path.join(options.out, "counterfeit-evidence.generated.json"), `${JSON.stringify(result.dataset, null, 2)}\n`),
       writeFile(path.join(options.out, "counterfeit-review-queue.generated.json"), `${JSON.stringify(result.reviewQueue, null, 2)}\n`),
+      writeFile(path.join(options.out, "community-mentions.generated.json"), `${JSON.stringify(result.communityMentions, null, 2)}\n`),
       writeFile(path.join(options.out, "counterfeit-import-report.json"), `${JSON.stringify(result.report, null, 2)}\n`),
     ]);
   }
