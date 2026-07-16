@@ -1,0 +1,29 @@
+{
+  "generatedAt": "2026-07-14T14:24:45+00:00",
+  "schemaVersion": 1,
+  "inputCaseCount": 109,
+  "autoCandidateCaseCount": 49,
+  "registeredEvidenceCount": 32,
+  "enrichedExistingCaseCount": 29,
+  "newVisibleCaseCount": 3,
+  "reviewPendingCount": 80,
+  "productMappingRequiredCount": 20,
+  "excludedCount": 0,
+  "excludedReasons": {},
+  "imageReferenceCount": 451,
+  "uniqueImageCount": 389,
+  "duplicateImageReferenceCount": 62,
+  "downloadedImageCount": 0,
+  "externalReferenceImageCount": 389,
+  "contentSha256ComputedCount": 0,
+  "perceptualHashComputedCount": 0,
+  "hashDeferredBecauseRightsUnknownCount": 389,
+  "imageStatusCounts": {
+    "access_restricted": 1,
+    "available": 371,
+    "broken": 6,
+    "not_image": 1,
+    "unverified": 10
+  },
+  "imageFailureCount": 8
+}

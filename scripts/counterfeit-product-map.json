@@ -1,0 +1,38 @@
+{
+  "NEN-00001": [{ "productId": "nendoroid-803", "productName": "Nendoroid Conan Edogawa", "nendoroidNumber": "803", "existingCaseId": "conan-package-joints-base" }],
+  "NEN-00002": [{ "productId": "nendoroid-730", "productName": "Nendoroid Tracer: Classic Skin Edition", "nendoroidNumber": "730", "existingCaseId": "tracer-package-neck-pulse-bomb" }],
+  "NEN-00003": [
+    { "productId": "nendoroid-682", "productName": "Nendoroid Naruto Uzumaki", "nendoroidNumber": "682", "existingCaseId": "naruto-package-neck-joint" },
+    { "productId": "nendoroid-707", "productName": "Nendoroid Sasuke Uchiha", "nendoroidNumber": "707", "existingCaseId": "sasuke-package-neck-joint" }
+  ],
+  "NEN-00004": [{ "productId": "nendoroid-544", "productName": "Nendoroid Kirby", "nendoroidNumber": "544", "existingCaseId": "kirby-mouth-screw-magnet" }],
+  "NEN-00005": [
+    { "productId": "nendoroid-511", "productName": "Nendoroid Mikazuki Munechika", "nendoroidNumber": "511", "existingCaseId": "mikazuki-lips-sheath-stand" },
+    { "productId": "nendoroid-518", "productName": "Nendoroid Kashu Kiyomitsu", "nendoroidNumber": "518", "existingCaseId": "kashu-lips-stand" },
+    { "productId": "nendoroid-525", "productName": "Nendoroid Kogitsunemaru", "nendoroidNumber": "525", "existingCaseId": "kogitsunemaru-logo-sheath-neck" }
+  ],
+  "NEN-00006": [{ "productId": "nendoroid-524", "productName": "Nendoroid Umaru", "nendoroidNumber": "524", "existingCaseId": "umaru-logo-hair-neck-base" }],
+  "NEN-00007": [{ "productId": "nendoroid-425", "productName": "Nendoroid Red", "nendoroidNumber": "425", "existingCaseId": "red-logo-joint-neck-base" }],
+  "NEN-00009": [{ "productId": "nendoroid-380", "productName": "Nendoroid Snow Miku: Magical Snow Ver.", "nendoroidNumber": "380", "existingCaseId": "snow-miku-magical-joints-magnet-base" }],
+  "NEN-00010": [{ "productId": "nendoroid-380", "productName": "Nendoroid Snow Miku: Magical Snow Ver.", "nendoroidNumber": "380" }],
+  "NEN-00011": [{ "productId": "nendoroid-284", "productName": "Nendoroid Iron Man Mark 7: Hero's Edition", "nendoroidNumber": "284", "existingCaseId": "iron-man-mask-base-package" }],
+  "NEN-00012": [{ "productId": "nendoroid-283", "productName": "Nendoroid Asuna", "nendoroidNumber": "283", "existingCaseId": "asuna-package-paint-joints" }],
+  "NEN-00013": [{ "productId": "nendoroid-303", "productName": "Nendoroid Snow Miku: Strawberry White Kimono Ver.", "nendoroidNumber": "303", "existingCaseId": "snow-miku-kimono-hood-face-package-base" }],
+  "NEN-00016": [{ "productId": "nendoroid-144", "productName": "Nendoroid Kirino Kousaka", "nendoroidNumber": "144", "existingCaseId": "kirino-base-face-joints-paint" }],
+  "NEN-00017": [{ "productId": "nendoroid-204", "productName": "Nendoroid Menma", "nendoroidNumber": "204", "existingCaseId": "menma-joints-numbering-stand-hair" }],
+  "NEN-00018": [{ "productId": "nendoroid-207", "productName": "Nendoroid Snow Miku: Fluffy Coat Ver.", "nendoroidNumber": "207", "existingCaseId": "snow-miku-fluffy-package-paint-parts" }],
+  "NEN-00019": [{ "productId": "nendoroid-97-playtime", "productName": "Nendoroid Snow Miku: Snow Playtime Edition", "nendoroidNumber": "97", "existingCaseId": "snow-miku-playtime-box-extras-paint" }],
+  "NEN-00020": [{ "productId": "nendoroid-163", "productName": "Nendoroid Kuroneko", "nendoroidNumber": "163", "existingCaseId": "kuroneko-face-frill-joints-hair" }],
+  "NEN-00021": [{ "productId": "nendoroid-129", "productName": "Nendoroid Hatsune Miku: Absolute HMO Edition", "nendoroidNumber": "129", "existingCaseId": "hmo-miku-face-paint-drum" }],
+  "NEN-00022": [{ "productId": "nendoroid-128", "productName": "Nendoroid Dead Master", "nendoroidNumber": "128", "existingCaseId": "dead-master-neck-hair-eyes-prop" }],
+  "NEN-00023": [{ "productId": "nendoroid-174", "productName": "Nendoroid Madoka Kaname", "nendoroidNumber": "174", "existingCaseId": "madoka-joints-bow-paint-package" }],
+  "NEN-00024": [{ "productId": "nendoroid-143", "productName": "Nendoroid Black Gold Saw", "nendoroidNumber": "143", "existingCaseId": "black-gold-saw-magnet-head-weapon" }],
+  "NEN-00025": [{ "productId": "nendoroid-106", "productName": "Nendoroid Black Rock Shooter", "nendoroidNumber": "106", "existingCaseId": "black-rock-shooter-package-zip-neck" }],
+  "NEN-00027": [{ "productId": "nendoroid-97", "productName": "Nendoroid Snow Miku", "nendoroidNumber": "97", "existingCaseId": "snow-miku-reflective-print-face-base" }],
+  "NEN-00028": [{ "productId": "nendoroid-77", "productName": "Nendoroid Saber Lily", "nendoroidNumber": "77", "existingCaseId": "saber-lily-sticker-face-joint-base" }],
+  "NEN-00032": [{ "productId": "nendoroid-33", "productName": "Nendoroid Hatsune Miku", "nendoroidNumber": "33", "existingCaseId": "original-miku-print-paint-base" }],
+  "NEN-00034": [{ "productId": "nendoroid-9", "productName": "Nendoroid Mikuru Asahina", "nendoroidNumber": "9", "existingCaseId": "mikuru-beam-face-package-base" }],
+  "NEN-00035": [{ "productId": "nendoroid-17", "productName": "Nendoroid L", "nendoroidNumber": "17", "existingCaseId": "l-box-face-chair-hair" }],
+  "NEN-00093": [{ "productId": "nendoroid-524", "productName": "Nendoroid Umaru", "nendoroidNumber": "524" }],
+  "NEN-00096": [{ "productId": "nendoroid-33", "productName": "Nendoroid Hatsune Miku", "nendoroidNumber": "33" }]
+}

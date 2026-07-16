@@ -635,7 +635,7 @@ export default function Home() {
       officialUrl: currentProduct.officialUrl,
       verified: currentProduct.verified,
     }));
-    formData.set("cases", JSON.stringify(productCases.map(({ id, title, summary, images, signals, sourceType, sourceName }) => ({
+    formData.set("cases", JSON.stringify(productCases.map(({ id, title, summary, images, signals, sourceType, sourceName, evidenceIds, evidenceSummary, verificationStatus }) => ({
       id,
       title,
       summary,
@@ -643,6 +643,9 @@ export default function Home() {
       signals,
       sourceType,
       sourceName,
+      evidenceIds,
+      evidenceSummary,
+      verificationStatus,
     }))));
     Object.entries(files).forEach(([key, file]) => {
       if (file) formData.set(`evidence:${key}`, file);
@@ -893,7 +896,7 @@ export default function Home() {
           )}
 
           {productCases.length > 0 && (
-            <CounterfeitCaseSection cases={productCases} observations={observations} />
+            <CounterfeitCaseSection cases={productCases} observations={observations} aiMatches={aiAnalysis?.caseMatches ?? []} />
           )}
 
           {pendingItems.some((item) => observations[item.key] === "missing") && <div className="pending-line"><CircleHelp size={16} /><span><strong>올리지 않은 사진</strong>{pendingItems.filter((item) => observations[item.key] === "missing").map((item) => item.title).join(" · ")}</span></div>}
@@ -1080,23 +1083,26 @@ function AiFindingsSection({ analysis, observations, previews, reviewed, onRevie
   );
 }
 
-function CounterfeitCaseSection({ cases, observations }: {
+function CounterfeitCaseSection({ cases, observations, aiMatches }: {
   cases: CounterfeitCase[];
   observations: Record<EvidenceKey, Observation>;
+  aiMatches: AiAnalysis["caseMatches"];
 }) {
   const overlapCount = cases.flatMap((item) => item.signals)
     .filter((signal) => observations[signal.evidenceKey] === "concern").length;
+  const aiMatchCount = aiMatches.filter((match) => match.similarity !== "low" && cases.some((item) => item.id === match.caseId)).length;
 
   return (
     <section className="case-section">
       <header>
         <div><TriangleAlert size={18} /><h2>공식·커뮤니티 가품 사례</h2></div>
-        <span>{overlapCount > 0 ? `현재 사진과 ${overlapCount}개 특징 겹침` : `${cases.length}건 등록`}</span>
+        <span>{aiMatchCount > 0 ? `AI가 ${aiMatchCount}건의 유사 사례 확인` : overlapCount > 0 ? `현재 사진과 ${overlapCount}개 특징 겹침` : `${cases.length}건 등록`}</span>
       </header>
 
       {cases.map((item) => {
         const overlappingSignals = item.signals.filter((signal) => observations[signal.evidenceKey] === "concern");
-        const hasOverlap = overlappingSignals.length > 0;
+        const aiMatch = aiMatches.find((match) => match.caseId === item.id && match.similarity !== "low");
+        const hasOverlap = overlappingSignals.length > 0 || Boolean(aiMatch);
 
         return (
           <article className={`case-card ${hasOverlap ? "overlap" : ""}`} key={item.id}>
@@ -1107,11 +1113,11 @@ function CounterfeitCaseSection({ cases, observations }: {
             </div>
             <div className="case-copy">
               <span className={`case-status ${hasOverlap ? "matched" : ""}`}>
-                {hasOverlap ? "현재 매물과 겹치는 사례" : "비교 참고 사례"}
+                {aiMatch ? "AI가 유사 특징을 찾은 사례" : hasOverlap ? "현재 매물과 겹치는 사례" : "비교 참고 사례"}
               </span>
               <div className="case-meta">
                 <span className={`case-source ${item.sourceType}`}>
-                  {item.sourceType === "official" ? "공식 제조사 자료" : "커뮤니티 확인 사례"}
+                  {item.sourceType === "official" ? "공식 제조사 자료" : "실물 비교 사례"}
                 </span>
                 <a className="case-source-link" href={item.sourceUrl} target="_blank" rel="noreferrer">
                   {item.sourceName} 원문 <ExternalLink size={11} />
@@ -1121,7 +1127,7 @@ function CounterfeitCaseSection({ cases, observations }: {
               <p>{item.summary}</p>
               <ul>
                 {item.signals.map((signal) => {
-                  const signalMatches = observations[signal.evidenceKey] === "concern";
+                  const signalMatches = observations[signal.evidenceKey] === "concern" || Boolean(aiMatch?.evidenceKeys.includes(signal.evidenceKey));
                   return (
                     <li className={signalMatches ? "matched" : ""} key={`${signal.evidenceKey}-${signal.label}`}>
                       {signalMatches ? <TriangleAlert size={13} /> : <span />}
@@ -1133,8 +1139,8 @@ function CounterfeitCaseSection({ cases, observations }: {
               </ul>
               {hasOverlap && (
                 <div className="case-conclusion">
-                  <strong>가품 쪽 근거로 확인 필요</strong>
-                  <p>사진에서 `달라요`로 표시한 항목이 알려진 사례의 특징과 겹칩니다.</p>
+                  <strong>{aiMatch ? "AI가 찾은 사례 근거" : "가품 쪽 근거로 확인 필요"}</strong>
+                  <p>{aiMatch?.reason ?? "사진에서 `달라요`로 표시한 항목이 알려진 사례의 특징과 겹칩니다."}</p>
                 </div>
               )}
             </div>

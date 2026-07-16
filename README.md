@@ -8,6 +8,7 @@
 npm install
 npm run dev
 npm run lint
+npm run test:data
 npm run build
 ```
 
@@ -17,12 +18,16 @@ Gemini 분석에는 배포 환경의 `GEMINI_API_KEY`가 필요합니다. 선택
 
 - `app/catalog.ts`: 자동완성에 쓰이는 제품명, 제품 번호, 제조사, 공식 이미지와 제품 페이지
 - `app/counterfeit-cases.ts`: 제품별 공식·커뮤니티 가품 사례, 비교 이미지, 판별 특징과 출처
+- `app/data/counterfeit-evidence.generated.json`: 자동 등록된 증빙과 외부 이미지 참조
+- `app/data/counterfeit-review-queue.generated.json`: 제품 매핑 또는 관리자 검수가 필요한 자료
+- `app/data/counterfeit-import-report.json`: 마지막 dry-run·등록 결과 집계
 - `app/page.tsx`: 제품 검색, 사진 입력, 결과와 가품 사례 UI
 - `app/api/analyze/route.ts`: 사용자 사진·공식 제품 이미지·가품 사례 이미지를 Gemini에 전달하는 서버 API
+- `scripts/import-counterfeit-dataset.mjs`: CSV 검증, 중복 제거, 등록·보류 분류 스크립트
 
 ## 정품·가품 확인 사례 보유 제품
 
-2026-07-16 기준으로 제품 번호와 버전을 공식 자료에서 정확히 식별할 수 있는 33개 사례를 연결했습니다. 아래 표의 `productId`는 `app/catalog.ts`와 `app/counterfeit-cases.ts`에서 동일해야 합니다.
+2026-07-16 기준으로 제품 번호와 버전을 정확히 식별할 수 있는 33개 제품에 36개 공개 비교 사례를 연결했습니다. 33개는 제조사 공식 사례이며, 추가 3개는 데이터셋 검수 규칙을 통과한 공식·실물 비교 사례입니다. 아래 표의 `productId`는 `app/catalog.ts`와 `app/counterfeit-cases.ts`에서 동일해야 합니다.
 
 | No. | 제품 | productId | 대표 확인 특징 | 근거 |
 | --- | --- | --- | --- | --- |
@@ -69,7 +74,25 @@ Gemini 분석에는 배포 환경의 `GEMINI_API_KEY`가 필요합니다. 선택
 3. 원본 사진과 구매 경위가 남은 커뮤니티 실물 비교 글
 4. 출처가 재확인되지 않는 재게시물이나 판매자 홍보 글은 등록하지 않음
 
-현재 제품별 33개 사례는 모두 굿스마일 공식 고객지원 또는 공식 가품 아카이브에서 확인했습니다. UI에는 `공식 제조사 자료` 배지와 원문 링크가 함께 표시됩니다.
+기존 제품별 33개 사례는 모두 굿스마일 공식 고객지원 또는 공식 가품 아카이브에서 확인했습니다. 추가 자료는 `official_confirmed` 또는 `side_by_side_author_asserted`만 자동 등록하며 UI에서 `공식 제조사 자료`와 `실물 비교 사례`를 구분합니다.
+
+## 외부 데이터셋 가져오기
+
+먼저 dry-run으로 분류 결과를 확인하고, 같은 입력으로 실제 생성합니다.
+
+```bash
+node scripts/import-counterfeit-dataset.mjs \
+  --dataset /absolute/path/to/nendoroid_counterfeit_dataset \
+  --check-links \
+  --dry-run
+
+npm run data:import -- \
+  --dataset /absolute/path/to/nendoroid_counterfeit_dataset
+```
+
+마지막 실행에서는 후보 109건 중 정확한 제품 매핑이 가능한 증빙 32건을 등록했습니다. 29건은 기존 사례에 출처 메타데이터를 보강했고, 3건은 신규 공개 사례로 연결했습니다. 약한 라벨과 제품 번호 미확정 자료 80건은 검수 대기로 분리했습니다.
+
+이미지 참조 451건은 URL 기준 389건으로 중복 정리했습니다. 모든 이미지의 권한 상태가 `unknown_link_only`이므로 파일은 다운로드하지 않았고 원본 URL만 저장했습니다. 이 때문에 콘텐츠 SHA-256과 perceptual hash는 의도적으로 비워 두며, 저장 허가가 확인된 이미지에만 추후 계산합니다. 깨진 링크·비이미지·접근 제한 8건은 공개 화면에서 사용하지 않습니다.
 
 ### 일반 커뮤니티 참고자료
 

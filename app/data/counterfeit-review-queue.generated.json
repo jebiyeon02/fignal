@@ -1,0 +1,3454 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-14T14:24:45+00:00",
+  "cases": [
+    {
+      "evidenceId": "NEN-00008",
+      "productId": null,
+      "productName": "Distribution of Bootleg Nendoroids",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "product_mapping_required",
+      "reviewReason": "exact_product_mapping_missing",
+      "sourceCaseId": "NEN-00008",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "high",
+      "verificationStatus": "official_confirmed",
+      "evidenceSummary": "Good Smile Company confirms a bootleg version and provides reference images.",
+      "publicTitle": "제조사가 공개한 정품·가품 비교 사례",
+      "publicSummary": "제조사가 이 제품의 가품 유통을 공식 확인하고 정품·가품 비교 자료를 공개했습니다.",
+      "signals": [
+        {
+          "tags": [
+            "packaging",
+            "logo",
+            "license_sticker"
+          ],
+          "evidenceKey": "boxFront",
+          "label": "패키지 구성·로고·인쇄 상태가 등록 사례와 유사함"
+        },
+        {
+          "tags": [
+            "base",
+            "copyright"
+          ],
+          "evidenceKey": "baseMark",
+          "label": "받침대 또는 저작권 표기가 등록 사례와 유사함"
+        },
+        {
+          "tags": [
+            "joint",
+            "mold",
+            "sculpt"
+          ],
+          "evidenceKey": "parts",
+          "label": "관절·몰드·파츠 결합 구조가 등록 사례와 유사함"
+        },
+        {
+          "tags": [
+            "paint",
+            "finish",
+            "gloss"
+          ],
+          "evidenceKey": "figureFull",
+          "label": "도색·표면 마감이 등록 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "official_bootleg_warning",
+        "packaging",
+        "paint",
+        "mold",
+        "joint",
+        "base"
+      ],
+      "sourceType": "official",
+      "sourcePlatform": "Good Smile Company",
+      "sourceUrl": "https://partner.goodsmile.info/support/eng/fake/en/nendoroid/",
+      "sourcePublishedAt": "2015-07-29",
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [
+        "img_ca1fd8a3e0795e3010d8",
+        "img_8fc2b8286154109ce493",
+        "img_37f8154cf440e67697d5",
+        "img_8aa42c6432469f77177f",
+        "img_2c1c8cd5176af0be4854",
+        "img_84ac26ab2349bdb43d94",
+        "img_df7161fde1b2e5d8af9c",
+        "img_e77cd559cb01e27e6d63",
+        "img_21c524af5ddd6d5ea989",
+        "img_f5f84f54f9449256708d",
+        "img_463efc75e9cf5de2a473",
+        "img_fda0d7348fa3f510040a",
+        "img_a8f09e244a3c49e956bc",
+        "img_79cbe48f7ba5fe28e922",
+        "img_4fa6b167472212178014",
+        "img_9f45c792023a0a69aeec",
+        "img_24169a7e6bfcf2ed64f9",
+        "img_a5d30f704cd41d646724",
+        "img_738a9647f27ff3205a79",
+        "img_2c8521dfb326212c5632",
+        "img_f0c0b758681bc821f6a7",
+        "img_f06af08dbc3c36182e22",
+        "img_a8cc0c73bb900ba80976",
+        "img_d5d92d3109600519129a",
+        "img_96f878177458ce76c9a1",
+        "img_51e8d9aebdbd69ff1247"
+      ],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00014",
+      "productId": null,
+      "productName": "Bootleg Warning: Nendoroid Petite - Puella Magi Madoka Magica (Good Smile Company)",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "product_mapping_required",
+      "reviewReason": "exact_product_mapping_missing",
+      "sourceCaseId": "NEN-00014",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "high",
+      "verificationStatus": "official_confirmed",
+      "evidenceSummary": "Good Smile Company confirms a bootleg version and provides reference images.",
+      "publicTitle": "제조사가 공개한 정품·가품 비교 사례",
+      "publicSummary": "제조사가 이 제품의 가품 유통을 공식 확인하고 정품·가품 비교 자료를 공개했습니다.",
+      "signals": [
+        {
+          "tags": [
+            "packaging",
+            "logo",
+            "license_sticker"
+          ],
+          "evidenceKey": "boxFront",
+          "label": "패키지 구성·로고·인쇄 상태가 등록 사례와 유사함"
+        },
+        {
+          "tags": [
+            "base",
+            "copyright"
+          ],
+          "evidenceKey": "baseMark",
+          "label": "받침대 또는 저작권 표기가 등록 사례와 유사함"
+        },
+        {
+          "tags": [
+            "joint",
+            "mold",
+            "sculpt"
+          ],
+          "evidenceKey": "parts",
+          "label": "관절·몰드·파츠 결합 구조가 등록 사례와 유사함"
+        },
+        {
+          "tags": [
+            "paint",
+            "finish",
+            "gloss"
+          ],
+          "evidenceKey": "figureFull",
+          "label": "도색·표면 마감이 등록 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "official_bootleg_warning",
+        "packaging",
+        "paint",
+        "mold",
+        "joint",
+        "base"
+      ],
+      "sourceType": "official",
+      "sourcePlatform": "Good Smile Company",
+      "sourceUrl": "https://partner.goodsmile.info/support/eng/fake/en/3587/",
+      "sourcePublishedAt": "2012-12-06",
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [
+        "img_8d1e6a3375438627e609",
+        "img_45a84b677a99ac80b476",
+        "img_722cd3bc3d81fec0a42d",
+        "img_a26c99593d3aca64229a",
+        "img_575543ed5a0df36f4649",
+        "img_268ec86ae4caa94441da",
+        "img_d99f1088394ae3dfaf36",
+        "img_2855a2eb2aec274ddc09",
+        "img_b7dc43013bfb320cbbd3",
+        "img_50220bc5976fac65e6e4",
+        "img_1473cf7ce465c55695fa",
+        "img_fbdb449d1da9cf3a2449",
+        "img_99e079cb860f3e04a604",
+        "img_37023571653f3becc1ea"
+      ],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00015",
+      "productId": null,
+      "productName": "Bootleg Warning: Nendoroid Melissa Seraphy (Good Smile Company)",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "product_mapping_required",
+      "reviewReason": "exact_product_mapping_missing",
+      "sourceCaseId": "NEN-00015",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "high",
+      "verificationStatus": "official_confirmed",
+      "evidenceSummary": "Good Smile Company confirms a bootleg version and provides reference images.",
+      "publicTitle": "제조사가 공개한 정품·가품 비교 사례",
+      "publicSummary": "제조사가 이 제품의 가품 유통을 공식 확인하고 정품·가품 비교 자료를 공개했습니다.",
+      "signals": [
+        {
+          "tags": [
+            "packaging",
+            "logo",
+            "license_sticker"
+          ],
+          "evidenceKey": "boxFront",
+          "label": "패키지 구성·로고·인쇄 상태가 등록 사례와 유사함"
+        },
+        {
+          "tags": [
+            "base",
+            "copyright"
+          ],
+          "evidenceKey": "baseMark",
+          "label": "받침대 또는 저작권 표기가 등록 사례와 유사함"
+        },
+        {
+          "tags": [
+            "joint",
+            "mold",
+            "sculpt"
+          ],
+          "evidenceKey": "parts",
+          "label": "관절·몰드·파츠 결합 구조가 등록 사례와 유사함"
+        },
+        {
+          "tags": [
+            "paint",
+            "finish",
+            "gloss"
+          ],
+          "evidenceKey": "figureFull",
+          "label": "도색·표면 마감이 등록 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "official_bootleg_warning",
+        "packaging",
+        "paint",
+        "mold",
+        "joint",
+        "base"
+      ],
+      "sourceType": "official",
+      "sourcePlatform": "Good Smile Company",
+      "sourceUrl": "https://partner.goodsmile.info/support/eng/fake/en/3562/",
+      "sourcePublishedAt": "2012-12-06",
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [
+        "img_aa2ab49d60c75c837f1b",
+        "img_4beb9b467fbb54a33609",
+        "img_65ab95adc1f9db4f0eac",
+        "img_883a669414191caf1159",
+        "img_7a790c264aa7e54de006"
+      ],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00026",
+      "productId": null,
+      "productName": "Bootleg Warning : Nendoroid Petite BRS Set (Good Smile Company)",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "product_mapping_required",
+      "reviewReason": "exact_product_mapping_missing",
+      "sourceCaseId": "NEN-00026",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "high",
+      "verificationStatus": "official_confirmed",
+      "evidenceSummary": "Good Smile Company confirms a bootleg version and provides reference images.",
+      "publicTitle": "제조사가 공개한 정품·가품 비교 사례",
+      "publicSummary": "제조사가 이 제품의 가품 유통을 공식 확인하고 정품·가품 비교 자료를 공개했습니다.",
+      "signals": [
+        {
+          "tags": [
+            "packaging",
+            "logo",
+            "license_sticker"
+          ],
+          "evidenceKey": "boxFront",
+          "label": "패키지 구성·로고·인쇄 상태가 등록 사례와 유사함"
+        },
+        {
+          "tags": [
+            "base",
+            "copyright"
+          ],
+          "evidenceKey": "baseMark",
+          "label": "받침대 또는 저작권 표기가 등록 사례와 유사함"
+        },
+        {
+          "tags": [
+            "joint",
+            "mold",
+            "sculpt"
+          ],
+          "evidenceKey": "parts",
+          "label": "관절·몰드·파츠 결합 구조가 등록 사례와 유사함"
+        },
+        {
+          "tags": [
+            "paint",
+            "finish",
+            "gloss"
+          ],
+          "evidenceKey": "figureFull",
+          "label": "도색·표면 마감이 등록 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "official_bootleg_warning",
+        "packaging",
+        "paint",
+        "mold",
+        "joint",
+        "base"
+      ],
+      "sourceType": "official",
+      "sourcePlatform": "Good Smile Company",
+      "sourceUrl": "https://partner.goodsmile.info/support/eng/fake/en/2966/",
+      "sourcePublishedAt": "2010-12-16",
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [
+        "img_dc1b6b4223b2ebe149dc",
+        "img_47edd97e8f2895a2a309",
+        "img_3064f6bb612fdbdc1f74",
+        "img_15e93a0d10c26f3894be",
+        "img_de8495257ea5a5fb86f2",
+        "img_8cfa077716a14eaeeda2"
+      ],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00029",
+      "productId": null,
+      "productName": "Bootleg Warning : Nendoroid Petite Vocaloid #01 (Good Smile Company)",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "product_mapping_required",
+      "reviewReason": "exact_product_mapping_missing",
+      "sourceCaseId": "NEN-00029",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "high",
+      "verificationStatus": "official_confirmed",
+      "evidenceSummary": "Good Smile Company confirms a bootleg version and provides reference images.",
+      "publicTitle": "제조사가 공개한 정품·가품 비교 사례",
+      "publicSummary": "제조사가 이 제품의 가품 유통을 공식 확인하고 정품·가품 비교 자료를 공개했습니다.",
+      "signals": [
+        {
+          "tags": [
+            "packaging",
+            "logo",
+            "license_sticker"
+          ],
+          "evidenceKey": "boxFront",
+          "label": "패키지 구성·로고·인쇄 상태가 등록 사례와 유사함"
+        },
+        {
+          "tags": [
+            "base",
+            "copyright"
+          ],
+          "evidenceKey": "baseMark",
+          "label": "받침대 또는 저작권 표기가 등록 사례와 유사함"
+        },
+        {
+          "tags": [
+            "joint",
+            "mold",
+            "sculpt"
+          ],
+          "evidenceKey": "parts",
+          "label": "관절·몰드·파츠 결합 구조가 등록 사례와 유사함"
+        },
+        {
+          "tags": [
+            "paint",
+            "finish",
+            "gloss"
+          ],
+          "evidenceKey": "figureFull",
+          "label": "도색·표면 마감이 등록 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "official_bootleg_warning",
+        "packaging",
+        "paint",
+        "mold",
+        "joint",
+        "base"
+      ],
+      "sourceType": "official",
+      "sourcePlatform": "Good Smile Company",
+      "sourceUrl": "https://partner.goodsmile.info/support/eng/fake/en/2819/",
+      "sourcePublishedAt": "2010-02-18",
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [
+        "img_84b2f36eaea679e5fd27",
+        "img_91f9d66cd1d2d6993799",
+        "img_c0c84a9a80f3c41056ff",
+        "img_15f20f9312ad233105e8",
+        "img_97236b4ae30f63f5d38c",
+        "img_dc01f98e0d88e2859439",
+        "img_5fa01cd55923e77f3c22",
+        "img_9066754ffa81e35afe04",
+        "img_bf1d0a119a48621ef157",
+        "img_7c35729b04de648399c7",
+        "img_602266278afd05ff7956",
+        "img_facb55010f9463d265b9"
+      ],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00030",
+      "productId": null,
+      "productName": "Bootleg Warning : Nendoroid Al Azif (Good Smile Company)",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "product_mapping_required",
+      "reviewReason": "exact_product_mapping_missing",
+      "sourceCaseId": "NEN-00030",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "high",
+      "verificationStatus": "official_confirmed",
+      "evidenceSummary": "Good Smile Company confirms a bootleg version and provides reference images.",
+      "publicTitle": "제조사가 공개한 정품·가품 비교 사례",
+      "publicSummary": "제조사가 이 제품의 가품 유통을 공식 확인하고 정품·가품 비교 자료를 공개했습니다.",
+      "signals": [
+        {
+          "tags": [
+            "packaging",
+            "logo",
+            "license_sticker"
+          ],
+          "evidenceKey": "boxFront",
+          "label": "패키지 구성·로고·인쇄 상태가 등록 사례와 유사함"
+        },
+        {
+          "tags": [
+            "base",
+            "copyright"
+          ],
+          "evidenceKey": "baseMark",
+          "label": "받침대 또는 저작권 표기가 등록 사례와 유사함"
+        },
+        {
+          "tags": [
+            "joint",
+            "mold",
+            "sculpt"
+          ],
+          "evidenceKey": "parts",
+          "label": "관절·몰드·파츠 결합 구조가 등록 사례와 유사함"
+        },
+        {
+          "tags": [
+            "paint",
+            "finish",
+            "gloss"
+          ],
+          "evidenceKey": "figureFull",
+          "label": "도색·표면 마감이 등록 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "official_bootleg_warning",
+        "packaging",
+        "paint",
+        "mold",
+        "joint",
+        "base"
+      ],
+      "sourceType": "official",
+      "sourcePlatform": "Good Smile Company",
+      "sourceUrl": "https://partner.goodsmile.info/support/eng/fake/en/2721/",
+      "sourcePublishedAt": "2009-10-23",
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [
+        "img_68442bae8911375c08a1",
+        "img_4d88fd48b719e67d4d2b",
+        "img_d103a889f8aeef8a158b"
+      ],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00031",
+      "productId": null,
+      "productName": "Bootleg Warning : Nendoroid Konata Izumi : Comptiq Ver. (Good Smile Company)",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "product_mapping_required",
+      "reviewReason": "exact_product_mapping_missing",
+      "sourceCaseId": "NEN-00031",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "high",
+      "verificationStatus": "official_confirmed",
+      "evidenceSummary": "Good Smile Company confirms a bootleg version and provides reference images.",
+      "publicTitle": "제조사가 공개한 정품·가품 비교 사례",
+      "publicSummary": "제조사가 이 제품의 가품 유통을 공식 확인하고 정품·가품 비교 자료를 공개했습니다.",
+      "signals": [
+        {
+          "tags": [
+            "packaging",
+            "logo",
+            "license_sticker"
+          ],
+          "evidenceKey": "boxFront",
+          "label": "패키지 구성·로고·인쇄 상태가 등록 사례와 유사함"
+        },
+        {
+          "tags": [
+            "base",
+            "copyright"
+          ],
+          "evidenceKey": "baseMark",
+          "label": "받침대 또는 저작권 표기가 등록 사례와 유사함"
+        },
+        {
+          "tags": [
+            "joint",
+            "mold",
+            "sculpt"
+          ],
+          "evidenceKey": "parts",
+          "label": "관절·몰드·파츠 결합 구조가 등록 사례와 유사함"
+        },
+        {
+          "tags": [
+            "paint",
+            "finish",
+            "gloss"
+          ],
+          "evidenceKey": "figureFull",
+          "label": "도색·표면 마감이 등록 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "official_bootleg_warning",
+        "packaging",
+        "paint",
+        "mold",
+        "joint",
+        "base"
+      ],
+      "sourceType": "official",
+      "sourcePlatform": "Good Smile Company",
+      "sourceUrl": "https://partner.goodsmile.info/support/eng/fake/en/2390/",
+      "sourcePublishedAt": "2009-03-26",
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [
+        "img_f3560147aa684bde90ce",
+        "img_ae18dccf40a6e475002b",
+        "img_14ad3c76db91517fae80",
+        "img_9a8df5f44f5ddb5683c4",
+        "img_becd11dfe30a1c4ca6fe"
+      ],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00033",
+      "productId": null,
+      "productName": "Bootleg Warning : Nendoroid Petite Lucky Star Season 1 (Good Smile Company)",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "product_mapping_required",
+      "reviewReason": "exact_product_mapping_missing",
+      "sourceCaseId": "NEN-00033",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "high",
+      "verificationStatus": "official_confirmed",
+      "evidenceSummary": "Good Smile Company confirms a bootleg version and provides reference images.",
+      "publicTitle": "제조사가 공개한 정품·가품 비교 사례",
+      "publicSummary": "제조사가 이 제품의 가품 유통을 공식 확인하고 정품·가품 비교 자료를 공개했습니다.",
+      "signals": [
+        {
+          "tags": [
+            "packaging",
+            "logo",
+            "license_sticker"
+          ],
+          "evidenceKey": "boxFront",
+          "label": "패키지 구성·로고·인쇄 상태가 등록 사례와 유사함"
+        },
+        {
+          "tags": [
+            "base",
+            "copyright"
+          ],
+          "evidenceKey": "baseMark",
+          "label": "받침대 또는 저작권 표기가 등록 사례와 유사함"
+        },
+        {
+          "tags": [
+            "joint",
+            "mold",
+            "sculpt"
+          ],
+          "evidenceKey": "parts",
+          "label": "관절·몰드·파츠 결합 구조가 등록 사례와 유사함"
+        },
+        {
+          "tags": [
+            "paint",
+            "finish",
+            "gloss"
+          ],
+          "evidenceKey": "figureFull",
+          "label": "도색·표면 마감이 등록 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "official_bootleg_warning",
+        "packaging",
+        "paint",
+        "mold",
+        "joint",
+        "base"
+      ],
+      "sourceType": "official",
+      "sourcePlatform": "Good Smile Company",
+      "sourceUrl": "https://partner.goodsmile.info/support/eng/fake/en/2032/",
+      "sourcePublishedAt": "2008-09-06",
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [
+        "img_8075e9b5a7dcecd2546a",
+        "img_f86814dc0036925989de",
+        "img_0ca91e1426b4d3f5b27b",
+        "img_a7265517b5bfb757bdd1",
+        "img_4b8d3747d198b0a3447c",
+        "img_4cfd999b5e2f281f0864"
+      ],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00036",
+      "productId": null,
+      "productName": "Nendoroid Elsa",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "product_mapping_required",
+      "reviewReason": "exact_product_mapping_missing",
+      "sourceCaseId": "NEN-00036",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "high",
+      "verificationStatus": "official_confirmed",
+      "evidenceSummary": "Good Smile Company includes this product in its official examples of Nendoroid bootlegs.",
+      "publicTitle": "제조사가 공개한 정품·가품 비교 사례",
+      "publicSummary": "제조사가 이 제품의 가품 유통을 공식 확인하고 정품·가품 비교 자료를 공개했습니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "official_bootleg_warning"
+      ],
+      "sourceType": "official",
+      "sourcePlatform": "Good Smile Company",
+      "sourceUrl": "https://partner.goodsmile.info/support/eng/fake/en/nendoroid/#Nendoroid%20Elsa",
+      "sourcePublishedAt": "2015-07-29",
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [
+        "img_ca1fd8a3e0795e3010d8",
+        "img_8fc2b8286154109ce493",
+        "img_79cbe48f7ba5fe28e922",
+        "img_4fa6b167472212178014"
+      ],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00037",
+      "productId": null,
+      "productName": "Nendoroid Kurumi Tokisaki",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "product_mapping_required",
+      "reviewReason": "exact_product_mapping_missing",
+      "sourceCaseId": "NEN-00037",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "high",
+      "verificationStatus": "official_confirmed",
+      "evidenceSummary": "Good Smile Company includes this product in its official examples of Nendoroid bootlegs.",
+      "publicTitle": "제조사가 공개한 정품·가품 비교 사례",
+      "publicSummary": "제조사가 이 제품의 가품 유통을 공식 확인하고 정품·가품 비교 자료를 공개했습니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "official_bootleg_warning"
+      ],
+      "sourceType": "official",
+      "sourcePlatform": "Good Smile Company",
+      "sourceUrl": "https://partner.goodsmile.info/support/eng/fake/en/nendoroid/#Nendoroid%20Kurumi%20Tokisaki",
+      "sourcePublishedAt": "2015-07-29",
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [
+        "img_37f8154cf440e67697d5",
+        "img_8aa42c6432469f77177f",
+        "img_9f45c792023a0a69aeec",
+        "img_24169a7e6bfcf2ed64f9"
+      ],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00038",
+      "productId": null,
+      "productName": "Nendoroid Eren Yeagar",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "product_mapping_required",
+      "reviewReason": "exact_product_mapping_missing",
+      "sourceCaseId": "NEN-00038",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "high",
+      "verificationStatus": "official_confirmed",
+      "evidenceSummary": "Good Smile Company includes this product in its official examples of Nendoroid bootlegs.",
+      "publicTitle": "제조사가 공개한 정품·가품 비교 사례",
+      "publicSummary": "제조사가 이 제품의 가품 유통을 공식 확인하고 정품·가품 비교 자료를 공개했습니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "official_bootleg_warning"
+      ],
+      "sourceType": "official",
+      "sourcePlatform": "Good Smile Company",
+      "sourceUrl": "https://partner.goodsmile.info/support/eng/fake/en/nendoroid/#Nendoroid%20Eren%20Yeagar",
+      "sourcePublishedAt": "2015-07-29",
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [
+        "img_2c1c8cd5176af0be4854",
+        "img_84ac26ab2349bdb43d94",
+        "img_a5d30f704cd41d646724",
+        "img_738a9647f27ff3205a79"
+      ],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00039",
+      "productId": null,
+      "productName": "Nendoroid Mikasa Ackerman",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "product_mapping_required",
+      "reviewReason": "exact_product_mapping_missing",
+      "sourceCaseId": "NEN-00039",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "high",
+      "verificationStatus": "official_confirmed",
+      "evidenceSummary": "Good Smile Company includes this product in its official examples of Nendoroid bootlegs.",
+      "publicTitle": "제조사가 공개한 정품·가품 비교 사례",
+      "publicSummary": "제조사가 이 제품의 가품 유통을 공식 확인하고 정품·가품 비교 자료를 공개했습니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "official_bootleg_warning"
+      ],
+      "sourceType": "official",
+      "sourcePlatform": "Good Smile Company",
+      "sourceUrl": "https://partner.goodsmile.info/support/eng/fake/en/nendoroid/#Nendoroid%20Mikasa%20Ackerman",
+      "sourcePublishedAt": "2015-07-29",
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [
+        "img_df7161fde1b2e5d8af9c",
+        "img_e77cd559cb01e27e6d63",
+        "img_2c8521dfb326212c5632",
+        "img_f0c0b758681bc821f6a7"
+      ],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00040",
+      "productId": null,
+      "productName": "Nendoroid Hatsune Miku: Senbonzakura Ver.",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "product_mapping_required",
+      "reviewReason": "exact_product_mapping_missing",
+      "sourceCaseId": "NEN-00040",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "high",
+      "verificationStatus": "official_confirmed",
+      "evidenceSummary": "Good Smile Company includes this product in its official examples of Nendoroid bootlegs.",
+      "publicTitle": "제조사가 공개한 정품·가품 비교 사례",
+      "publicSummary": "제조사가 이 제품의 가품 유통을 공식 확인하고 정품·가품 비교 자료를 공개했습니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "official_bootleg_warning"
+      ],
+      "sourceType": "official",
+      "sourcePlatform": "Good Smile Company",
+      "sourceUrl": "https://partner.goodsmile.info/support/eng/fake/en/nendoroid/#Nendoroid%20Hatsune%20Miku%3A%20Senbonzakura%20Ver.",
+      "sourcePublishedAt": "2015-07-29",
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [
+        "img_21c524af5ddd6d5ea989",
+        "img_f5f84f54f9449256708d",
+        "img_f06af08dbc3c36182e22",
+        "img_a8cc0c73bb900ba80976"
+      ],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00041",
+      "productId": null,
+      "productName": "Nendoroid Sakura Miku: Bloomed in Japan",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "product_mapping_required",
+      "reviewReason": "exact_product_mapping_missing",
+      "sourceCaseId": "NEN-00041",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "high",
+      "verificationStatus": "official_confirmed",
+      "evidenceSummary": "Good Smile Company includes this product in its official examples of Nendoroid bootlegs.",
+      "publicTitle": "제조사가 공개한 정품·가품 비교 사례",
+      "publicSummary": "제조사가 이 제품의 가품 유통을 공식 확인하고 정품·가품 비교 자료를 공개했습니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "official_bootleg_warning"
+      ],
+      "sourceType": "official",
+      "sourcePlatform": "Good Smile Company",
+      "sourceUrl": "https://partner.goodsmile.info/support/eng/fake/en/nendoroid/#Nendoroid%20Sakura%20Miku%3A%20Bloomed%20in%20Japan",
+      "sourcePublishedAt": "2015-07-29",
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [
+        "img_463efc75e9cf5de2a473",
+        "img_fda0d7348fa3f510040a",
+        "img_a8f09e244a3c49e956bc",
+        "img_d5d92d3109600519129a",
+        "img_96f878177458ce76c9a1",
+        "img_51e8d9aebdbd69ff1247"
+      ],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00042",
+      "productId": null,
+      "productName": "NO.09 涼宮ハルヒ",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00042",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#NO.09%20%E6%B6%BC%E5%AE%AE%E3%83%8F%E3%83%AB%E3%83%92",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00043",
+      "productId": null,
+      "productName": "NO.11 リューク",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00043",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#NO.11%20%E3%83%AA%E3%83%A5%E3%83%BC%E3%82%AF",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00044",
+      "productId": null,
+      "productName": "NO.12 夜神 月",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00044",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#NO.12%20%E5%A4%9C%E7%A5%9E%20%E6%9C%88",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00045",
+      "productId": null,
+      "productName": "NO.14 涼宮ハルヒの憂鬱 バニーガールセット",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00045",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#NO.14%20%E6%B6%BC%E5%AE%AE%E3%83%8F%E3%83%AB%E3%83%92%E3%81%AE%E6%86%82%E9%AC%B1%20%E3%83%90%E3%83%8B%E3%83%BC%E3%82%AC%E3%83%BC%E3%83%AB%E3%82%BB%E3%83%83%E3%83%88",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00046",
+      "productId": null,
+      "productName": "NO.16 朝比奈 みくる",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00046",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#NO.16%20%E6%9C%9D%E6%AF%94%E5%A5%88%20%E3%81%BF%E3%81%8F%E3%82%8B",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00047",
+      "productId": null,
+      "productName": "NO.17 L",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00047",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#NO.17%20L",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00048",
+      "productId": null,
+      "productName": "NO.18 弥 海砂",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00048",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#NO.18%20%E5%BC%A5%20%E6%B5%B7%E7%A0%82",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00049",
+      "productId": null,
+      "productName": "NO.27a 泉 こなた コンプティークVer.",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00049",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#NO.27a%20%E6%B3%89%20%E3%81%93%E3%81%AA%E3%81%9F%20%E3%82%B3%E3%83%B3%E3%83%97%E3%83%86%E3%82%A3%E3%83%BC%E3%82%AFVer.",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00050",
+      "productId": null,
+      "productName": "NO.29 アル・アジフ",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00050",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#NO.29%20%E3%82%A2%E3%83%AB%E3%83%BB%E3%82%A2%E3%82%B8%E3%83%95",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00051",
+      "productId": null,
+      "productName": "NO.33 初音 ミク",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00051",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#NO.33%20%E5%88%9D%E9%9F%B3%20%E3%83%9F%E3%82%AF",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00052",
+      "productId": null,
+      "productName": "NO.36 メリッサ・セラフィ",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00052",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#NO.36%20%E3%83%A1%E3%83%AA%E3%83%83%E3%82%B5%E3%83%BB%E3%82%BB%E3%83%A9%E3%83%95%E3%82%A3",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00053",
+      "productId": null,
+      "productName": "NO.39 鏡音リン",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00053",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#NO.39%20%E9%8F%A1%E9%9F%B3%E3%83%AA%E3%83%B3",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00054",
+      "productId": null,
+      "productName": "NO.47a シャナ 炎髪灼眼Ver.",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00054",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#NO.47a%20%E3%82%B7%E3%83%A3%E3%83%8A%20%E7%82%8E%E9%AB%AA%E7%81%BC%E7%9C%BCVer.",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00055",
+      "productId": null,
+      "productName": "NO.50 セイバーライオン",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00055",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#NO.50%20%E3%82%BB%E3%82%A4%E3%83%90%E3%83%BC%E3%83%A9%E3%82%A4%E3%82%AA%E3%83%B3",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00056",
+      "productId": null,
+      "productName": "NO.53 ヨーコ",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00056",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#NO.53%20%E3%83%A8%E3%83%BC%E3%82%B3",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00057",
+      "productId": null,
+      "productName": "NO.62 ミックミクかがみ",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00057",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#NO.62%20%E3%83%9F%E3%83%83%E3%82%AF%E3%83%9F%E3%82%AF%E3%81%8B%E3%81%8C%E3%81%BF",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00058",
+      "productId": null,
+      "productName": "NO.68 セバスチャン・ミカエリス",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00058",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#NO.68%20%E3%82%BB%E3%83%90%E3%82%B9%E3%83%81%E3%83%A3%E3%83%B3%E3%83%BB%E3%83%9F%E3%82%AB%E3%82%A8%E3%83%AA%E3%82%B9",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00059",
+      "productId": null,
+      "productName": "NO.69 ざんげちゃん",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00059",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#NO.69%20%E3%81%96%E3%82%93%E3%81%92%E3%81%A1%E3%82%83%E3%82%93",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00060",
+      "productId": null,
+      "productName": "NO.74 博麗霊夢",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00060",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#NO.74%20%E5%8D%9A%E9%BA%97%E9%9C%8A%E5%A4%A2",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00061",
+      "productId": null,
+      "productName": "NO.77 セイバー・リリィ",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00061",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#NO.77%20%E3%82%BB%E3%82%A4%E3%83%90%E3%83%BC%E3%83%BB%E3%83%AA%E3%83%AA%E3%82%A3",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00062",
+      "productId": null,
+      "productName": "NO.82 秋山 澪",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00062",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#NO.82%20%E7%A7%8B%E5%B1%B1%20%E6%BE%AA",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00063",
+      "productId": null,
+      "productName": "NO.84 両儀 式",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00063",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#NO.84%20%E4%B8%A1%E5%84%80%20%E5%BC%8F",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00064",
+      "productId": null,
+      "productName": "NO.97 雪ミク",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00064",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#NO.97%20%E9%9B%AA%E3%83%9F%E3%82%AF",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00065",
+      "productId": null,
+      "productName": "NO.104 中野梓",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00065",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#NO.104%20%E4%B8%AD%E9%87%8E%E6%A2%93",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00066",
+      "productId": null,
+      "productName": "NO.106 ブラック★ロックシューター",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00066",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#NO.106%20%E3%83%96%E3%83%A9%E3%83%83%E3%82%AF%E2%98%85%E3%83%AD%E3%83%83%E3%82%AF%E3%82%B7%E3%83%A5%E3%83%BC%E3%82%BF%E3%83%BC",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00067",
+      "productId": null,
+      "productName": "NO.109 レーシングミク",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00067",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#NO.109%20%E3%83%AC%E3%83%BC%E3%82%B7%E3%83%B3%E3%82%B0%E3%83%9F%E3%82%AF",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00068",
+      "productId": null,
+      "productName": "NO.117 シエル・ファントムハイヴ",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00068",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#NO.117%20%E3%82%B7%E3%82%A8%E3%83%AB%E3%83%BB%E3%83%95%E3%82%A1%E3%83%B3%E3%83%88%E3%83%A0%E3%83%8F%E3%82%A4%E3%83%B4",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00069",
+      "productId": null,
+      "productName": "NO.121 セイバー スーパームーバブル・エディション",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00069",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#NO.121%20%E3%82%BB%E3%82%A4%E3%83%90%E3%83%BC%20%E3%82%B9%E3%83%BC%E3%83%91%E3%83%BC%E3%83%A0%E3%83%BC%E3%83%90%E3%83%96%E3%83%AB%E3%83%BB%E3%82%A8%E3%83%87%E3%82%A3%E3%82%B7%E3%83%A7%E3%83%B3",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00070",
+      "productId": null,
+      "productName": "NO.123 長門有希 消失Ver.",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00070",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#NO.123%20%E9%95%B7%E9%96%80%E6%9C%89%E5%B8%8C%20%E6%B6%88%E5%A4%B1Ver.",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00071",
+      "productId": null,
+      "productName": "NO.128 デッドマスター",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00071",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#NO.128%20%E3%83%87%E3%83%83%E3%83%89%E3%83%9E%E3%82%B9%E3%82%BF%E3%83%BC",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00072",
+      "productId": null,
+      "productName": "NO.129 初音ミク アブソリュートHMO・エディション",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00072",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#NO.129%20%E5%88%9D%E9%9F%B3%E3%83%9F%E3%82%AF%20%E3%82%A2%E3%83%96%E3%82%BD%E3%83%AA%E3%83%A5%E3%83%BC%E3%83%88HMO%E3%83%BB%E3%82%A8%E3%83%87%E3%82%A3%E3%82%B7%E3%83%A7%E3%83%B3",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00073",
+      "productId": null,
+      "productName": "NO.142 高坂桐乃",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00073",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#NO.142%20%E9%AB%98%E5%9D%82%E6%A1%90%E4%B9%83",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00074",
+      "productId": null,
+      "productName": "NO.144 黒猫",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00074",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#NO.144%20%E9%BB%92%E7%8C%AB",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00075",
+      "productId": null,
+      "productName": "NO.145 ブラックゴールドソー",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00075",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#NO.145%20%E3%83%96%E3%83%A9%E3%83%83%E3%82%AF%E3%82%B4%E3%83%BC%E3%83%AB%E3%83%89%E3%82%BD%E3%83%BC",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00076",
+      "productId": null,
+      "productName": "NO.150 雪ミク たのしい雪あそび・エディション",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00076",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#NO.150%20%E9%9B%AA%E3%83%9F%E3%82%AF%20%E3%81%9F%E3%81%AE%E3%81%97%E3%81%84%E9%9B%AA%E3%81%82%E3%81%9D%E3%81%B3%E3%83%BB%E3%82%A8%E3%83%87%E3%82%A3%E3%82%B7%E3%83%A7%E3%83%B3",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00077",
+      "productId": null,
+      "productName": "NO.170 初音ミク 応援ver.",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00077",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#NO.170%20%E5%88%9D%E9%9F%B3%E3%83%9F%E3%82%AF%20%E5%BF%9C%E6%8F%B4ver.",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00078",
+      "productId": null,
+      "productName": "NO.174 鹿目まどか",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00078",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#NO.174%20%E9%B9%BF%E7%9B%AE%E3%81%BE%E3%81%A9%E3%81%8B",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00079",
+      "productId": null,
+      "productName": "NO.175 鹿目まどか 制服Ver.",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00079",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#NO.175%20%E9%B9%BF%E7%9B%AE%E3%81%BE%E3%81%A9%E3%81%8B%20%E5%88%B6%E6%9C%8DVer.",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00080",
+      "productId": null,
+      "productName": "NO.207 雪ミク ふわふわコートVer.",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00080",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#NO.207%20%E9%9B%AA%E3%83%9F%E3%82%AF%20%E3%81%B5%E3%82%8F%E3%81%B5%E3%82%8F%E3%82%B3%E3%83%BC%E3%83%88Ver.",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00081",
+      "productId": null,
+      "productName": "NO.274 桜ミク",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00081",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#NO.274%20%E6%A1%9C%E3%83%9F%E3%82%AF",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00082",
+      "productId": null,
+      "productName": "ねんどろいどぷち らき☆すた シーズン1",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00082",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#%E3%81%AD%E3%82%93%E3%81%A9%E3%82%8D%E3%81%84%E3%81%A9%E3%81%B7%E3%81%A1%20%E3%82%89%E3%81%8D%E2%98%86%E3%81%99%E3%81%9F%20%E3%82%B7%E3%83%BC%E3%82%BA%E3%83%B31",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00083",
+      "productId": null,
+      "productName": "ねんどろいどぷち デスノート Case File01",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00083",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#%E3%81%AD%E3%82%93%E3%81%A9%E3%82%8D%E3%81%84%E3%81%A9%E3%81%B7%E3%81%A1%20%E3%83%87%E3%82%B9%E3%83%8E%E3%83%BC%E3%83%88%20Case%20File01",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00084",
+      "productId": null,
+      "productName": "ねんどろいどぷち ボーカロイド01",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00084",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#%E3%81%AD%E3%82%93%E3%81%A9%E3%82%8D%E3%81%84%E3%81%A9%E3%81%B7%E3%81%A1%20%E3%83%9C%E3%83%BC%E3%82%AB%E3%83%AD%E3%82%A4%E3%83%8901",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00085",
+      "productId": null,
+      "productName": "ねんどろいどぷち デスノート Case File02",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00085",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#%E3%81%AD%E3%82%93%E3%81%A9%E3%82%8D%E3%81%84%E3%81%A9%E3%81%B7%E3%81%A1%20%E3%83%87%E3%82%B9%E3%83%8E%E3%83%BC%E3%83%88%20Case%20File02",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00086",
+      "productId": null,
+      "productName": "ねんどろいどぷち ボーカロイド RQセット",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00086",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#%E3%81%AD%E3%82%93%E3%81%A9%E3%82%8D%E3%81%84%E3%81%A9%E3%81%B7%E3%81%A1%20%E3%83%9C%E3%83%BC%E3%82%AB%E3%83%AD%E3%82%A4%E3%83%89%20RQ%E3%82%BB%E3%83%83%E3%83%88",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00087",
+      "productId": null,
+      "productName": "ねんどろいどぷち B★RSセット",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00087",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#%E3%81%AD%E3%82%93%E3%81%A9%E3%82%8D%E3%81%84%E3%81%A9%E3%81%B7%E3%81%A1%20B%E2%98%85RS%E3%82%BB%E3%83%83%E3%83%88",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00088",
+      "productId": null,
+      "productName": "ねんどろいどぷち Fate/stay night",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00088",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#%E3%81%AD%E3%82%93%E3%81%A9%E3%82%8D%E3%81%84%E3%81%A9%E3%81%B7%E3%81%A1%20Fate/stay%20night",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00089",
+      "productId": null,
+      "productName": "ねんどろいどぷち 魔法少女リリカルなのは THE MOVIE 1st",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00089",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#%E3%81%AD%E3%82%93%E3%81%A9%E3%82%8D%E3%81%84%E3%81%A9%E3%81%B7%E3%81%A1%20%E9%AD%94%E6%B3%95%E5%B0%91%E5%A5%B3%E3%83%AA%E3%83%AA%E3%82%AB%E3%83%AB%E3%81%AA%E3%81%AE%E3%81%AF%20THE%20MOVIE%201st",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00090",
+      "productId": null,
+      "productName": "ねんどろいどぷち 東方Project",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00090",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#%E3%81%AD%E3%82%93%E3%81%A9%E3%82%8D%E3%81%84%E3%81%A9%E3%81%B7%E3%81%A1%20%E6%9D%B1%E6%96%B9Project",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00091",
+      "productId": null,
+      "productName": "ねんどろいどぷち けいおん！だいいっき",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00091",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#%E3%81%AD%E3%82%93%E3%81%A9%E3%82%8D%E3%81%84%E3%81%A9%E3%81%B7%E3%81%A1%20%E3%81%91%E3%81%84%E3%81%8A%E3%82%93%EF%BC%81%E3%81%A0%E3%81%84%E3%81%84%E3%81%A3%E3%81%8D",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00092",
+      "productId": null,
+      "productName": "ねんどろいどぷち 化物語",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00092",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "community_catalog_asserted",
+      "evidenceSummary": "Japanese Nendoroid community wiki catalogs this product as a confirmed/suspected bootleg.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "community_catalog",
+        "bootleg_reference"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "ねんどろいどスレ @ Wiki",
+      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html#%E3%81%AD%E3%82%93%E3%81%A9%E3%82%8D%E3%81%84%E3%81%A9%E3%81%B7%E3%81%A1%20%E5%8C%96%E7%89%A9%E8%AA%9E",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00094",
+      "productId": null,
+      "productName": "Nendoroid Gawr Gura genuine vs counterfeit comparison",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "product_mapping_required",
+      "reviewReason": "exact_product_mapping_missing",
+      "sourceCaseId": "NEN-00094",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "side_by_side_author_asserted",
+      "evidenceSummary": "Side-by-side comparison covering package print, missing logos, face print alignment, blister, instructions, and joints.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "tags": [
+            "packaging",
+            "logo",
+            "license_sticker"
+          ],
+          "evidenceKey": "boxFront",
+          "label": "패키지 구성·로고·인쇄 상태가 등록 사례와 유사함"
+        },
+        {
+          "tags": [
+            "base",
+            "copyright"
+          ],
+          "evidenceKey": "baseMark",
+          "label": "받침대 또는 저작권 표기가 등록 사례와 유사함"
+        },
+        {
+          "tags": [
+            "joint",
+            "mold",
+            "sculpt"
+          ],
+          "evidenceKey": "parts",
+          "label": "관절·몰드·파츠 결합 구조가 등록 사례와 유사함"
+        },
+        {
+          "tags": [
+            "paint",
+            "finish",
+            "gloss"
+          ],
+          "evidenceKey": "figureFull",
+          "label": "도색·표면 마감이 등록 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "side_by_side",
+        "packaging",
+        "paint",
+        "mold",
+        "joint",
+        "base"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "note",
+      "sourceUrl": "https://note.com/sim4562/n/ndaf837b8ba39",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [
+        "img_17d52a21768896f0a1fe",
+        "img_6fb9f5dc81fd6f91397e",
+        "img_926a7935aef82fd24d5b",
+        "img_6661cf97742c5c29ae1c",
+        "img_e02f57e77415ec55baaf",
+        "img_2e8f6d04f00b3d227532",
+        "img_4cb4e5f0ab8d4e5235b1",
+        "img_4417d42522c02f41220c",
+        "img_4357aeb68f258ae68887",
+        "img_a8fe5dd8c9aafc3aa1eb",
+        "img_ecc361ab8e00cba46835",
+        "img_f756f01c9dbccb472eea",
+        "img_1a43319bd1c298bd0629",
+        "img_181fe77c43a3e26aa219",
+        "img_51f817b814af77a584c3",
+        "img_2189d151e3f8b1fa6304",
+        "img_1017b751d124372d2f80",
+        "img_82c36205f67c236c109a",
+        "img_112558383b739a1a9eb4",
+        "img_3ef9351ff1617eab4753",
+        "img_bc782995d186ec2f7a28",
+        "img_681dea041db6ad570081",
+        "img_c14001e723c540d66068",
+        "img_903a18afbde242c957e3",
+        "img_48e2ebae5e9c35184682",
+        "img_2cd06f98f9fd6a224b27",
+        "img_b8a68728cf741a96cd39",
+        "img_ff6ed124d82436e9b877",
+        "img_70a801b1ad49f301c024",
+        "img_a79fd6665c9144a8b29d",
+        "img_def89147d220aa030be8",
+        "img_6714c824690443b95617",
+        "img_ddc6b1a00ea27c2037ad",
+        "img_da5ebaae436ebadd9c92",
+        "img_de50d76ac673cb2a048a",
+        "img_c4e942b6abde171784e2",
+        "img_df0b79554463427936a6",
+        "img_d13cd0944ce1033cb0f0",
+        "img_6c99f52c1c6375a3ff5a",
+        "img_c0bf75bf2fc4c938333a",
+        "img_ef3221cb0f70ae31f345"
+      ],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00095",
+      "productId": null,
+      "productName": "Nendoroid #274 Sakura Miku genuine vs counterfeit comparison",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "product_mapping_required",
+      "reviewReason": "exact_product_mapping_missing",
+      "sourceCaseId": "NEN-00095",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "side_by_side_author_asserted",
+      "evidenceSummary": "Side-by-side comparison covering packaging, print resolution, paint, eye alignment, and sculpt.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "tags": [
+            "packaging",
+            "logo",
+            "license_sticker"
+          ],
+          "evidenceKey": "boxFront",
+          "label": "패키지 구성·로고·인쇄 상태가 등록 사례와 유사함"
+        },
+        {
+          "tags": [
+            "base",
+            "copyright"
+          ],
+          "evidenceKey": "baseMark",
+          "label": "받침대 또는 저작권 표기가 등록 사례와 유사함"
+        },
+        {
+          "tags": [
+            "joint",
+            "mold",
+            "sculpt"
+          ],
+          "evidenceKey": "parts",
+          "label": "관절·몰드·파츠 결합 구조가 등록 사례와 유사함"
+        },
+        {
+          "tags": [
+            "paint",
+            "finish",
+            "gloss"
+          ],
+          "evidenceKey": "figureFull",
+          "label": "도색·표면 마감이 등록 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "side_by_side",
+        "packaging",
+        "paint",
+        "mold",
+        "joint",
+        "base"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "note",
+      "sourceUrl": "https://note.com/yuusukeblog/n/n5b5a3143509f",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [
+        "img_c5fc34d619e6c144c9a3",
+        "img_9200e5a9f56358043d25",
+        "img_5577f29218cb504fab7a",
+        "img_f8d5bdcbb86f86331ffc",
+        "img_6ef42cbce0aca8915d33",
+        "img_8e02b8df886330d976d1",
+        "img_c064444e20e73e963be8",
+        "img_26327bf7d6553fab0cb9",
+        "img_ca8fce0724577d756501",
+        "img_f391571aacd4284a97d3"
+      ],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00097",
+      "productId": null,
+      "productName": "Official vs Bootleg: Nendoroid Albedo",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "product_mapping_required",
+      "reviewReason": "exact_product_mapping_missing",
+      "sourceCaseId": "NEN-00097",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "side_by_side_author_asserted",
+      "evidenceSummary": "Detailed side-by-side comparison of packaging, paint, parts, wings, base, stand arm and copyright.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "tags": [
+            "packaging",
+            "logo",
+            "license_sticker"
+          ],
+          "evidenceKey": "boxFront",
+          "label": "패키지 구성·로고·인쇄 상태가 등록 사례와 유사함"
+        },
+        {
+          "tags": [
+            "base",
+            "copyright"
+          ],
+          "evidenceKey": "baseMark",
+          "label": "받침대 또는 저작권 표기가 등록 사례와 유사함"
+        },
+        {
+          "tags": [
+            "joint",
+            "mold",
+            "sculpt"
+          ],
+          "evidenceKey": "parts",
+          "label": "관절·몰드·파츠 결합 구조가 등록 사례와 유사함"
+        },
+        {
+          "tags": [
+            "paint",
+            "finish",
+            "gloss"
+          ],
+          "evidenceKey": "figureFull",
+          "label": "도색·표면 마감이 등록 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "side_by_side",
+        "packaging",
+        "paint",
+        "mold",
+        "joint",
+        "base"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "MyFigureCollection",
+      "sourceUrl": "https://myfigurecollection.net/blogpost/46327",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00098",
+      "productId": null,
+      "productName": "Official vs Bootleg: Nendoroid Rimuru #1067",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "product_mapping_required",
+      "reviewReason": "exact_product_mapping_missing",
+      "sourceCaseId": "NEN-00098",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "side_by_side_author_asserted",
+      "evidenceSummary": "Detailed side-by-side comparison of packaging, faceplates, mold, neck joint, base, stand arm and accessories.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "tags": [
+            "packaging",
+            "logo",
+            "license_sticker"
+          ],
+          "evidenceKey": "boxFront",
+          "label": "패키지 구성·로고·인쇄 상태가 등록 사례와 유사함"
+        },
+        {
+          "tags": [
+            "base",
+            "copyright"
+          ],
+          "evidenceKey": "baseMark",
+          "label": "받침대 또는 저작권 표기가 등록 사례와 유사함"
+        },
+        {
+          "tags": [
+            "joint",
+            "mold",
+            "sculpt"
+          ],
+          "evidenceKey": "parts",
+          "label": "관절·몰드·파츠 결합 구조가 등록 사례와 유사함"
+        },
+        {
+          "tags": [
+            "paint",
+            "finish",
+            "gloss"
+          ],
+          "evidenceKey": "figureFull",
+          "label": "도색·표면 마감이 등록 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "side_by_side",
+        "packaging",
+        "paint",
+        "mold",
+        "joint",
+        "base"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "MyFigureCollection",
+      "sourceUrl": "https://myfigurecollection.net/blogpost/57000",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [
+        "img_c0130f94ef90e2fcaf8a",
+        "img_70ec14cfd86c97f3b3fd",
+        "img_e87b8fbd05ab817b7695",
+        "img_2a59da7097747bffa790",
+        "img_d06bce10ee407b65ad2c"
+      ],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00099",
+      "productId": null,
+      "productName": "Bootleg Yami Yugi Nendoroid: a detailed look",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "product_mapping_required",
+      "reviewReason": "exact_product_mapping_missing",
+      "sourceCaseId": "NEN-00099",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "side_by_side_author_asserted",
+      "evidenceSummary": "Detailed review of a deliberately purchased bootleg with visual red flags.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "tags": [
+            "packaging",
+            "logo",
+            "license_sticker"
+          ],
+          "evidenceKey": "boxFront",
+          "label": "패키지 구성·로고·인쇄 상태가 등록 사례와 유사함"
+        },
+        {
+          "tags": [
+            "base",
+            "copyright"
+          ],
+          "evidenceKey": "baseMark",
+          "label": "받침대 또는 저작권 표기가 등록 사례와 유사함"
+        },
+        {
+          "tags": [
+            "joint",
+            "mold",
+            "sculpt"
+          ],
+          "evidenceKey": "parts",
+          "label": "관절·몰드·파츠 결합 구조가 등록 사례와 유사함"
+        },
+        {
+          "tags": [
+            "paint",
+            "finish",
+            "gloss"
+          ],
+          "evidenceKey": "figureFull",
+          "label": "도색·표면 마감이 등록 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "side_by_side",
+        "packaging",
+        "paint",
+        "mold",
+        "joint",
+        "base"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "MyFigureCollection",
+      "sourceUrl": "https://myfigurecollection.net/blogpost/49139",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [
+        "img_7bb9df590348ffa5d4b0"
+      ],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00100",
+      "productId": null,
+      "productName": "Nendoroid guide using a counterfeit Hatsune Miku",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "product_mapping_required",
+      "reviewReason": "exact_product_mapping_missing",
+      "sourceCaseId": "NEN-00100",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "side_by_side_author_asserted",
+      "evidenceSummary": "Counterfeit Miku example with packaging, paint, color, loose parts, back hole, joints, stand and finish.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "tags": [
+            "packaging",
+            "logo",
+            "license_sticker"
+          ],
+          "evidenceKey": "boxFront",
+          "label": "패키지 구성·로고·인쇄 상태가 등록 사례와 유사함"
+        },
+        {
+          "tags": [
+            "base",
+            "copyright"
+          ],
+          "evidenceKey": "baseMark",
+          "label": "받침대 또는 저작권 표기가 등록 사례와 유사함"
+        },
+        {
+          "tags": [
+            "joint",
+            "mold",
+            "sculpt"
+          ],
+          "evidenceKey": "parts",
+          "label": "관절·몰드·파츠 결합 구조가 등록 사례와 유사함"
+        },
+        {
+          "tags": [
+            "paint",
+            "finish",
+            "gloss"
+          ],
+          "evidenceKey": "figureFull",
+          "label": "도색·표면 마감이 등록 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "side_by_side",
+        "packaging",
+        "paint",
+        "mold",
+        "joint",
+        "base"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "WordPress",
+      "sourceUrl": "https://leeksarefalling.wordpress.com/2012/03/24/nendoroid-guide-10-steps-to-differentiate-between-real-and-fakes/",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [
+        "img_feea92999a4ebbfb2a96",
+        "img_095598126d0401612c95",
+        "img_9532218440684dbc5b26",
+        "img_a431a1dff894e6e5a30b",
+        "img_226683eb7b1ef538e59c",
+        "img_a9922cb5baf77dc366d7",
+        "img_d8d82ba6e489c13c3fa6",
+        "img_52b2b1a15d48ebf748a0",
+        "img_54f7208d5568695dd9f3",
+        "img_3740bc7f5b8d34a86e07",
+        "img_9f2117149382a2d1da7e",
+        "img_33c3c76e0ac5176252c8"
+      ],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00134",
+      "productId": null,
+      "productName": "Tfw you almost bought a fake 🥴🥲 The figure itself looks insanely real but the box was missing the text on the clear plastic… Gotta be really careful out here 😭",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00134",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "author_asserted",
+      "evidenceSummary": "Public community post; automated triage reason: title_or_body_asserts_counterfeit. Manual review is required unless independently confirmed.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "tags": [
+            "packaging",
+            "logo",
+            "license_sticker"
+          ],
+          "evidenceKey": "boxFront",
+          "label": "패키지 구성·로고·인쇄 상태가 등록 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "title_or_body_asserts_counterfeit",
+        "packaging"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "Reddit r/Nendoroid",
+      "sourceUrl": "https://www.reddit.com/r/Nendoroid/comments/obyfqv/tfw_you_almost_bought_a_fake_the_figure_itself/",
+      "sourcePublishedAt": "2021-07-01",
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [
+        "img_0cb422e880d9aa6dcdcb",
+        "img_ed8034b7115eea02884a"
+      ],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00162",
+      "productId": null,
+      "productName": "Got this bootleg rip",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00162",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "author_asserted",
+      "evidenceSummary": "Public community post; automated triage reason: title_or_body_asserts_counterfeit. Manual review is required unless independently confirmed.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "title_or_body_asserts_counterfeit"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "Reddit r/Nendoroid",
+      "sourceUrl": "https://www.reddit.com/r/Nendoroid/comments/v4si12/got_this_bootleg_rip/",
+      "sourcePublishedAt": "2022-06-04",
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [
+        "img_5d621713156c7ea8bcf9",
+        "img_4be6c23a5de37ad6fa97"
+      ],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00175",
+      "productId": null,
+      "productName": "so, I posted a picture of a nendoroid on ebay that was WAY to cheap and was from China and I asked if it was a bootleg and it was. but, the bootleg isn't terrible. I did kinda intentionally buy the bootleg because I don't have enough money for a real one so no one get mad at me for buying a bootleg.",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00175",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "author_asserted",
+      "evidenceSummary": "Public community post; automated triage reason: title_or_body_asserts_counterfeit. Manual review is required unless independently confirmed.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "title_or_body_asserts_counterfeit"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "Reddit r/Nendoroid",
+      "sourceUrl": "https://www.reddit.com/r/Nendoroid/comments/w5q2q2/so_i_posted_a_picture_of_a_nendoroid_on_ebay_that/",
+      "sourcePublishedAt": "2022-07-23",
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [
+        "img_d9fa3705c3d77ca67a99",
+        "img_1eec92db125f030032e3"
+      ],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00176",
+      "productId": null,
+      "productName": "My dumbass bought a Joker Nendoroid on AliExpress for $15 and it ended up being a bootleg so I repurchased it on Amazon for $55. Here’s the comparison. I wanted a Nendoroid for 7 years and finally got a one so it was still worth the hassle💕",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00176",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "author_asserted",
+      "evidenceSummary": "Public community post; automated triage reason: title_or_body_asserts_counterfeit. Manual review is required unless independently confirmed.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "title_or_body_asserts_counterfeit"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "Reddit r/Nendoroid",
+      "sourceUrl": "https://www.reddit.com/r/Nendoroid/comments/wbdhwi/my_dumbass_bought_a_joker_nendoroid_on_aliexpress/",
+      "sourcePublishedAt": "2022-07-29",
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00179",
+      "productId": null,
+      "productName": "My dumbass bought a Joker Nendoroid on AliExpress for $15 and it ended up being a bootleg so I rebought it on Amazon for $55. Here is the comparison. I wanted a Nendoroid for 7 years and finally got a one so it was still worth the hassle",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00179",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "author_asserted",
+      "evidenceSummary": "Public community post; automated triage reason: title_or_body_asserts_counterfeit. Manual review is required unless independently confirmed.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "title_or_body_asserts_counterfeit"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "Reddit r/Nendoroid",
+      "sourceUrl": "https://www.reddit.com/r/Nendoroid/comments/wgfodh/my_dumbass_bought_a_joker_nendoroid_on_aliexpress/",
+      "sourcePublishedAt": "2022-08-04",
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00195",
+      "productId": null,
+      "productName": "Y’all I got a bootleg the other day… it says handmade crafts on the box but no good smile. Not sure if she was worth it 🥹",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00195",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "author_asserted",
+      "evidenceSummary": "Public community post; automated triage reason: title_or_body_asserts_counterfeit. Manual review is required unless independently confirmed.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "tags": [
+            "packaging",
+            "logo",
+            "license_sticker"
+          ],
+          "evidenceKey": "boxFront",
+          "label": "패키지 구성·로고·인쇄 상태가 등록 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "title_or_body_asserts_counterfeit",
+        "packaging"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "Reddit r/Nendoroid",
+      "sourceUrl": "https://www.reddit.com/r/Nendoroid/comments/xyfgp2/yall_i_got_a_bootleg_the_other_day_it_says/",
+      "sourcePublishedAt": "2022-10-08",
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [
+        "img_2ab8d501beb5fa07678f",
+        "img_cbe03aed0a7fabc8234d"
+      ],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00251",
+      "productId": null,
+      "productName": "Just got my first bootleg figure from Ebay. Kinda upset.",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00251",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "author_asserted",
+      "evidenceSummary": "Public community post; automated triage reason: title_or_body_asserts_counterfeit. Manual review is required unless independently confirmed.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "title_or_body_asserts_counterfeit"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "Reddit r/Nendoroid",
+      "sourceUrl": "https://www.reddit.com/r/Nendoroid/comments/14etezk/just_got_my_first_bootleg_figure_from_ebay_kinda/",
+      "sourcePublishedAt": "2023-06-21",
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [
+        "img_e86a70e780c63a922fb1",
+        "img_a2cab6a883346db84a42"
+      ],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-00487",
+      "productId": null,
+      "productName": "가품 넨도로이드 사봤습니다",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-00487",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "author_asserted",
+      "evidenceSummary": "Author explicitly states these Nendoroids were purchased as counterfeits for customization and describes paint/packaging differences.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "tags": [
+            "packaging",
+            "logo",
+            "license_sticker"
+          ],
+          "evidenceKey": "boxFront",
+          "label": "패키지 구성·로고·인쇄 상태가 등록 사례와 유사함"
+        },
+        {
+          "tags": [
+            "paint",
+            "finish",
+            "gloss"
+          ],
+          "evidenceKey": "figureFull",
+          "label": "도색·표면 마감이 등록 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "author_asserted",
+        "packaging",
+        "paint",
+        "side_by_side_context"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "Ruliweb",
+      "sourceUrl": "https://bbs.ruliweb.com/family/242/board/300087/read/16237810",
+      "sourcePublishedAt": null,
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [
+        "img_23b5aa82f7f8ca662579",
+        "img_58f2b98d4c3cac6df49d",
+        "img_69bc3c2f0a8a9f79cf80",
+        "img_e5f24112739f2c7cbb2a",
+        "img_9ff8e2d4e4b5cfff02c2",
+        "img_e0df1015eeba99921d2d",
+        "img_23268bc03f1f0e80b2ac",
+        "img_46f5326d8cb7b2d02cdb",
+        "img_657610472b34597eeb64",
+        "img_5ba9b5bb5726a8baf1c3",
+        "img_9d155046d9990d16ef03",
+        "img_15e42d9217b1190c099b",
+        "img_ed2f08f26b1c3388553a",
+        "img_27d6211cc2ea05af1465",
+        "img_fae80e7f1ae0db2d62aa"
+      ],
+      "requiresHumanReview": true
+    },
+    {
+      "evidenceId": "NEN-01006",
+      "productId": null,
+      "productName": "사유키 짭이네",
+      "nendoroidNumber": null,
+      "existingCaseId": null,
+      "registrationStatus": "review_pending",
+      "reviewReason": "label_requires_admin_review",
+      "sourceCaseId": "NEN-01006",
+      "authenticityLabel": "counterfeit",
+      "confidenceLevel": "medium",
+      "verificationStatus": "author_asserted",
+      "evidenceSummary": "Korean community post; automated triage reason: title_asserts_counterfeit. Manual review is required unless independently confirmed.",
+      "publicTitle": "동일 제품의 정품·가품 실물 비교 사례",
+      "publicSummary": "작성자가 동일 제품의 정품과 가품을 나란히 비교한 사례입니다. 비교 이미지의 정품·가품 영역은 추가 검수 대상입니다.",
+      "signals": [
+        {
+          "evidenceKey": "figureFull",
+          "label": "전체 외형이 등록 비교 사례와 유사함"
+        }
+      ],
+      "signalTags": [
+        "title_asserts_counterfeit"
+      ],
+      "sourceType": "community",
+      "sourcePlatform": "DCInside 넨도로이드 갤러리",
+      "sourceUrl": "https://gall.dcinside.com/mgallery/board/view/?id=nendoroid&no=879456",
+      "sourcePublishedAt": "2026-07-10",
+      "sourceRetrievedAt": "2026-07-14T14:24:45+00:00",
+      "rightsStatus": "unknown_link_only",
+      "imageIds": [
+        "img_d4e70da917637e08190e"
+      ],
+      "requiresHumanReview": true
+    }
+  ]
+}

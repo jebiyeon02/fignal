@@ -1,3 +1,5 @@
+import evidenceDataset from "./data/counterfeit-evidence.generated.json";
+
 export type CounterfeitEvidenceKey =
   | "boxFront"
   | "boxBack"
@@ -24,6 +26,13 @@ export type CounterfeitCase = {
   sourceName: string;
   sourceUrl: string;
   checkedAt: string;
+  evidenceIds?: string[];
+  evidenceSummary?: string;
+  confidenceLevel?: "high" | "medium";
+  verificationStatus?: string;
+  rightsStatus?: string;
+  sourcePublishedAt?: string | null;
+  requiresHumanReview?: boolean;
 };
 
 const currentGoodSmileSupport = {
@@ -44,7 +53,7 @@ const archivedGoodSmileImages = (...files: string[]) => files.map(
   (file) => `https://partner.goodsmile.info/support/eng/images/large/${file}`,
 );
 
-export const counterfeitCases: CounterfeitCase[] = [
+const curatedCounterfeitCases: CounterfeitCase[] = [
   {
     id: "miku-symphony-package",
     productId: "nendoroid-1538",
@@ -650,3 +659,87 @@ export const counterfeitCases: CounterfeitCase[] = [
     ...archivedGoodSmileSupport("https://partner.goodsmile.info/support/eng/fake/en/4133-1/"),
   },
 ];
+
+type ImportedEvidenceCase = {
+  evidenceId: string;
+  productId: string;
+  existingCaseId: string | null;
+  registrationStatus: string;
+  confidenceLevel: "high" | "medium";
+  verificationStatus: string;
+  evidenceSummary: string;
+  publicTitle: string;
+  publicSummary: string;
+  signals: Array<{ evidenceKey: CounterfeitEvidenceKey; label: string }>;
+  sourceType: CounterfeitCaseSourceType;
+  sourcePlatform: string;
+  sourceUrl: string;
+  sourcePublishedAt: string | null;
+  sourceRetrievedAt: string | null;
+  rightsStatus: string;
+  imageIds: string[];
+  requiresHumanReview: boolean;
+};
+
+type ImportedEvidenceImage = {
+  id: string;
+  displayUrl: string | null;
+  linkStatus: string;
+};
+
+const importedEvidenceCases = evidenceDataset.cases as ImportedEvidenceCase[];
+const importedEvidenceImages = evidenceDataset.images as ImportedEvidenceImage[];
+const importedImageById = new Map(importedEvidenceImages.map((image) => [image.id, image]));
+const importedByExistingCaseId = new Map<string, ImportedEvidenceCase[]>();
+
+for (const evidence of importedEvidenceCases) {
+  if (!evidence.existingCaseId || evidence.registrationStatus !== "registered") continue;
+  const records = importedByExistingCaseId.get(evidence.existingCaseId) ?? [];
+  records.push(evidence);
+  importedByExistingCaseId.set(evidence.existingCaseId, records);
+}
+
+const enrichedCuratedCases = curatedCounterfeitCases.map((counterfeitCase) => {
+  const evidence = importedByExistingCaseId.get(counterfeitCase.id) ?? [];
+  if (evidence.length === 0) return counterfeitCase;
+  const strongest = evidence.find((item) => item.confidenceLevel === "high") ?? evidence[0];
+  return {
+    ...counterfeitCase,
+    evidenceIds: evidence.map((item) => item.evidenceId),
+    evidenceSummary: strongest.evidenceSummary,
+    confidenceLevel: strongest.confidenceLevel,
+    verificationStatus: strongest.verificationStatus,
+    rightsStatus: strongest.rightsStatus,
+    sourcePublishedAt: strongest.sourcePublishedAt,
+    requiresHumanReview: evidence.some((item) => item.requiresHumanReview),
+  };
+});
+
+const importedNewCases: CounterfeitCase[] = importedEvidenceCases
+  .filter((evidence) => evidence.registrationStatus === "registered" && !evidence.existingCaseId)
+  .map((evidence) => ({
+    id: `dataset-${evidence.evidenceId.replace(/[^a-zA-Z0-9-]+/g, "-").toLowerCase()}`,
+    productId: evidence.productId,
+    title: evidence.publicTitle,
+    summary: evidence.publicSummary,
+    images: evidence.imageIds
+      .map((imageId) => importedImageById.get(imageId))
+      .filter((image): image is ImportedEvidenceImage => Boolean(image?.displayUrl) && image?.linkStatus === "available")
+      .map((image) => image.displayUrl as string)
+      .slice(0, 4),
+    signals: evidence.signals.map(({ evidenceKey, label }) => ({ evidenceKey, label })),
+    sourceType: evidence.sourceType,
+    sourceName: evidence.sourceType === "official" ? "GOOD SMILE COMPANY 공식 가품 아카이브" : "검수된 실물 비교 자료",
+    sourceUrl: evidence.sourceUrl,
+    checkedAt: evidence.sourceRetrievedAt?.slice(0, 10) ?? "2026-07-16",
+    evidenceIds: [evidence.evidenceId],
+    evidenceSummary: evidence.evidenceSummary,
+    confidenceLevel: evidence.confidenceLevel,
+    verificationStatus: evidence.verificationStatus,
+    rightsStatus: evidence.rightsStatus,
+    sourcePublishedAt: evidence.sourcePublishedAt,
+    requiresHumanReview: evidence.requiresHumanReview,
+  }))
+  .filter((counterfeitCase) => counterfeitCase.images.length > 0);
+
+export const counterfeitCases: CounterfeitCase[] = [...enrichedCuratedCases, ...importedNewCases];

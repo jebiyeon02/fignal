@@ -19,7 +19,9 @@ const supportedImageTypes = new Set([
 const referenceImageHosts = new Set([
   "www.goodsmile.com",
   "images.goodsmile.info",
+  "i0.wp.com",
   "partner.goodsmile.info",
+  "stat.ameba.jp",
   "support.goodsmile.com",
 ]);
 
@@ -55,6 +57,9 @@ type CasePayload = {
   signals: Array<{ evidenceKey: EvidenceKey; label: string }>;
   sourceType?: "official" | "community";
   sourceName?: string;
+  evidenceIds?: string[];
+  evidenceSummary?: string;
+  verificationStatus?: string;
 };
 
 type GeminiPart =
@@ -270,7 +275,15 @@ export async function POST(request: Request) {
 
   for (const counterfeitCase of cases.slice(0, 3)) {
     content.push({
-      text: `[알려진 가품 사례 ${counterfeitCase.id}] ${counterfeitCase.title}\n출처: ${counterfeitCase.sourceName ?? "등록 자료"} (${counterfeitCase.sourceType ?? "출처 유형 미표기"})\n${counterfeitCase.summary}\n특징: ${counterfeitCase.signals.map((signal) => signal.label).join(", ")}`,
+      text: [
+        `[알려진 가품 사례 ${counterfeitCase.id}] ${counterfeitCase.title}`,
+        `증빙 ID: ${counterfeitCase.evidenceIds?.join(", ") || "기존 검수 자료"}`,
+        `출처: ${counterfeitCase.sourceName ?? "등록 자료"} (${counterfeitCase.sourceType ?? "출처 유형 미표기"})`,
+        `검수 상태: ${counterfeitCase.verificationStatus ?? "기존 검수 완료"}`,
+        counterfeitCase.summary,
+        `원문 근거 요약: ${counterfeitCase.evidenceSummary ?? counterfeitCase.summary}`,
+        `특징: ${counterfeitCase.signals.map((signal) => signal.label).join(", ")}`,
+      ].join("\n"),
     });
     for (const image of counterfeitCase.images.filter(isAllowedReferenceUrl).slice(0, 2)) {
       referenceRequests.push(fetchReferenceImage(`[가품 사례 이미지 ${counterfeitCase.id}]`, image));
@@ -338,6 +351,9 @@ export async function POST(request: Request) {
     "정품을 보증하거나 단정하지 말고, 사진에 실제로 보이는 근거만 한국어로 짧고 구체적으로 설명하세요.",
     "공식 제품 이미지는 전체 외형 참고용이며 박스 뒷면, 바코드, 받침대 각인의 정답으로 추측하지 마세요.",
     "가품 사례 이미지와 시각적으로 겹치는 특징이 있을 때만 caseMatches에 넣으세요.",
+    "comparison 이미지에는 정품과 가품이 함께 있을 수 있으므로 이미지 전체를 가품으로 간주하지 마세요.",
+    "official_confirmed는 제조사 확인 자료이고 side_by_side_author_asserted는 비교 작성자의 판단입니다. 두 출처 강도를 구분하세요.",
+    "caseMatches.reason에는 사용자 사진에서 관찰된 부분과 등록 사례의 어떤 특징이 겹치는지 구체적으로 적으세요.",
     "보이지 않거나 해상도가 부족한 글자, 로고, JAN, 각인은 status=unclear로 처리하고 재촬영 방법을 userAction에 적으세요.",
     "사진마다 해당 evidence_key로 findings를 정확히 하나씩 만들고, 업로드되지 않은 key는 만들지 마세요.",
     "한 장의 일반 제품 사진만으로 정품 가능성 높음을 주지 마세요. 핵심 표기 사진이 부족하면 insufficient_photos를 선택하세요.",
