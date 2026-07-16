@@ -76,12 +76,8 @@ export function buildGeminiAnalysisGenerationConfig(schema: unknown) {
   return {
     maxOutputTokens: GEMINI_ANALYSIS_MAX_OUTPUT_TOKENS,
     temperature: 0.1,
-    responseFormat: {
-      text: {
-        mimeType: "application/json",
-        schema,
-      },
-    },
+    responseMimeType: "application/json",
+    responseJsonSchema: schema,
   };
 }
 

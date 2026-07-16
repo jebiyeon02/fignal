@@ -29,8 +29,8 @@ test("Gemini generation config enforces structured JSON with enough output room"
   const schema = buildAnalysisResponseSchema(["boxBack"], []);
   const config = buildGeminiAnalysisGenerationConfig(schema);
 
-  assert.equal(config.responseFormat.text.mimeType, "application/json");
-  assert.equal(config.responseFormat.text.schema, schema);
+  assert.equal(config.responseMimeType, "application/json");
+  assert.equal(config.responseJsonSchema, schema);
   assert.equal(config.maxOutputTokens, GEMINI_ANALYSIS_MAX_OUTPUT_TOKENS);
   assert.ok(config.maxOutputTokens >= 4096);
 });
