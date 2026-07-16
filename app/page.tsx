@@ -739,7 +739,7 @@ export default function Home() {
       `${currentProduct.name} · No.${currentProduct.number}`,
       `제조사: ${currentProduct.maker}`,
       `AI 위험 신호: ${result.label} · 자료 충족도 ${evidenceCompleteness}%`,
-      "제품별 비교 사례가 없어 커뮤니티 또는 전문가의 추가 검토를 요청합니다.",
+      "명확한 비정상 신호는 없지만 판본 또는 서로 충돌하는 근거가 남아 추가 검토를 요청합니다.",
       reviewFindings ? `\n확인이 필요한 항목\n${reviewFindings}` : "",
       "\n이 요청은 사진 기반 참고 의견이며 정품 보증서가 아닙니다.",
     ].filter(Boolean).join("\n");
@@ -1190,7 +1190,7 @@ function VerificationCriteriaDialog({ onClose }: { onClose: () => void }) {
             <div className="criteria-section-title"><h3>함께 비교하는 정보</h3></div>
             <ul className="criteria-rules">
               <li><span>01</span><p><strong>공식 제품 정보</strong>서버에 등록된 제품명·제조사·제품번호와 사진 속 표기가 충돌하는지 확인합니다.</p></li>
-              <li><span>02</span><p><strong>알려진 가품 사례</strong>같은 제품의 검수된 텍스트 특징과 실제로 겹치는 모양·표기만 비교합니다.</p></li>
+              <li><span>02</span><p><strong>알려진 가품 사례</strong>같은 제품의 검수 특징은 직접 대조하고, 다른 제품의 공식 사례는 반복되는 이상 유형과 검사 위치를 찾는 데 사용합니다.</p></li>
               <li><span>03</span><p><strong>사용자가 올린 원본 사진</strong>사진에서 직접 확인되는 내용만 근거로 사용하고 보이지 않는 부분은 추측하지 않습니다.</p></li>
             </ul>
           </section>

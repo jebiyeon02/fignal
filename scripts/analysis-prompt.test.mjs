@@ -5,8 +5,10 @@ import {
   analysisPromptVersion,
   buildNendoroidAnalysisPrompt,
   evidenceRoleInspectionInstructions,
+  expertCalibrationExamples,
   expertDecisionInstructions,
   expertEvidenceHierarchyInstructions,
+  expertFinalAuditInstructions,
   officialCasePatternInstructions,
   packagingTextInspectionInstructions,
 } from "../app/api/analyze/analysis-prompt.ts";
@@ -53,4 +55,13 @@ test("expert prompt makes one clear anomaly decisive without a product case", ()
   assert.match(expertDecisionInstructions, /등록 사례가 0건이어도 verdict=counterfeit_suspected/);
   assert.match(expertDecisionInstructions, /concern이 하나라도 있으면 다른 사진이 흐리거나/);
   assert.match(expertDecisionInstructions, /제품별 사례가 없다는 이유만으로 needs_review/);
+});
+
+test("expert prompt calibrates weak models with positive and negative examples", () => {
+  assert.match(expertCalibrationExamples, /MOCK TEST DATA/);
+  assert.match(expertCalibrationExamples, /MADE IN CHINA/);
+  assert.match(expertCalibrationExamples, /작은 도색 편차/);
+  assert.match(expertCalibrationExamples, /정상 로고가 우려 신호를 상쇄하지 않으며/);
+  assert.match(expertFinalAuditInstructions, /concern 개수가 1개 이상이면 verdict가 반드시 counterfeit_suspected/);
+  assert.match(expertFinalAuditInstructions, /제품별 사례 부재.*낮추지 마세요/);
 });

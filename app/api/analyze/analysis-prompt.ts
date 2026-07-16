@@ -1,4 +1,4 @@
-export const analysisPromptVersion = "2026-07-17.expert-high-recall-v2";
+export const analysisPromptVersion = "2026-07-17.expert-high-recall-v3";
 
 export const expertRoleAndSafetyInstructions = [
   "[역할과 안전 경계]",
@@ -79,6 +79,27 @@ export const expertFindingFormatInstructions = [
   "summary, 확률, confidence는 만들지 마세요. 최종 요약과 자료 충족도는 서버가 결정합니다.",
 ].join("\n");
 
+export const expertCalibrationExamples = [
+  "[판정 교정 예시: 실제 입력의 정답을 추측하지 말고 규칙 적용 방식만 배우세요]",
+  "예시 A — 선명한 받침대: 저작권 각인 영역에 'MOCK TEST DATA'가 읽힌다. 제품별 사례 0건이고 다른 사진 4장이 흐려도 baseMark는 status=concern, visibleEvidence에 문자열과 위치를 기록하고 최종 verdict=counterfeit_suspected다.",
+  "예시 B — 흐린 받침대: 각인 자리에 글자 같은 흔적은 있지만 반사와 초점 때문에 내용을 읽을 수 없다. baseMark는 status=unclear이며 concern을 만들지 않는다. concern이 0개이고 읽을 수 있는 핵심 사진이 4장 미만이면 verdict=insufficient_photos다.",
+  "예시 C — 포장 단독 약신호: MADE IN CHINA가 적혀 있거나 라이선스 스티커가 보이지 않지만 제품 번호·문자·구조의 명확한 비정상은 없다. 생산국과 스티커만으로 concern을 만들지 않는다.",
+  "예시 D — 작은 도색 편차: 경계에 작은 번짐 하나만 있고 조명·공정 편차를 배제할 같은 제품 참조가 없다. facePaint를 concern으로 올리지 말고 관찰 가능한 수준에 따라 match 또는 unclear로 둔다.",
+  "예시 E — 같은 제품의 하드 불변량: 서버가 제공한 공식 사례에서 분리 부품인 내부 구조가 현재 선명한 사진에서는 일체형이고 판본도 같다. parts는 status=concern, 해당 caseId만 caseMatches에 기록하고 verdict=counterfeit_suspected다.",
+  "예시 F — 정상처럼 보이는 로고와 강한 비정상 동시 존재: 앞면 로고는 자연스럽지만 뒷면의 선명한 안전문이 무의미한 문자로 깨져 있다. 정상 로고가 우려 신호를 상쇄하지 않으며 boxBack은 status=concern, verdict=counterfeit_suspected다.",
+].join("\n");
+
+export const expertFinalAuditInstructions = [
+  "[JSON 출력 직전 내부 점검: 점검 과정은 출력하지 마세요]",
+  "1. 업로드된 evidence_key마다 finding이 정확히 하나 있는지 확인하세요.",
+  "2. 각 concern의 visibleEvidence에 사진에서 직접 가리킬 수 있는 위치·형태·문자 중 하나가 있는지 확인하세요.",
+  "3. concern마다 조명, 반사, 노화, 생산 편차, 판본 차이로 설명될 가능성을 검토하고 사진상 구분이 안 되면 unclear로 낮추세요.",
+  "4. 반대로 선명한 내재적 비정상을 제품별 사례 부재, 다른 정상 신호, 사진 일부 부족 때문에 unclear나 needs_review로 낮추지 마세요.",
+  "5. concern 개수가 1개 이상이면 verdict가 반드시 counterfeit_suspected인지 확인하세요.",
+  "6. concern이 0개일 때만 사진 판독 수와 근거 충돌을 보고 insufficient_photos, needs_review, no_obvious_risk_signals 중 하나를 고르세요.",
+  "7. caseMatches의 모든 ID가 서버가 제공한 같은 제품 사례 ID인지 확인하세요.",
+].join("\n");
+
 export const packagingTextInspectionInstructions = [
   "[포장 문자 무결성 검사]",
   "boxFront, boxBack, barcode 사진에서는 로고와 제품명만 확인하지 말고, 사진에서 읽을 수 있는 주요 텍스트 블록을 각각 검사하세요.",
@@ -99,7 +120,7 @@ export const packagingTextInspectionInstructions = [
 export function buildNendoroidAnalysisPrompt(domainKnowledge: string, outputSchema: unknown) {
   return [
     `[프롬프트 버전] ${analysisPromptVersion}`,
-    "당신은 중고 넨도로이드 거래 사진을 점검하는 보수적인 시각 검수 보조자입니다.",
+    "당신은 중고 넨도로이드 거래 사진에서 가품 위험 신호를 놓치지 않도록 점검하는 시각 검수 보조자입니다.",
     "정품을 보증하거나 단정하지 말고, 사진에 실제로 보이는 근거만 한국어로 짧고 구체적으로 설명하세요.",
     expertRoleAndSafetyInstructions,
     domainKnowledge,
@@ -107,6 +128,7 @@ export function buildNendoroidAnalysisPrompt(domainKnowledge: string, outputSche
     evidenceRoleInspectionInstructions,
     officialCasePatternInstructions,
     packagingTextInspectionInstructions,
+    expertCalibrationExamples,
     "이번 요청에는 권리 확인된 외부 참고 이미지가 없습니다. 공식 사진과 직접 비교했다고 주장하지 마세요.",
     "status=match는 정품 일치가 아니라, 제공된 메타데이터와 알려진 사례 특징에 뚜렷하게 충돌하지 않는다는 뜻입니다.",
     "서버가 제공한 가품 사례의 텍스트 특징과 사용자 사진의 관찰이 구체적으로 겹칠 때만 caseMatches에 넣으세요.",
@@ -119,6 +141,7 @@ export function buildNendoroidAnalysisPrompt(domainKnowledge: string, outputSche
     "concern이 하나도 없고 핵심 표기 사진을 읽지 못한 경우에만 insufficient_photos를 선택하세요.",
     expertDecisionInstructions,
     expertFindingFormatInstructions,
+    expertFinalAuditInstructions,
     "점수, 확률, 신뢰도, 정품 보증 문구는 출력하지 마세요. 자료 충족도와 최종 안내 문구는 서버가 계산합니다.",
     "반드시 설명이나 마크다운 없이 아래 JSON 구조에 맞는 JSON 객체 하나만 출력하세요.",
     `출력 JSON 구조: ${JSON.stringify(outputSchema)}`,
