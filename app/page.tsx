@@ -39,6 +39,7 @@ import { communityMentions, type CommunityMention } from "./community-mentions";
 import {
   counterfeitCases,
   type CounterfeitCase,
+  type CounterfeitCaseKind,
   type CounterfeitEvidenceKey,
 } from "./counterfeit-cases";
 
@@ -504,8 +505,9 @@ export default function Home() {
   const concernItems = evidenceItems.filter((item) => observations[item.key] === "concern");
   const pendingItems = evidenceItems.filter((item) => observations[item.key] === "unverified" || observations[item.key] === "missing");
   const productCases = counterfeitCases.filter((item) => item.productId === currentProduct?.id);
+  const aiProductCases = productCases.filter((item) => item.verdictImpact !== "none");
   const productCommunityMentions = communityMentions.filter((item) => item.productId === currentProduct?.id);
-  const matchedCaseSignals = productCases.flatMap((item) => item.signals)
+  const matchedCaseSignals = aiProductCases.flatMap((item) => item.signals)
     .filter((signal) => observations[signal.evidenceKey] === "concern");
   const hasKnownCaseOverlap = matchedCaseSignals.length > 0;
   const riskPoints = concernItems.reduce((sum, item) => sum + item.weight, 0);
@@ -640,7 +642,7 @@ export default function Home() {
       officialUrl: currentProduct.officialUrl,
       verified: currentProduct.verified,
     }));
-    formData.set("cases", JSON.stringify(productCases.map(({ id, title, summary, images, signals, sourceType, sourceName, evidenceIds, evidenceSummary, verificationStatus }) => ({
+    formData.set("cases", JSON.stringify(aiProductCases.map(({ id, title, summary, images, signals, sourceType, sourceName, evidenceIds, evidenceSummary, verificationStatus }) => ({
       id,
       title,
       summary,
@@ -1098,9 +1100,10 @@ function CounterfeitCaseSection({ cases, observations, aiMatches }: {
   aiMatches: AiAnalysis["caseMatches"];
 }) {
   const [preview, setPreview] = useState<{ caseId: string; imageIndex: number } | null>(null);
-  const overlapCount = cases.flatMap((item) => item.signals)
+  const verdictCases = cases.filter((item) => item.verdictImpact !== "none");
+  const overlapCount = verdictCases.flatMap((item) => item.signals)
     .filter((signal) => observations[signal.evidenceKey] === "concern").length;
-  const aiMatchCount = aiMatches.filter((match) => match.similarity !== "low" && cases.some((item) => item.id === match.caseId)).length;
+  const aiMatchCount = aiMatches.filter((match) => match.similarity !== "low" && verdictCases.some((item) => item.id === match.caseId)).length;
   const previewCase = preview ? cases.find((item) => item.id === preview.caseId) : null;
 
   const movePreview = useCallback((direction: -1 | 1) => {
@@ -1140,44 +1143,74 @@ function CounterfeitCaseSection({ cases, observations, aiMatches }: {
         </header>
 
         {cases.map((item) => {
-          const overlappingSignals = item.signals.filter((signal) => observations[signal.evidenceKey] === "concern");
-          const aiMatch = aiMatches.find((match) => match.caseId === item.id && match.similarity !== "low");
+          const affectsVerdict = item.verdictImpact !== "none";
+          const caseKind: CounterfeitCaseKind = item.caseKind ?? (item.sourceType === "official" ? "official" : "comparison");
+          const caseKindLabel: Record<CounterfeitCaseKind, string> = {
+            official: "공식 제조사 자료",
+            comparison: "정품·가품 비교 사례",
+            specimen: "가품 실물 확인 사례",
+            mention: "커뮤니티 언급 사례",
+          };
+          const overlappingSignals = affectsVerdict
+            ? item.signals.filter((signal) => observations[signal.evidenceKey] === "concern")
+            : [];
+          const aiMatch = affectsVerdict
+            ? aiMatches.find((match) => match.caseId === item.id && match.similarity !== "low")
+            : undefined;
           const hasOverlap = overlappingSignals.length > 0 || Boolean(aiMatch);
 
           return (
             <article className={`case-card ${hasOverlap ? "overlap" : ""}`} key={item.id}>
-              <div className={`case-images count-${Math.min(item.images.length, 4)}`}>
-                {item.images.map((image, index) => (
-                  <button
-                    type="button"
-                    className="case-image-button"
-                    onClick={() => setPreview({ caseId: item.id, imageIndex: index })}
-                    aria-label={`${item.title} 비교 사진 ${index + 1} 크게 보기`}
-                    key={`${image}-${index}`}
-                  >
-                    <img src={image} alt={`${item.title} 비교 사진 ${index + 1}`} loading="lazy" />
-                    <span>{index + 1}</span>
-                    <ZoomIn size={16} />
-                  </button>
-                ))}
-              </div>
+              {item.images.length > 0 ? (
+                <div className={`case-images count-${Math.min(item.images.length, 4)}`}>
+                  {item.images.map((image, index) => (
+                    <button
+                      type="button"
+                      className="case-image-button"
+                      onClick={() => setPreview({ caseId: item.id, imageIndex: index })}
+                      aria-label={`${item.title} 비교 사진 ${index + 1} 크게 보기`}
+                      key={`${image}-${index}`}
+                    >
+                      <img src={image} alt={`${item.title} 비교 사진 ${index + 1}`} loading="lazy" />
+                      <span>{index + 1}</span>
+                      <ZoomIn size={16} />
+                    </button>
+                  ))}
+                </div>
+              ) : (
+                <a className="case-reference-only" href={item.sourceUrl} target="_blank" rel="noreferrer">
+                  <FileCheck2 size={25} />
+                  <span><strong>원문에서 실물 확인</strong><small>이미지는 복제하지 않았습니다.</small></span>
+                  <ExternalLink size={16} />
+                </a>
+              )}
               <div className="case-copy">
                 <span className={`case-status ${hasOverlap ? "matched" : ""}`}>
-                  {aiMatch ? "AI가 유사 특징을 찾은 사례" : hasOverlap ? "현재 매물과 겹치는 사례" : "비교 참고 사례"}
+                  {!affectsVerdict ? "검증 전 참고 사례" : aiMatch ? "AI가 유사 특징을 찾은 사례" : hasOverlap ? "현재 매물과 겹치는 사례" : "비교 참고 사례"}
                 </span>
                 <div className="case-meta">
-                  <span className={`case-source ${item.sourceType}`}>
-                    {item.sourceType === "official" ? "공식 제조사 자료" : "실물 비교 사례"}
+                  <span className={`case-source ${caseKind}`}>
+                    {caseKindLabel[caseKind]}
                   </span>
-                  <a className="case-source-link" href={item.sourceUrl} target="_blank" rel="noreferrer">
-                    {item.sourceName} 원문 <ExternalLink size={11} />
-                  </a>
+                  <span className="case-source-links">
+                    <a className="case-source-link" href={item.sourceUrl} target="_blank" rel="noreferrer">
+                      {item.sourceName} 원문 <ExternalLink size={11} />
+                    </a>
+                    {item.secondarySources?.map((source) => (
+                      <a className="case-source-link" href={source.url} target="_blank" rel="noreferrer" key={source.url}>
+                        {source.name} <ExternalLink size={11} />
+                      </a>
+                    ))}
+                  </span>
                 </div>
                 <h3>{item.title}</h3>
                 <p>{item.summary}</p>
+                {item.sourceType === "community" && (
+                  <p className="case-community-note"><Info size={13} /> 커뮤니티 자료이며 제조사 공식 판정은 아닙니다. AI 판정과 점수에는 반영하지 않았습니다.</p>
+                )}
                 <ul>
                   {item.signals.map((signal) => {
-                    const signalMatches = observations[signal.evidenceKey] === "concern" || Boolean(aiMatch?.evidenceKeys.includes(signal.evidenceKey));
+                    const signalMatches = affectsVerdict && (observations[signal.evidenceKey] === "concern" || Boolean(aiMatch?.evidenceKeys.includes(signal.evidenceKey)));
                     return (
                       <li className={signalMatches ? "matched" : ""} key={`${signal.evidenceKey}-${signal.label}`}>
                         {signalMatches ? <TriangleAlert size={13} /> : <span />}

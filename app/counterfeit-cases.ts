@@ -1,4 +1,5 @@
 import evidenceDataset from "./data/counterfeit-evidence.generated.json";
+import { researchedCommunityCases } from "./researched-counterfeit-cases";
 
 export type CounterfeitEvidenceKey =
   | "boxFront"
@@ -11,6 +12,7 @@ export type CounterfeitEvidenceKey =
   | "purchaseProof";
 
 export type CounterfeitCaseSourceType = "official" | "community";
+export type CounterfeitCaseKind = "official" | "comparison" | "specimen" | "mention";
 
 export type CounterfeitCase = {
   id: string;
@@ -26,6 +28,9 @@ export type CounterfeitCase = {
   sourceName: string;
   sourceUrl: string;
   checkedAt: string;
+  caseKind?: CounterfeitCaseKind;
+  verdictImpact?: "ai_reference" | "none";
+  secondarySources?: Array<{ name: string; url: string }>;
   evidenceIds?: string[];
   evidenceSummary?: string;
   confidenceLevel?: "high" | "medium";
@@ -742,4 +747,8 @@ const importedNewCases: CounterfeitCase[] = importedEvidenceCases
   }))
   .filter((counterfeitCase) => counterfeitCase.images.length > 0);
 
-export const counterfeitCases: CounterfeitCase[] = [...enrichedCuratedCases, ...importedNewCases];
+export const counterfeitCases: CounterfeitCase[] = [
+  ...enrichedCuratedCases,
+  ...importedNewCases,
+  ...researchedCommunityCases,
+];

@@ -241,6 +241,12 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .case-card.overlap { border-bottom-color: #efc9c3; }
 .case-images { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: start; gap: 10px; min-width: 0; }
 .case-images.count-1 { grid-template-columns: 1fr; }
+.case-reference-only { min-height: 210px; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 14px; padding: 24px; border: 1px solid #e4e4e4; border-radius: 10px; background: #f7f7f7; color: #555; text-decoration: none; }
+.case-reference-only:hover { border-color: #aaa; background: #f3f3f3; }
+.case-reference-only > svg:first-child { color: #888; }
+.case-reference-only > span { display: grid; gap: 5px; }
+.case-reference-only strong { font-size: 12px; }
+.case-reference-only small { color: #999; font-size: 9px; }
 .case-image-button { position: relative; min-width: 0; aspect-ratio: 4 / 3; overflow: hidden; padding: 0; border: 1px solid #e5e5e5; border-radius: 9px; background: #f5f5f5; cursor: zoom-in; transition: border-color .16s ease, box-shadow .16s ease, transform .16s ease; }
 .case-images.count-1 .case-image-button { aspect-ratio: 16 / 10; }
 .case-image-button:hover { border-color: #999; box-shadow: 0 8px 24px rgba(0,0,0,.08); transform: translateY(-1px); }
@@ -255,11 +261,16 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .case-meta { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; margin-top: 10px; }
 .case-source { display: inline-flex; align-items: center; padding: 4px 6px; border-radius: 4px; font-size: 7px; font-weight: 700; }
 .case-source.official { background: var(--green-bg); color: var(--green); }
-.case-source.community { background: #f0f0f0; color: #666; }
+.case-source.comparison { background: #edf3ff; color: #4167a7; }
+.case-source.specimen { background: var(--amber-bg); color: var(--amber); }
+.case-source.mention { background: #f0f0f0; color: #666; }
+.case-source-links { display: inline-flex; align-items: center; flex-wrap: wrap; gap: 7px; }
 .case-source-link { display: inline-flex; align-items: center; gap: 4px; color: #888; font-size: 8px; text-decoration: none; }
 .case-source-link:hover { color: #222; text-decoration: underline; text-underline-offset: 3px; }
 .case-copy h3 { margin: 15px 0 0; font-size: 18px; letter-spacing: -.025em; }
 .case-copy > p { margin: 9px 0 0; color: #777; font-size: 10px; line-height: 1.65; }
+.case-copy > .case-community-note { display: flex; align-items: flex-start; gap: 6px; padding: 9px 10px; margin-top: 12px; border-radius: 6px; background: #f7f7f7; color: #777; font-size: 8px; line-height: 1.5; }
+.case-community-note svg { flex: 0 0 auto; margin-top: 1px; }
 .case-copy ul { display: grid; gap: 8px; padding: 14px 0 0; margin: 16px 0 0; border-top: 1px solid #eee; list-style: none; }
 .case-copy li { min-height: 22px; display: grid; grid-template-columns: 14px 1fr auto; align-items: center; gap: 6px; color: #777; }
 .case-copy li > span { width: 5px; height: 5px; margin-left: 4px; border-radius: 50%; background: #c7c7c7; }

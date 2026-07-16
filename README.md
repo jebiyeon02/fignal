@@ -28,7 +28,7 @@ Gemini 분석에는 배포 환경의 `GEMINI_API_KEY`가 필요합니다. 선택
 
 ## 정품·가품 확인 사례 보유 제품
 
-2026-07-16 기준으로 제품 번호와 버전을 정확히 식별할 수 있는 33개 제품에 36개 공개 비교 사례를 연결했습니다. 33개는 제조사 공식 사례이며, 추가 3개는 데이터셋 검수 규칙을 통과한 공식·실물 비교 사례입니다. 아래 표의 `productId`는 `app/catalog.ts`와 `app/counterfeit-cases.ts`에서 동일해야 합니다.
+2026-07-16 기준으로 제품 번호와 버전을 정확히 식별할 수 있는 44개 제품에 47개 공개 사례를 연결했습니다. 기존 33개 제품은 제조사 공식 자료와 검수된 데이터셋을 사용하며, 신규 11개 제품은 커뮤니티 비교·실물·언급 자료로 분리해 표시합니다. 신규 커뮤니티 사례는 사용자 화면에만 참고용으로 노출하며 AI 요청, 점수와 최종 판정에는 전달하지 않습니다. 아래 표의 `productId`는 `app/catalog.ts`와 `app/counterfeit-cases.ts`에서 동일해야 합니다.
 
 | No. | 제품 | productId | 대표 확인 특징 | 근거 |
 | --- | --- | --- | --- | --- |
@@ -66,6 +66,24 @@ Gemini 분석에는 배포 환경의 `GEMINI_API_KEY`가 필요합니다. 선택
 | 1279 | 헌터 | `nendoroid-1279` | 머리 구조, 권총·램프 도색, 받침대 표기 | [GSC 고객지원](https://support.goodsmile.com/hc/en-us/articles/39729124039449-Bootleg-Information-Nendoroid-series) |
 | 1538 | 하츠네 미쿠 심포니 5주년 Ver. | `nendoroid-1538` | 패키지 크기, 로고·창 인쇄·저작권 누락 | [GSC 고객지원](https://support.goodsmile.com/hc/en-us/articles/39729124039449-Bootleg-Information-Nendoroid-series) |
 
+### 커뮤니티 사례 확장 제품 11개
+
+아래 자료는 제조사 공식 판정이 아닙니다. `정품·가품 비교`, `가품 실물 확인`, `커뮤니티 언급`으로 신뢰 범위를 구분하고 모든 레코드에 `verdictImpact: "none"`을 설정합니다. 외부 이미지는 `unknown_link_only`로 연결하며 프로젝트 저장소나 이미지 저장소에 복제하지 않습니다.
+
+| No. | 제품 | productId | 노출 등급 | 확인 내용 | 근거 |
+| --- | --- | --- | --- | --- | --- |
+| 724 | 하타케 카카시 | `nendoroid-724` | 정품·가품 비교 | 패키지·본체·부속품 비교 사진 | [TOYS KING 비교 자료](https://note.com/yuusukeblog/n/n8ad8d643c0e9) |
+| 1193 | 카마도 탄지로 | `nendoroid-1193` | 가품 실물 확인 | No.1193 박스, 작품 로고 누락 | [Reddit 실물 게시물](https://www.reddit.com/r/Nendoroid/comments/14etezk/just_got_my_first_bootleg_figure_from_ebay_kinda/) |
+| 1194 | 카마도 네즈코 | `nendoroid-1194` | 가품 실물 확인 | 대나무 결합, 크기·이마 비율, 재질 설명 | [가품 실물](https://www.reddit.com/r/Nendoroid/comments/mfvzk4/my_fake_amazon_nezuko_nendoroid_came_in_the_mail/), [관련 특징 언급](https://www.reddit.com/r/Nendoroid/comments/n4k6bt/bootleg_vs_official_todoroki_so_glad_i_was_able/) |
+| 1334 | 아가츠마 젠이츠 | `nendoroid-1334` | 가품 실물 확인 | 제품 번호가 명시된 가품 리뷰 영상 | [YouTube 리뷰](https://www.youtube.com/watch?v=-5UHg4BIzag) |
+| 1361 | 하시비라 이노스케 | `nendoroid-1361` | 가품 실물 확인 | 제품 번호가 명시된 가품 언박싱 | [YouTube 언박싱](https://www.youtube.com/watch?v=bR_gqZKmOPc) |
+| 1528 | 고죠 사토루 | `nendoroid-1528` | 커뮤니티 언급 | 판매점이 No.1528을 가품으로 분류 | [해외 판매점 게시물](https://www.facebook.com/FMSHOPVNHK/posts/pfbid02usSQoSrkdzE1NMzVRfuxJTrCxsshohpjEWDmyuQ8DwtHim9zAHoW6vP4b2nz1tJ5l) |
+| 1560 | 덴지 | `nendoroid-1560` | 정품·가품 비교 | 크기·눈·머리 몰드·포치타 마감 비교 | [Reddit 정품·가품 비교](https://www.reddit.com/r/Nendoroid/comments/18w75br/spot_the_difference/) |
+| 1580 | 파워 | `nendoroid-1580` | 커뮤니티 언급 | 작성자가 마지막 사진의 파워도 가품이라고 명시 | [Reddit 작성자 언급](https://www.reddit.com/r/Nendoroid/comments/18w75br/spot_the_difference/) |
+| 1834 | 료멘 스쿠나 | `nendoroid-1834` | 가품 실물 확인 | No.1834 박스·실물, 비교 대상은 고죠 No.1528 | [Instagram 비교 영상](https://www.instagram.com/reel/DUwgeflk1WR/) |
+| 2069 | 고토 히토리 | `nendoroid-2069` | 가품 실물 확인 | 가품 리뷰 영상과 판매점 번호 등록 교차 확인 | [YouTube 리뷰](https://www.youtube.com/watch?v=hvYwExim_og), [판매점 등록](https://www.facebook.com/FMSHOPVNHK/posts/pfbid02usSQoSrkdzE1NMzVRfuxJTrCxsshohpjEWDmyuQ8DwtHim9zAHoW6vP4b2nz1tJ5l) |
+| 2367 | 프리렌 | `nendoroid-2367` | 커뮤니티 언급 | 두 제품 비교 사진, 가품 방향은 검수 필요 | [Reddit 비교 게시물](https://www.reddit.com/r/Frieren/comments/1q1q3nz/real_vs_fake_nendroid_frieren_2367/) |
+
 ## 출처 신뢰도 원칙
 
 제품별 판정 근거의 우선순위는 다음과 같습니다.
@@ -75,7 +93,7 @@ Gemini 분석에는 배포 환경의 `GEMINI_API_KEY`가 필요합니다. 선택
 3. 원본 사진과 구매 경위가 남은 커뮤니티 실물 비교 글
 4. 출처가 재확인되지 않는 재게시물이나 판매자 홍보 글은 등록하지 않음
 
-기존 제품별 33개 사례는 모두 굿스마일 공식 고객지원 또는 공식 가품 아카이브에서 확인했습니다. 추가 자료는 `official_confirmed` 또는 `side_by_side_author_asserted`만 자동 등록하며 UI에서 `공식 제조사 자료`와 `실물 비교 사례`를 구분합니다.
+기존 제품별 33개 제품 자료는 굿스마일 공식 고객지원·공식 가품 아카이브와 기존 검수 데이터셋에서 확인했습니다. 신규 11개 커뮤니티 자료는 자동 판정 근거로 승격하지 않고 UI에서 `정품·가품 비교 사례`, `가품 실물 확인 사례`, `커뮤니티 언급 사례`로 구분합니다.
 
 ## 외부 데이터셋 가져오기
 
