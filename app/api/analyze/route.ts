@@ -19,6 +19,7 @@ const supportedImageTypes = new Set([
 const referenceImageHosts = new Set([
   "www.goodsmile.com",
   "images.goodsmile.info",
+  "www.nendo.guide",
   "i0.wp.com",
   "partner.goodsmile.info",
   "stat.ameba.jp",

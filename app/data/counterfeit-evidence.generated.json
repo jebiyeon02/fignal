@@ -2203,10 +2203,10 @@
       "requiresHumanReview": true
     },
     {
-      "evidenceId": "NEN-00034:nendoroid-9",
-      "productId": "nendoroid-9",
+      "evidenceId": "NEN-00034:nendoroid-16",
+      "productId": "nendoroid-16",
       "productName": "Nendoroid Mikuru Asahina",
-      "nendoroidNumber": "9",
+      "nendoroidNumber": "16",
       "releaseVersion": null,
       "manufacturer": "Good Smile Company",
       "existingCaseId": "mikuru-beam-face-package-base",

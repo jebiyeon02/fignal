@@ -343,7 +343,7 @@ const curatedCounterfeitCases: CounterfeitCase[] = [
   },
   {
     id: "mikuru-beam-face-package-base",
-    productId: "nendoroid-9",
+    productId: "nendoroid-16",
     title: "빔 투명도와 얼굴·패키지 차이",
     summary: "미쿠루 빔이 불투명하고 볼 홍조·눈썹 색이 다르며, JAN 글꼴과 패키지 인쇄·받침대 표기가 다른 가품이 공식 확인됐습니다.",
     images: archivedGoodSmileImages(

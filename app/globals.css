@@ -79,7 +79,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .catalog-shortcuts button:hover { border-color: #999; color: #222; }
 
 .product-image { overflow: hidden; background: #f4f4f4; }
-.product-image img { width: 100%; height: 100%; display: block; object-fit: cover; }
+.product-image img { width: 100%; height: 100%; display: block; object-fit: contain; mix-blend-mode: multiply; }
 .product-image.small { width: 58px; height: 64px; border-radius: 7px; }
 .product-image.medium { width: 78px; height: 88px; border-radius: 9px; }
 .product-image.large { width: 100%; height: 100%; border-radius: 0; }

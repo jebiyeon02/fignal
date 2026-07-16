@@ -510,28 +510,6 @@
       "requiresHumanReview": true
     },
     {
-      "mentionId": "mention_c892fc3b98ab3b49aba9",
-      "sourceCaseId": "NEN-00042",
-      "productId": "nendoroid-9",
-      "productName": "넨도로이드 아사히나 미쿠루",
-      "nendoroidNumber": "9",
-      "status": "community_catalog_asserted",
-      "statusLabel": "커뮤니티 분류",
-      "publicTitle": "동일 제품의 가품 분류 사례",
-      "publicSummary": "외부 커뮤니티에서 가품 사례로 분류했지만 제조사나 독립 검수자가 확인한 자료는 아닙니다.",
-      "sourceUrl": "https://w.atwiki.jp/nendoroido/pages/47.html",
-      "sourcePublishedAt": null,
-      "signalTags": [
-        "community_catalog",
-        "bootleg_reference"
-      ],
-      "imageReferenceCount": 0,
-      "rightsStatus": "unknown_link_only",
-      "exactMatchBasis": "number",
-      "verdictImpact": "none",
-      "requiresHumanReview": true
-    },
-    {
       "mentionId": "mention_443264472a8fd8808998",
       "sourceCaseId": "NEN-00165",
       "productId": "nendoroid-97",
