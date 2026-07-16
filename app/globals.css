@@ -212,10 +212,6 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .verdict-card.danger .verdict-copy h1 { color: var(--red); }
 .verdict-card.caution .verdict-copy h1 { color: var(--amber); }
 .verdict-copy p { margin: 10px 0 0; color: #777; font-size: 11px; }
-.risk-pill { width: fit-content; display: block; margin-top: 12px; padding: 6px 8px; border-radius: 6px; background: #f1f1f1; color: #666; font-size: 8px; font-style: normal; font-weight: 750; }
-.risk-pill.safe { background: var(--green-bg); color: var(--green); }
-.risk-pill.caution { background: var(--amber-bg); color: var(--amber); }
-.risk-pill.danger { background: var(--red-bg); color: var(--red); }
 .verdict-numbers { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, 1fr); padding-top: 22px; border-top: 1px solid #eee; }
 .verdict-numbers > div { padding: 0 20px; border-left: 1px solid #eee; }
 .verdict-numbers > div:first-child { padding-left: 0; border-left: 0; }

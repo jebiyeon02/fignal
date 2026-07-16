@@ -540,6 +540,7 @@ export default function Home() {
   const hasKnownCaseOverlap = matchedCaseSignals.length > 0;
   const riskPoints = concernItems.reduce((sum, item) => sum + item.weight, 0);
   const confidence = aiAnalysis?.confidence ?? Math.min(96, (currentProduct?.verified ? 18 : 8) + completedCount * 8 + assessedCount * 4);
+  const reviewedCount = Object.values(reviewedEvidence).filter(Boolean).length;
   const hasUserOverride = Object.keys(userOverrides).length > 0;
   const evidenceReady = essentialCompleted >= 4;
   const reviewPath = resolveReviewPath({
@@ -577,6 +578,11 @@ export default function Home() {
     ...calculatedResult,
     summary: `사용자가 수정한 ${Object.keys(userOverrides).length}개 항목을 반영한 결과입니다.`,
   } : (aiVerdict ?? calculatedResult);
+  const verdictCardResult = reviewPath === "unsupported" ? {
+    label: "판정할 수 없음",
+    tone: "neutral",
+    summary: "현재 지원 범위에 필요한 공식 제품 정보와 기준 자료가 없습니다.",
+  } : result;
 
   const selectProduct = (product: Product) => {
     if (selectedProduct?.id && selectedProduct.id !== product.id) {
@@ -998,10 +1004,10 @@ export default function Home() {
       {stage === "result" && currentProduct && (
         <section className="result-page page-enter">
           <PageBack onClick={reviewPath === "unsupported" ? resetAll : () => setStage("photos")} label={reviewPath === "unsupported" ? "제품 다시 선택" : "사진 수정"} />
-          <article className={`verdict-card ${reviewPathResult.tone}`}>
+          <article className={`verdict-card ${verdictCardResult.tone}`}>
             <div className="verdict-product"><ProductImage product={currentProduct} size="medium" /><span><small>No.{currentProduct.number}</small><strong>{currentProduct.name}</strong><em>{currentProduct.maker}</em></span></div>
-            <div className="verdict-copy"><span>{reviewPathResult.eyebrow}</span><h1>{reviewPathResult.label}</h1><p>{reviewPathResult.summary}</p>{aiAnalysis && <em className={`risk-pill ${result.tone}`}>AI 위험 신호 · {result.label}</em>}</div>
-            <div className="verdict-numbers"><div><strong>{reviewPath === "unsupported" ? "—" : `${confidence}%`}</strong><span>{reviewPath === "unsupported" ? "자료 미확인" : "자료 충족도"}</span></div><div><strong>{completedCount}</strong><span>분석 사진</span></div><div><strong>{reviewPath === "case_comparison" ? aiProductCases.length : reviewPath === "more_photos_needed" ? photoActions.length : 0}</strong><span>{reviewPath === "case_comparison" ? "비교 사례" : reviewPath === "more_photos_needed" ? "추가 촬영" : reviewPath === "unsupported" ? "지원 사례" : "제품별 사례"}</span></div></div>
+            <div className="verdict-copy"><span>{hasUserOverride ? "사용자 확인 반영" : aiAnalysis ? "AI 판정" : "검토 결과"}</span><h1>{verdictCardResult.label}</h1><p>{verdictCardResult.summary}</p></div>
+            <div className="verdict-numbers"><div><strong>{reviewPath === "unsupported" ? "—" : `${confidence}%`}</strong><span>{reviewPath === "unsupported" ? "자료 미확인" : "자료 충족도"}</span></div><div><strong>{completedCount}</strong><span>분석 사진</span></div><div><strong>{reviewedCount}/{aiAnalysis?.findings.length ?? assessedCount}</strong><span>사용자 확인</span></div></div>
           </article>
 
           <ReviewPathSection
