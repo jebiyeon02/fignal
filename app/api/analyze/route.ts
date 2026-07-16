@@ -47,6 +47,8 @@ type ProductPayload = {
   englishName: string;
   number: string;
   maker: string;
+  seriesName?: string;
+  englishSeriesName?: string;
   image: string;
   officialUrl: string;
   verified: boolean;
@@ -265,6 +267,7 @@ export async function POST(request: Request) {
       text: [
         `검증 대상: ${product.name} (${product.englishName || product.name})`,
         `제품번호: ${product.number}`,
+        `작품: ${[product.seriesName, product.englishSeriesName].filter(Boolean).join(" / ") || "미확인"}`,
         `제조사: ${product.maker}`,
         `공식 카탈로그 등록 여부: ${product.verified ? "등록됨" : "직접 입력"}`,
         ...(product.verificationNotes?.length ? [`제품별 확인 메모:\n- ${product.verificationNotes.join("\n- ")}`] : []),

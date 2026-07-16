@@ -13,6 +13,8 @@ export type CatalogProduct = {
   officialUrl: string;
   verified: boolean;
   series?: string;
+  seriesName?: string;
+  englishSeriesName?: string;
 };
 
 const curatedCatalogProducts: CatalogProduct[] = [
@@ -1736,16 +1738,28 @@ const curatedCatalogProducts: CatalogProduct[] = [
 ];
 
 const curatedProductIds = new Set(curatedCatalogProducts.map((product) => product.id));
+const gsInfoProductsById = new Map((allGsInfoNendoroids as CatalogProduct[]).map((product) => [product.id, product]));
+const enrichWithSeries = (product: CatalogProduct): CatalogProduct => {
+  const gsInfoProduct = gsInfoProductsById.get(product.id);
+  if (!gsInfoProduct) return product;
+  return {
+    ...product,
+    aliases: [...new Set([...product.aliases, ...gsInfoProduct.aliases])],
+    series: product.series ?? gsInfoProduct.series,
+    seriesName: product.seriesName ?? gsInfoProduct.seriesName,
+    englishSeriesName: product.englishSeriesName ?? gsInfoProduct.englishSeriesName,
+  };
+};
 const officialOneToFiveHundred = (nendoroidsOneToFiveHundred as CatalogProduct[]).filter(
   (product) => !curatedProductIds.has(product.id),
-);
+).map(enrichWithSeries);
 const preferredProductIds = new Set([
   ...curatedProductIds,
   ...officialOneToFiveHundred.map((product) => product.id),
 ]);
 
 export const expandedProducts: CatalogProduct[] = [
-  ...curatedCatalogProducts,
+  ...curatedCatalogProducts.map(enrichWithSeries),
   ...officialOneToFiveHundred,
   ...(allGsInfoNendoroids as CatalogProduct[]).filter((product) => !preferredProductIds.has(product.id)),
 ];

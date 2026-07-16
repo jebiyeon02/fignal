@@ -64,6 +64,8 @@ function transform(payload) {
         officialUrl: `${CATALOG_URL}/detail?type=NEN&num=${encodeURIComponent(product.num)}`,
         verified: true,
         series: seriesSlug(product.seriesCd),
+        seriesName: koreanSeries,
+        englishSeriesName: englishSeries,
       };
     })
     .sort((left, right) => {
@@ -82,6 +84,7 @@ function validate(products) {
     if (!product.englishName.startsWith("Nendoroid ")) errors.push(`${product.id}: invalid English name`);
     if (!product.image.startsWith(`${IMAGE_BASE_URL}/`)) errors.push(`${product.id}: invalid image URL`);
     if (!product.officialUrl.startsWith(`${CATALOG_URL}/detail?`)) errors.push(`${product.id}: invalid source URL`);
+    if (!product.seriesName) errors.push(`${product.id}: missing series name`);
   }
   if (products.length < MINIMUM_PRODUCT_COUNT) {
     errors.push(`expected at least ${MINIMUM_PRODUCT_COUNT} products, found ${products.length}`);
