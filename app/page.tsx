@@ -1324,6 +1324,7 @@ function CounterfeitCaseSection({ cases, observations, aiMatches }: {
 
         {cases.map((item) => {
           const displayImages = displayableCaseImages(item);
+          const usesExternalSourceImages = item.rightsStatus === "unknown_link_only";
           const affectsVerdict = item.verdictImpact !== "none";
           const caseKind: CounterfeitCaseKind = item.caseKind ?? (item.sourceType === "official" ? "official" : "comparison");
           const caseKindLabel: Record<CounterfeitCaseKind, string> = {
@@ -1343,20 +1344,33 @@ function CounterfeitCaseSection({ cases, observations, aiMatches }: {
           return (
             <article className={`case-card ${hasOverlap ? "overlap" : ""}`} key={item.id}>
               {displayImages.length > 0 ? (
-                <div className={`case-images count-${Math.min(displayImages.length, 4)}`}>
-                  {displayImages.map((image, index) => (
-                    <button
-                      type="button"
-                      className="case-image-button"
-                      onClick={() => setPreview({ caseId: item.id, imageIndex: index })}
-                      aria-label={`${item.title} 비교 사진 ${index + 1} 크게 보기`}
-                      key={`${image}-${index}`}
-                    >
-                      <img src={image} alt={`${item.title} 비교 사진 ${index + 1}`} loading="lazy" />
-                      <span>{index + 1}</span>
-                      <ZoomIn size={16} />
-                    </button>
-                  ))}
+                <div className="case-media">
+                  <div className={`case-images count-${Math.min(displayImages.length, 4)}`}>
+                    {displayImages.map((image, index) => (
+                      <button
+                        type="button"
+                        className="case-image-button"
+                        onClick={() => setPreview({ caseId: item.id, imageIndex: index })}
+                        aria-label={`${item.title} 비교 사진 ${index + 1} 크게 보기`}
+                        key={`${image}-${index}`}
+                      >
+                        <img
+                          src={image}
+                          alt={`${item.title} 비교 사진 ${index + 1}`}
+                          loading="lazy"
+                          decoding="async"
+                          referrerPolicy="no-referrer"
+                        />
+                        <span>{usesExternalSourceImages ? `외부 원문 ${index + 1}` : index + 1}</span>
+                        <ZoomIn size={16} />
+                      </button>
+                    ))}
+                  </div>
+                  {usesExternalSourceImages && (
+                    <a className="case-external-image-note" href={item.sourceUrl} target="_blank" rel="noreferrer">
+                      <ExternalLink size={12} /> 외부 출처에서 불러온 참고 이미지 · AI 판정 미반영
+                    </a>
+                  )}
                 </div>
               ) : (
                 <a className="case-reference-only" href={item.sourceUrl} target="_blank" rel="noreferrer">
@@ -1428,6 +1442,9 @@ function CounterfeitCaseSection({ cases, observations, aiMatches }: {
               <div>
                 <span>비교 사진 {preview.imageIndex + 1} / {previewImages.length}</span>
                 <h2 id="case-lightbox-title">{previewCase.title}</h2>
+                <a className="case-lightbox-source" href={previewCase.sourceUrl} target="_blank" rel="noreferrer">
+                  출처 원문 <ExternalLink size={11} />
+                </a>
               </div>
               <button type="button" autoFocus onClick={() => setPreview(null)} aria-label="비교 사진 닫기"><X size={20} /></button>
             </header>
@@ -1435,7 +1452,15 @@ function CounterfeitCaseSection({ cases, observations, aiMatches }: {
               {previewImages.length > 1 && (
                 <button type="button" className="case-lightbox-arrow previous" onClick={() => movePreview(-1)} aria-label="이전 비교 사진"><ArrowLeft size={22} /></button>
               )}
-              <img src={previewImages[preview.imageIndex]} alt={`${previewCase.title} 비교 사진 ${preview.imageIndex + 1} 확대`} />
+              <img
+                src={previewImages[preview.imageIndex]}
+                alt={`${previewCase.title} 비교 사진 ${preview.imageIndex + 1} 확대`}
+                decoding="async"
+                referrerPolicy="no-referrer"
+              />
+              {previewCase.rightsStatus === "unknown_link_only" && (
+                <span className="case-lightbox-external">외부 출처 이미지 · AI 판정 미반영</span>
+              )}
               {previewImages.length > 1 && (
                 <button type="button" className="case-lightbox-arrow next" onClick={() => movePreview(1)} aria-label="다음 비교 사진"><ArrowRight size={22} /></button>
               )}
@@ -1451,7 +1476,7 @@ function CounterfeitCaseSection({ cases, observations, aiMatches }: {
                     aria-current={preview.imageIndex === index ? "true" : undefined}
                     key={`${image}-preview-${index}`}
                   >
-                    <img src={image} alt="" />
+                    <img src={image} alt="" loading="lazy" decoding="async" referrerPolicy="no-referrer" />
                     <span>{index + 1}</span>
                   </button>
                 ))}

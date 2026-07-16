@@ -284,6 +284,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .case-section > header > span { color: var(--red); font-size: 9px; font-weight: 650; }
 .case-card { display: grid; grid-template-columns: minmax(280px, 1.02fr) 1fr; gap: 28px; padding: 24px 0; border-bottom: 1px solid #e8e8e8; }
 .case-card.overlap { border-bottom-color: #efc9c3; }
+.case-media { min-width: 0; display: grid; align-content: start; gap: 9px; }
 .case-images { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-content: start; gap: 10px; min-width: 0; }
 .case-images.count-1 { grid-template-columns: 1fr; }
 .case-reference-only { min-height: 210px; display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 14px; padding: 24px; border: 1px solid #e4e4e4; border-radius: 10px; background: #f7f7f7; color: #555; text-decoration: none; }
@@ -300,6 +301,8 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .case-image-button > span, .case-image-button > svg { position: absolute; bottom: 8px; display: grid; place-items: center; height: 24px; border-radius: 5px; background: rgba(20,20,20,.76); color: #fff; pointer-events: none; }
 .case-image-button > span { left: 8px; min-width: 24px; padding: 0 7px; font-size: 9px; font-weight: 700; }
 .case-image-button > svg { right: 8px; width: 24px; padding: 5px; }
+.case-external-image-note { min-height: 28px; display: flex; align-items: center; gap: 6px; color: #777; font-size: 8px; line-height: 1.45; text-decoration: none; }
+.case-external-image-note:hover { color: #222; text-decoration: underline; text-underline-offset: 3px; }
 .case-copy { min-width: 0; padding: 4px 0; }
 .case-status { display: inline-flex; padding: 5px 7px; border-radius: 5px; background: #f2f2f2; color: #777; font-size: 8px; font-weight: 700; }
 .case-status.matched { background: var(--red-bg); color: var(--red); }
@@ -334,10 +337,13 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .case-lightbox > header > div { min-width: 0; }
 .case-lightbox > header span { color: #999; font-size: 9px; font-weight: 700; }
 .case-lightbox > header h2 { overflow: hidden; margin: 5px 0 0; font-size: 16px; text-overflow: ellipsis; white-space: nowrap; }
+.case-lightbox-source { display: inline-flex; align-items: center; gap: 4px; margin-top: 5px; color: #777; font-size: 8px; text-decoration: none; }
+.case-lightbox-source:hover { color: #222; text-decoration: underline; text-underline-offset: 3px; }
 .case-lightbox > header button { width: 40px; height: 40px; display: grid; place-items: center; flex: 0 0 auto; padding: 0; border: 1px solid #ddd; border-radius: 50%; background: #fff; color: #333; cursor: pointer; }
 .case-lightbox > header button:hover { border-color: #888; }
 .case-lightbox-stage { position: relative; min-height: 0; display: grid; place-items: center; overflow: hidden; padding: 28px 76px; background: #171717; }
 .case-lightbox-stage > img { width: 100%; height: 100%; display: block; object-fit: contain; }
+.case-lightbox-external { position: absolute; right: 16px; bottom: 14px; z-index: 1; padding: 7px 9px; border-radius: 5px; background: rgba(0,0,0,.72); color: #fff; font-size: 8px; font-weight: 700; }
 .case-lightbox-arrow { position: absolute; top: 50%; z-index: 1; width: 46px; height: 46px; display: grid; place-items: center; padding: 0; border: 1px solid rgba(255,255,255,.18); border-radius: 50%; background: rgba(255,255,255,.11); color: #fff; cursor: pointer; transform: translateY(-50%); transition: background .15s ease; }
 .case-lightbox-arrow:hover { background: rgba(255,255,255,.22); }
 .case-lightbox-arrow.previous { left: 18px; }
