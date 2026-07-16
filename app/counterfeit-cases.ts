@@ -438,7 +438,7 @@ const curatedCounterfeitCases: CounterfeitCase[] = [
   },
   {
     id: "black-gold-saw-magnet-head-weapon",
-    productId: "nendoroid-143",
+    productId: "nendoroid-145",
     title: "자석과 머리·무기 조형 차이",
     summary: "정식판의 자석이 없고 머리 뒤 구멍이 생기며, 무기 조형 디테일과 관절 색이 다른 가품이 공식 확인됐습니다.",
     images: archivedGoodSmileImages(
@@ -533,7 +533,7 @@ const curatedCounterfeitCases: CounterfeitCase[] = [
   },
   {
     id: "snow-miku-playtime-box-extras-paint",
-    productId: "nendoroid-97-playtime",
+    productId: "nendoroid-150",
     title: "홀로그램과 구성품·마감 차이",
     summary: "패키지 홀로그램과 얼음틀이 빠지고, 눈 도색·트윈테일 결합과 눈사람 마감이 다른 가품이 공식 확인됐습니다.",
     images: archivedGoodSmileImages(
@@ -552,7 +552,7 @@ const curatedCounterfeitCases: CounterfeitCase[] = [
   },
   {
     id: "kuroneko-face-frill-joints-hair",
-    productId: "nendoroid-163",
+    productId: "nendoroid-144",
     title: "홍조와 의상·관절 도색 차이",
     summary: "볼 홍조가 지나치게 진하고 의상 프릴·관절 색과 머리 파츠 안쪽 도색이 다른 가품이 공식 확인됐습니다.",
     images: archivedGoodSmileImages(
@@ -590,7 +590,7 @@ const curatedCounterfeitCases: CounterfeitCase[] = [
   },
   {
     id: "kirino-base-face-joints-paint",
-    productId: "nendoroid-144",
+    productId: "nendoroid-142",
     title: "받침대 표기와 얼굴·관절 도색 차이",
     summary: "받침대 저작권이 빠지고 얼굴 연결부가 일체형이며, 팔 관절·목·하체 도색과 눈 인쇄가 다른 가품이 공식 확인됐습니다.",
     images: archivedGoodSmileImages(

@@ -122,7 +122,7 @@ export function extractCatalogProductsFromTs(sourceText, fileName = "catalog.ts"
     if (
       ts.isVariableDeclaration(node)
       && ts.isIdentifier(node.name)
-      && new Set(["expandedProducts", "curatedProducts"]).has(node.name.text)
+      && new Set(["expandedProducts", "curatedProducts", "curatedCatalogProducts"]).has(node.name.text)
       && node.initializer
       && ts.isArrayLiteralExpression(node.initializer)
     ) {
@@ -615,17 +615,21 @@ function parseArguments(argv) {
 
 async function main() {
   const options = parseArguments(process.argv.slice(2));
-  const [caseText, allCaseText, imageText, uniqueImageText, mapText, catalogText, pageText] = await Promise.all([
+  const [caseText, allCaseText, imageText, uniqueImageText, mapText, catalogText, generatedCatalogText, allCatalogText, pageText] = await Promise.all([
     readFile(path.join(options.dataset, "candidate_counterfeit_cases.csv"), "utf8"),
     readFile(path.join(options.dataset, "cases.csv"), "utf8"),
     readFile(path.join(options.dataset, "image_manifest.csv"), "utf8"),
     readFile(path.join(options.dataset, "unique_image_manifest.csv"), "utf8"),
     readFile(options.map, "utf8"),
     readFile(path.resolve(scriptDirectory, "../app/catalog.ts"), "utf8"),
+    readFile(path.resolve(scriptDirectory, "../app/data/nendoroids-1-500.generated.json"), "utf8"),
+    readFile(path.resolve(scriptDirectory, "../app/data/nendoroids-all.generated.json"), "utf8"),
     readFile(path.resolve(scriptDirectory, "../app/page.tsx"), "utf8"),
   ]);
   const catalogProducts = [
     ...extractCatalogProductsFromTs(catalogText, "catalog.ts"),
+    ...JSON.parse(generatedCatalogText),
+    ...JSON.parse(allCatalogText),
     ...extractCatalogProductsFromTs(pageText, "page.tsx"),
   ].filter((product, index, allProducts) => allProducts.findIndex((candidate) => candidate.id === product.id) === index);
   const result = await buildEvidenceDataset({

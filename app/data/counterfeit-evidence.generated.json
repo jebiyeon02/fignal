@@ -1188,10 +1188,10 @@
       "requiresHumanReview": true
     },
     {
-      "evidenceId": "NEN-00016:nendoroid-144",
-      "productId": "nendoroid-144",
+      "evidenceId": "NEN-00016:nendoroid-142",
+      "productId": "nendoroid-142",
       "productName": "Nendoroid Kirino Kousaka",
-      "nendoroidNumber": "144",
+      "nendoroidNumber": "142",
       "releaseVersion": null,
       "manufacturer": "Good Smile Company",
       "existingCaseId": "kirino-base-face-joints-paint",
@@ -1424,10 +1424,10 @@
       "requiresHumanReview": true
     },
     {
-      "evidenceId": "NEN-00019:nendoroid-97-playtime",
-      "productId": "nendoroid-97-playtime",
+      "evidenceId": "NEN-00019:nendoroid-150",
+      "productId": "nendoroid-150",
       "productName": "Nendoroid Snow Miku: Snow Playtime Edition",
-      "nendoroidNumber": "97",
+      "nendoroidNumber": "150",
       "releaseVersion": null,
       "manufacturer": "Good Smile Company",
       "existingCaseId": "snow-miku-playtime-box-extras-paint",
@@ -1502,10 +1502,10 @@
       "requiresHumanReview": true
     },
     {
-      "evidenceId": "NEN-00020:nendoroid-163",
-      "productId": "nendoroid-163",
+      "evidenceId": "NEN-00020:nendoroid-144",
+      "productId": "nendoroid-144",
       "productName": "Nendoroid Kuroneko",
-      "nendoroidNumber": "163",
+      "nendoroidNumber": "144",
       "releaseVersion": null,
       "manufacturer": "Good Smile Company",
       "existingCaseId": "kuroneko-face-frill-joints-hair",
@@ -1817,10 +1817,10 @@
       "requiresHumanReview": true
     },
     {
-      "evidenceId": "NEN-00024:nendoroid-143",
-      "productId": "nendoroid-143",
+      "evidenceId": "NEN-00024:nendoroid-145",
+      "productId": "nendoroid-145",
       "productName": "Nendoroid Black Gold Saw",
-      "nendoroidNumber": "143",
+      "nendoroidNumber": "145",
       "releaseVersion": null,
       "manufacturer": "Good Smile Company",
       "existingCaseId": "black-gold-saw-magnet-head-weapon",

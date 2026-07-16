@@ -95,7 +95,7 @@ const catalogProducts = [
   { id: "nendoroid-1151", name: "넨도로이드 하츠네 미쿠 매지컬 미라이 2018 Ver.", englishName: "Nendoroid Hatsune Miku: Magical Mirai 2018 Ver.", number: "1151" },
   { id: "nendoroid-524", name: "넨도로이드 우마루", englishName: "Nendoroid Umaru", number: "524" },
   { id: "nendoroid-97", name: "넨도로이드 스노우 미쿠", englishName: "Nendoroid Snow Miku", number: "97" },
-  { id: "nendoroid-97-playtime", name: "넨도로이드 스노우 미쿠 즐거운 눈놀이 에디션", englishName: "Nendoroid Snow Miku: Snow Playtime Edition", number: "97" },
+  { id: "nendoroid-150", name: "넨도로이드 스노우 미쿠 즐거운 눈놀이 에디션", englishName: "Nendoroid Snow Miku: Snow Playtime Edition", number: "150" },
 ];
 
 test("catalog products are extracted from TypeScript object arrays", () => {
@@ -108,6 +108,18 @@ test("catalog products are extracted from TypeScript object arrays", () => {
     }];
   `);
   assert.deepEqual(products, [catalogProducts[0]]);
+});
+
+test("curated catalog arrays remain available to the dataset importer", () => {
+  const products = extractCatalogProductsFromTs(`
+    const curatedCatalogProducts: Product[] = [{
+      id: "nendoroid-142",
+      name: "넨도로이드 코우사카 키리노",
+      englishName: "Nendoroid Kirino Kousaka",
+      number: "142",
+    }];
+  `);
+  assert.equal(products[0]?.id, "nendoroid-142");
 });
 
 test("community matching accepts explicit numbers and exact product names", () => {
@@ -123,7 +135,10 @@ test("community matching accepts explicit numbers and exact product names", () =
 
 test("ambiguous numbers and loose character fragments do not attach to a product", () => {
   assert.equal(
-    matchCommunityProduct({ case_id: "ambiguous", product_or_post_title: "Is Nendoroid 97 real?" }, catalogProducts),
+    matchCommunityProduct({ case_id: "ambiguous", product_or_post_title: "Is Nendoroid 97 real?" }, [
+      catalogProducts[2],
+      { id: "nendoroid-97-variant", name: "넨도로이드 스노우 미쿠 파생판", englishName: "Nendoroid Snow Miku Variant", number: "97" },
+    ]),
     null,
   );
   assert.equal(

@@ -1,5 +1,7 @@
 import { env } from "cloudflare:workers";
 
+import { nendoroidAnalysisDomainKnowledge } from "./domain-knowledge";
+
 const MAX_FILES = 8;
 const MAX_FILE_BYTES = 6 * 1024 * 1024;
 const MAX_TOTAL_BYTES = 9 * 1024 * 1024;
@@ -352,6 +354,7 @@ export async function POST(request: Request) {
   const prompt = [
     "당신은 중고 넨도로이드 거래 사진을 점검하는 보수적인 시각 검수 보조자입니다.",
     "정품을 보증하거나 단정하지 말고, 사진에 실제로 보이는 근거만 한국어로 짧고 구체적으로 설명하세요.",
+    nendoroidAnalysisDomainKnowledge,
     "공식 제품 이미지는 전체 외형 참고용이며 박스 뒷면, 바코드, 받침대 각인의 정답으로 추측하지 마세요.",
     "가품 사례 이미지와 시각적으로 겹치는 특징이 있을 때만 caseMatches에 넣으세요.",
     "comparison 이미지에는 정품과 가품이 함께 있을 수 있으므로 이미지 전체를 가품으로 간주하지 마세요.",

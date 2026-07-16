@@ -1,3 +1,6 @@
+import nendoroidsOneToFiveHundred from "./data/nendoroids-1-500.generated.json";
+import allGsInfoNendoroids from "./data/nendoroids-all.generated.json";
+
 export type CatalogProduct = {
   id: string;
   name: string;
@@ -12,7 +15,7 @@ export type CatalogProduct = {
   series?: string;
 };
 
-export const expandedProducts: CatalogProduct[] = [
+const curatedCatalogProducts: CatalogProduct[] = [
   {
     id: "nendoroid-803",
     name: "넨도로이드 에도가와 코난",
@@ -194,11 +197,11 @@ export const expandedProducts: CatalogProduct[] = [
     verified: true,
   },
   {
-    id: "nendoroid-97-playtime",
+    id: "nendoroid-150",
     name: "넨도로이드 스노우 미쿠 즐거운 눈놀이 에디션",
     englishName: "Nendoroid Snow Miku: Snow Playtime Edition",
     aliases: ["스노우 미쿠 눈놀이", "즐거운 눈놀이", "Snow Miku Snow Playtime", "설미쿠"],
-    number: "97",
+    number: "150",
     maker: "Good Smile Company",
     release: "구판 확장판 · 공식 가품 사례 확인",
     image: "https://images.goodsmile.info/cgm/images/product/20120125/3452/17050/medium/cf48eee0f23a9e95fa1e7c12b4be8f78.jpg",
@@ -242,11 +245,11 @@ export const expandedProducts: CatalogProduct[] = [
     verified: true,
   },
   {
-    id: "nendoroid-143",
+    id: "nendoroid-145",
     name: "넨도로이드 블랙 골드 소",
     englishName: "Nendoroid Black Gold Saw",
     aliases: ["블랙 골드 소", "Black Gold Saw", "BGS", "블랙 록 슈터"],
-    number: "143",
+    number: "145",
     maker: "Good Smile Company",
     release: "구판 · 공식 가품 사례 확인",
     image: "https://images.goodsmile.info/cgm/images/product/20110802/3241/14873/medium/0b41e35d33a2d8c8fd4f2ff83079ad57.jpg",
@@ -254,11 +257,11 @@ export const expandedProducts: CatalogProduct[] = [
     verified: true,
   },
   {
-    id: "nendoroid-144",
+    id: "nendoroid-142",
     name: "넨도로이드 코우사카 키리노",
     englishName: "Nendoroid Kirino Kousaka",
     aliases: ["코우사카 키리노", "키리노", "Kirino Kousaka", "내 여동생이 이렇게 귀여울 리가 없어"],
-    number: "144",
+    number: "142",
     maker: "Good Smile Company",
     release: "구판 · 공식 가품 사례 확인",
     image: "https://images.goodsmile.info/cgm/images/product/20120528/3561/18585/medium/5ee32bc57175ff1a5b62ca9a3cf420d8.jpg",
@@ -266,11 +269,11 @@ export const expandedProducts: CatalogProduct[] = [
     verified: true,
   },
   {
-    id: "nendoroid-163",
+    id: "nendoroid-144",
     name: "넨도로이드 쿠로네코",
     englishName: "Nendoroid Kuroneko",
     aliases: ["쿠로네코", "Kuroneko", "고코우 루리", "내 여동생이 이렇게 귀여울 리가 없어"],
-    number: "163",
+    number: "144",
     maker: "Good Smile Company",
     release: "구판 · 공식 가품 사례 확인",
     image: "https://images.goodsmile.info/cgm/images/product/20120130/3453/17076/medium/6af29873541086aee77439206cb4ef50.jpg",
@@ -1730,4 +1733,19 @@ export const expandedProducts: CatalogProduct[] = [
     verified: true,
     series: "my-hero-academia",
   }
+];
+
+const curatedProductIds = new Set(curatedCatalogProducts.map((product) => product.id));
+const officialOneToFiveHundred = (nendoroidsOneToFiveHundred as CatalogProduct[]).filter(
+  (product) => !curatedProductIds.has(product.id),
+);
+const preferredProductIds = new Set([
+  ...curatedProductIds,
+  ...officialOneToFiveHundred.map((product) => product.id),
+]);
+
+export const expandedProducts: CatalogProduct[] = [
+  ...curatedCatalogProducts,
+  ...officialOneToFiveHundred,
+  ...(allGsInfoNendoroids as CatalogProduct[]).filter((product) => !preferredProductIds.has(product.id)),
 ];

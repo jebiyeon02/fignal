@@ -16,7 +16,9 @@ Gemini 분석에는 배포 환경의 `GEMINI_API_KEY`가 필요합니다. 선택
 
 ## 주요 데이터 파일
 
-- `app/catalog.ts`: 자동완성에 쓰이는 제품명, 제품 번호, 제조사, 공식 이미지와 제품 페이지
+- `app/catalog.ts`: 수기 검수 제품과 생성 카탈로그를 합쳐 자동완성에 제공
+- `app/data/nendoroids-1-500.generated.json`: 굿스마일 공식 목록·제품 상세에서 동기화한 No.1–500 제품
+- `app/data/nendoroids-all.generated.json`: GSInfo의 전체 넨도로이드 제품·번역·이미지 데이터를 동기화한 카탈로그
 - `app/counterfeit-cases.ts`: 제품별 공식·커뮤니티 가품 사례, 비교 이미지, 판별 특징과 출처
 - `app/data/counterfeit-evidence.generated.json`: 자동 등록된 증빙과 외부 이미지 참조
 - `app/data/counterfeit-review-queue.generated.json`: 제품 매핑 또는 관리자 검수가 필요한 자료
@@ -25,6 +27,9 @@ Gemini 분석에는 배포 환경의 `GEMINI_API_KEY`가 필요합니다. 선택
 - `app/page.tsx`: 제품 검색, 사진 입력, 결과와 가품 사례 UI
 - `app/api/analyze/route.ts`: 사용자 사진·공식 제품 이미지·가품 사례 이미지를 Gemini에 전달하는 서버 API
 - `scripts/import-counterfeit-dataset.mjs`: CSV 검증, 중복 제거, 등록·보류 분류 스크립트
+- `research/domain/`: 사람과 AI가 함께 사용하는 넨도로이드 기본 도메인 지식
+- `research/authenticity/`: 진품·가품 출처 사례, 이미지 참조, 라벨링 가이드와 학습 후보
+- `research/service/`: 사진 접수, 위험 보고서, 분쟁 대응 등 서비스 설계와 워크플로 사례
 
 ## 정품·가품 확인 사례 보유 제품
 
@@ -38,13 +43,13 @@ Gemini 분석에는 배포 환경의 `GEMINI_API_KEY`가 필요합니다. 선택
 | 40 | 카가미네 렌 | `nendoroid-40` | 마이크 방향, 넥타이 결합, 소품 도색, 홀로그램 | [GSC 공식 가품 사례](https://partner.goodsmile.info/support/eng/fake/en/3565/) |
 | 77 | 세이버 릴리 | `nendoroid-77` | 승인 스티커, 얼굴 광택, 관절 색, 받침대 표기 | [GSC 공식 가품 사례](https://partner.goodsmile.info/support/eng/fake/en/2842/) |
 | 97 | 스노우 미쿠 | `nendoroid-97` | 눈꽃 반사 인쇄, 입·넥타이 도색, 받침대 표기 | [GSC 공식 가품 사례](https://partner.goodsmile.info/support/eng/fake/en/2899/) |
-| 97 확장판 | 스노우 미쿠 즐거운 눈놀이 에디션 | `nendoroid-97-playtime` | 홀로그램, 얼음틀, 눈 그라데이션, 트윈테일 결합 | [GSC 공식 가품 사례](https://partner.goodsmile.info/support/eng/fake/en/3452/) |
+| 150 | 스노우 미쿠 즐거운 눈놀이 에디션 | `nendoroid-150` | 홀로그램, 얼음틀, 눈 그라데이션, 트윈테일 결합 | [GSC 공식 가품 사례](https://partner.goodsmile.info/support/eng/fake/en/3452/) |
 | 106 | 블랙 록 슈터 | `nendoroid-106` | DVD 스티커, 지퍼 구멍, 목 도색, 얼굴 내부 구조 | [GSC 공식 가품 사례](https://partner.goodsmile.info/support/eng/fake/en/3064/) |
 | 128 | 데드 마스터 | `nendoroid-128` | 얼굴 연결부, 머리 그라데이션, 눈 인쇄, 소품 분리 | [GSC 공식 가품 사례](https://partner.goodsmile.info/support/eng/fake/en/3249/) |
 | 129 | 하츠네 미쿠 앱솔루트 HMO 에디션 | `nendoroid-129` | 얼굴 연결부, 어깨 번호, 의상·드럼 도색 | [GSC 공식 가품 사례](https://partner.goodsmile.info/support/eng/fake/en/3251/) |
-| 143 | 블랙 골드 소 | `nendoroid-143` | 자석, 머리 구멍, 무기 디테일, 관절 색 | [GSC 공식 가품 사례](https://partner.goodsmile.info/support/eng/fake/en/3241/) |
-| 144 | 코우사카 키리노 | `nendoroid-144` | 받침대 표기, 얼굴 연결부, 관절·눈 도색 | [GSC 공식 가품 사례](https://partner.goodsmile.info/support/eng/fake/en/3561/) |
-| 163 | 쿠로네코 | `nendoroid-163` | 홍조, 프릴 색, 관절 색, 머리 안쪽 도색 | [GSC 공식 가품 사례](https://partner.goodsmile.info/support/eng/fake/en/3453/) |
+| 142 | 코우사카 키리노 | `nendoroid-142` | 받침대 표기, 얼굴 연결부, 관절·눈 도색 | [GSC 공식 가품 사례](https://partner.goodsmile.info/support/eng/fake/en/3561/) |
+| 144 | 쿠로네코 | `nendoroid-144` | 홍조, 프릴 색, 관절 색, 머리 안쪽 도색 | [GSC 공식 가품 사례](https://partner.goodsmile.info/support/eng/fake/en/3453/) |
+| 145 | 블랙 골드 소 | `nendoroid-145` | 자석, 머리 구멍, 무기 디테일, 관절 색 | [GSC 공식 가품 사례](https://partner.goodsmile.info/support/eng/fake/en/3241/) |
 | 174 | 카나메 마도카 | `nendoroid-174` | 얼굴 연결부, 활 투명도, 눈 도색, 내부 포장 | [GSC 공식 가품 사례](https://partner.goodsmile.info/support/eng/fake/en/3250/) |
 | 204 | 멘마 | `nendoroid-204` | 관절 색, 얼굴 번호, 자석 스탠드, 머리 마감 | [GSC 공식 가품 사례](https://partner.goodsmile.info/support/eng/fake/en/3516/) |
 | 207 | 스노우 미쿠 푹신푹신 코트 Ver. | `nendoroid-207` | 박스 크기·설명, 결합 마감, 누락 구성품 | [GSC 공식 가품 사례](https://partner.goodsmile.info/support/eng/fake/en/3438/) |
@@ -143,12 +148,12 @@ Gemini 분석에는 배포 환경의 `GEMINI_API_KEY`가 필요합니다. 선택
 
 ```bash
 node scripts/import-counterfeit-dataset.mjs \
-  --dataset /absolute/path/to/nendoroid_counterfeit_dataset \
+  --dataset /absolute/path/to/figsignal/research/authenticity \
   --check-links \
   --dry-run
 
 npm run data:import -- \
-  --dataset /absolute/path/to/nendoroid_counterfeit_dataset
+  --dataset /absolute/path/to/figsignal/research/authenticity
 ```
 
 마지막 실행에서는 후보 109건 중 정확한 제품 매핑이 가능한 증빙 32건을 등록했습니다. 29건은 기존 사례에 출처 메타데이터를 보강했고, 3건은 신규 공개 사례로 연결했습니다. 약한 라벨과 제품 번호 미확정 자료 80건은 검수 대기로 분리했습니다.
@@ -180,6 +185,19 @@ npm run data:import -- \
 7. README 표에도 같은 제품을 추가합니다.
 
 공식 사례가 있다는 사실은 해당 특징이 보이면 가품 가능성을 높이는 근거이지만, 그 특징이 보이지 않는다고 정품이 보장되지는 않습니다. 제조 시기·재판·유통 지역에 따른 정식 패키지 차이도 있으므로 최종 판정 문구는 항상 가능성으로 표현합니다.
+
+## 전체 넨도로이드 카탈로그
+
+굿스마일의 번호 구간별 공식 목록에서 숫자부가 1–500인 기본판과 `a`·`b` 파생 번호를 수집하고, 각 공식 제품 상세 페이지의 제조사·발매월·작품명·대표 이미지를 연결했습니다. 웹 목록에서 내려간 초기 한정판과 라이선스 제품은 굿스마일의 공식 스탠드 호환표와 NendoGuide 번호 목록으로 교차 보완했습니다.
+
+여기에 [GSInfo 전체 카테고리](https://gsinfoproject.com/ko/category)의 넨도로이드 타입을 합쳐 한글·영문 제품명, 작품명, 대표 이미지와 발매월을 제공합니다. 2026-07-17 동기화 기준 GSInfo 제품은 3,201개이며 최고 번호는 No.3333입니다. No.1–500 공식 자료와 수기 검수 제품은 GSInfo 데이터보다 우선합니다.
+
+```bash
+npm run catalog:sync
+npm run catalog:check
+```
+
+No.1–500 공식 동기화 결과는 기본 번호 1–500을 모두 포함하는 535개 제품입니다. `a`·`b` 등 파생판은 57개이며, GSInfo와 합친 생성 카탈로그는 중복 제거 후 3,207개입니다. 공식 대표 이미지 주소를 더 이상 확인할 수 없는 초기 제품 29개는 깨진 이미지를 노출하지 않고 이미지 자리표시자로 표시합니다.
 
 ## 배포 구조
 
