@@ -33,6 +33,7 @@ import {
   ZoomIn,
 } from "lucide-react";
 import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { createPortal } from "react-dom";
 import { expandedProducts } from "./catalog";
 import { communityMentions, type CommunityMention } from "./community-mentions";
 import {
@@ -1200,7 +1201,7 @@ function CounterfeitCaseSection({ cases, observations, aiMatches }: {
         <p className="case-note">사례는 판정 근거 중 하나입니다. 모양이 다르다고 정품이라는 뜻은 아니므로 사진과 실물을 함께 비교하세요.</p>
       </section>
 
-      {preview && previewCase && (
+      {preview && previewCase && typeof document !== "undefined" && createPortal(
         <div className="case-lightbox-backdrop" onMouseDown={() => setPreview(null)}>
           <section
             className="case-lightbox"
@@ -1243,7 +1244,8 @@ function CounterfeitCaseSection({ cases, observations, aiMatches }: {
               </footer>
             )}
           </section>
-        </div>
+        </div>,
+        document.body,
       )}
     </>
   );
