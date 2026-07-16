@@ -46,6 +46,7 @@ const currentGoodSmileSupport = {
   sourceName: "GOOD SMILE COMPANY 고객지원",
   sourceUrl: "https://support.goodsmile.com/hc/en-us/articles/39729124039449-Bootleg-Information-Nendoroid-series",
   checkedAt: "2026-07-16",
+  rightsStatus: "unknown_link_only",
 };
 
 const archivedGoodSmileSupport = (sourceUrl: string) => ({
@@ -53,6 +54,7 @@ const archivedGoodSmileSupport = (sourceUrl: string) => ({
   sourceName: "GOOD SMILE COMPANY 공식 가품 아카이브",
   sourceUrl,
   checkedAt: "2026-07-16",
+  rightsStatus: "unknown_link_only",
 });
 
 const archivedGoodSmileImages = (...files: string[]) => files.map(

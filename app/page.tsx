@@ -34,19 +34,25 @@ import {
 } from "lucide-react";
 import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
+import {
+  isAnalysisResult,
+  type AnalysisFinding,
+  type AnalysisResult,
+  type EvidenceKey,
+} from "./api/analyze/analysis-contract";
+import { displayableCaseImages } from "./case-image-rights";
 import { expandedProducts } from "./catalog";
 import { communityMentions, type CommunityMention } from "./community-mentions";
 import {
   counterfeitCases,
   type CounterfeitCase,
   type CounterfeitCaseKind,
-  type CounterfeitEvidenceKey,
 } from "./counterfeit-cases";
+import { getProductVerificationNotes, myHeroVerificationNotes } from "./product-verification";
 import { resolveReviewPath, reviewPathCopy, type ReviewPath } from "./review-path";
 
 type Stage = "search" | "photos" | "result";
 type Observation = "missing" | "unverified" | "match" | "concern";
-type EvidenceKey = CounterfeitEvidenceKey;
 
 type Product = {
   id: string;
@@ -75,28 +81,8 @@ type EvidenceItem = {
   icon: typeof Camera;
 };
 
-type AiFinding = {
-  key: EvidenceKey;
-  status: "match" | "concern" | "unclear";
-  title: string;
-  reason: string;
-  visibleEvidence: string;
-  userAction: string;
-};
-
-type AiAnalysis = {
-  verdict: "likely_authentic" | "needs_review" | "counterfeit_suspected" | "insufficient_photos";
-  confidence: number;
-  summary: string;
-  findings: AiFinding[];
-  caseMatches: Array<{
-    caseId: string;
-    similarity: "high" | "medium" | "low";
-    reason: string;
-    evidenceKeys: EvidenceKey[];
-  }>;
-  caveat: string;
-};
+type AiFinding = AnalysisFinding;
+type AiAnalysis = AnalysisResult;
 
 const curatedProducts: Product[] = [
   {
@@ -226,17 +212,6 @@ function seriesLabel(product: Product) {
 
 const catalogShortcuts = ["히로아카", "봇치 더 록", "귀멸의 칼날", "주술회전", "체인소맨", "나루토", "블리치"];
 
-const myHeroVerificationNotes = [
-  "발매판·유통사에 따라 박스 우측 상단의 굿스마일 로고가 없을 수 있어, 로고 부재만으로 가품을 판단하지 않습니다.",
-  "제품 번호와 히어로·교복·스텔스·결전 코스튬 버전을 정확히 고른 뒤 표정, 이펙트, 텍스트 플레이트 구성을 공식 페이지와 대조합니다.",
-  "박스 뒷면의 작품 저작권과 TOMY·TOHO·Good Smile 유통 표기, 받침대 저작권 각인은 같은 발매판 기준으로 확인합니다.",
-  "과도한 광택, 굵거나 번진 눈·입 인쇄, 머리 파츠 단차, 지나치게 투명한 받침대, 결합 불량이 함께 나타나는지 확인합니다.",
-];
-
-function getProductVerificationNotes(product: Product) {
-  return product.series === "my-hero-academia" ? myHeroVerificationNotes : [];
-}
-
 const manufacturers = [
   "Good Smile Company",
   "ORANGE ROUGE",
@@ -251,8 +226,8 @@ const evidenceItems: EvidenceItem[] = [
     key: "boxFront",
     title: "박스 정면",
     description: "로고와 제품번호가 보이게",
-    matchReason: "로고와 상품명, 패키지 구성이 공식 이미지와 비슷합니다.",
-    concernReason: "로고나 상품명 배치가 공식 패키지와 다릅니다.",
+    matchReason: "제품명과 번호가 판독되며 등록된 위험 신호가 뚜렷하지 않습니다.",
+    concernReason: "제품명·번호가 선택한 상품과 충돌하거나 등록 사례의 누락 신호가 보입니다.",
     weight: 7,
     essential: true,
     icon: Box,
@@ -261,8 +236,8 @@ const evidenceItems: EvidenceItem[] = [
     key: "boxBack",
     title: "박스 뒷면",
     description: "주의문구와 저작권 표기",
-    matchReason: "주의문구와 저작권 표기가 공식 패키지와 비슷합니다.",
-    concernReason: "문구나 인쇄 배열에서 공식 패키지와 다른 점이 있습니다.",
+    matchReason: "주의문구와 저작권 표기가 판독되며 등록된 누락 신호가 뚜렷하지 않습니다.",
+    concernReason: "저작권·주의문구에 등록 사례의 누락 또는 인쇄 위험 신호가 보입니다.",
     weight: 9,
     essential: true,
     icon: PackageCheck,
@@ -271,8 +246,8 @@ const evidenceItems: EvidenceItem[] = [
     key: "barcode",
     title: "바코드",
     description: "JAN 숫자가 선명하게",
-    matchReason: "JAN과 제품번호가 선택한 제품 정보와 맞습니다.",
-    concernReason: "JAN 또는 제품번호가 선택한 제품과 맞지 않습니다.",
+    matchReason: "JAN 숫자가 판독 가능해 공식 원문과 추가 대조할 수 있습니다.",
+    concernReason: "JAN 또는 함께 인쇄된 제품번호가 선택한 상품 정보와 충돌합니다.",
     weight: 11,
     essential: true,
     icon: ScanBarcode,
@@ -281,8 +256,8 @@ const evidenceItems: EvidenceItem[] = [
     key: "baseMark",
     title: "받침대 각인",
     description: "바닥의 저작권 문구",
-    matchReason: "받침대의 저작권 문구와 형태가 기준과 비슷합니다.",
-    concernReason: "각인 문구나 받침대 형태가 기준과 다릅니다.",
+    matchReason: "받침대 각인이 판독되며 등록된 누락 신호가 뚜렷하지 않습니다.",
+    concernReason: "각인 누락이나 받침대 구조에 등록 사례와 겹치는 위험 신호가 보입니다.",
     weight: 13,
     essential: true,
     icon: Stamp,
@@ -291,8 +266,8 @@ const evidenceItems: EvidenceItem[] = [
     key: "facePaint",
     title: "얼굴 근접",
     description: "눈과 도색이 보이게",
-    matchReason: "눈 프린팅과 도색 경계가 공식 이미지와 비슷합니다.",
-    concernReason: "눈 프린팅이나 도색에서 뚜렷한 차이가 있습니다.",
+    matchReason: "눈 인쇄와 도색 경계가 판독되며 등록된 위험 신호가 뚜렷하지 않습니다.",
+    concernReason: "눈 인쇄나 도색에 등록 사례와 겹치는 위험 신호가 보입니다.",
     weight: 13,
     essential: true,
     icon: ScanFace,
@@ -301,8 +276,8 @@ const evidenceItems: EvidenceItem[] = [
     key: "figureFull",
     title: "본체 전체",
     description: "앞뒤 조형과 부품 위치",
-    matchReason: "본체 비율과 부품 위치가 공식 이미지와 비슷합니다.",
-    concernReason: "조형 비율이나 부품 위치가 공식 이미지와 다릅니다.",
+    matchReason: "본체 비율과 부품 위치가 판독 가능한 상태입니다.",
+    concernReason: "조형 비율이나 부품 위치에 등록 사례와 겹치는 위험 신호가 보입니다.",
     weight: 8,
     essential: false,
     icon: Camera,
@@ -311,8 +286,8 @@ const evidenceItems: EvidenceItem[] = [
     key: "parts",
     title: "구성품",
     description: "블리스터와 교체 파츠",
-    matchReason: "블리스터와 교체 파츠 구성이 공식 구성과 맞습니다.",
-    concernReason: "내부 포장이나 교체 파츠 구성이 다릅니다.",
+    matchReason: "블리스터와 교체 파츠 구성을 추가 대조할 수 있게 확인했습니다.",
+    concernReason: "내부 포장이나 교체 파츠에 등록 사례와 겹치는 누락·형태 신호가 보입니다.",
     weight: 8,
     essential: false,
     icon: FileCheck2,
@@ -321,8 +296,8 @@ const evidenceItems: EvidenceItem[] = [
     key: "purchaseProof",
     title: "구매내역",
     description: "판매처와 상품명",
-    matchReason: "공식 판매처와 상품명이 선택한 제품과 맞습니다.",
-    concernReason: "판매처나 상품명이 선택한 제품과 맞지 않습니다.",
+    matchReason: "판매처와 상품명이 판독 가능하며 선택한 제품 정보와 충돌하지 않습니다.",
+    concernReason: "구매내역의 상품명이 선택한 제품과 충돌하거나 판매처 확인이 필요합니다.",
     weight: 12,
     essential: false,
     icon: Store,
@@ -425,13 +400,7 @@ async function readClipboardImage() {
 }
 
 function isAiAnalysis(value: unknown): value is AiAnalysis {
-  if (!value || typeof value !== "object") return false;
-  const candidate = value as Partial<AiAnalysis>;
-  return typeof candidate.summary === "string"
-    && typeof candidate.confidence === "number"
-    && Array.isArray(candidate.findings)
-    && Array.isArray(candidate.caseMatches)
-    && typeof candidate.caveat === "string";
+  return isAnalysisResult(value);
 }
 
 export default function Home() {
@@ -539,7 +508,11 @@ export default function Home() {
     .filter((signal) => observations[signal.evidenceKey] === "concern");
   const hasKnownCaseOverlap = matchedCaseSignals.length > 0;
   const riskPoints = concernItems.reduce((sum, item) => sum + item.weight, 0);
-  const confidence = aiAnalysis?.confidence ?? Math.min(96, (currentProduct?.verified ? 18 : 8) + completedCount * 8 + assessedCount * 4);
+  const localEvidencePoints = Object.values(observations).reduce(
+    (sum, observation) => sum + (observation === "match" || observation === "concern" ? 1 : observation === "unverified" ? 0.5 : 0),
+    0,
+  );
+  const evidenceCompleteness = aiAnalysis?.evidenceCompleteness ?? Math.round((localEvidencePoints / evidenceItems.length) * 100);
   const reviewedCount = Object.values(reviewedEvidence).filter(Boolean).length;
   const hasUserOverride = Object.keys(userOverrides).length > 0;
   const evidenceReady = essentialCompleted >= 4;
@@ -567,9 +540,9 @@ export default function Home() {
       ? { label: "가품 가능성 높음", tone: "danger", summary: hasKnownCaseOverlap ? "확인한 차이 중 알려진 가품 사례와 겹치는 특징이 있습니다." : "공식 제품과 다른 점이 여러 곳에서 보입니다." }
       : riskPoints >= 8
         ? { label: "판정이 애매함", tone: "caution", summary: hasKnownCaseOverlap ? "알려진 가품 사례와 겹치는 항목을 거래 전에 다시 확인하세요." : "거래 전에 다시 볼 항목이 있습니다." }
-        : { label: "진품 가능성 높음", tone: "safe", summary: "확인한 사진에서는 큰 차이가 보이지 않습니다." };
+        : { label: "뚜렷한 위험 신호 미확인", tone: "safe", summary: "확인한 사진에서 뚜렷한 가품 위험 신호는 보이지 않습니다. 정품 확인을 뜻하지는 않습니다." };
   const aiVerdict = aiAnalysis ? {
-    likely_authentic: { label: "진품 가능성 높음", tone: "safe", summary: aiAnalysis.summary },
+    no_obvious_risk_signals: { label: "뚜렷한 위험 신호 미확인", tone: "safe", summary: aiAnalysis.summary },
     needs_review: { label: "판정이 애매함", tone: "caution", summary: aiAnalysis.summary },
     counterfeit_suspected: { label: "가품 가능성 높음", tone: "danger", summary: aiAnalysis.summary },
     insufficient_photos: { label: "사진이 더 필요함", tone: "neutral", summary: aiAnalysis.summary },
@@ -694,31 +667,7 @@ export default function Home() {
     setIsAnalyzing(true);
     setAnalysisError("");
     const formData = new FormData();
-    formData.set("product", JSON.stringify({
-      id: currentProduct.id,
-      name: currentProduct.name,
-      englishName: currentProduct.englishName,
-      number: currentProduct.number,
-      maker: currentProduct.maker,
-      seriesName: currentProduct.seriesName,
-      englishSeriesName: currentProduct.englishSeriesName,
-      image: currentProduct.image,
-      officialUrl: currentProduct.officialUrl,
-      verified: currentProduct.verified,
-      verificationNotes: getProductVerificationNotes(currentProduct),
-    }));
-    formData.set("cases", JSON.stringify(aiProductCases.map(({ id, title, summary, images, signals, sourceType, sourceName, evidenceIds, evidenceSummary, verificationStatus }) => ({
-      id,
-      title,
-      summary,
-      images,
-      signals,
-      sourceType,
-      sourceName,
-      evidenceIds,
-      evidenceSummary,
-      verificationStatus,
-    }))));
+    formData.set("product", JSON.stringify({ id: currentProduct.id }));
     Object.entries(files).forEach(([key, file]) => {
       if (file) formData.set(`evidence:${key}`, file);
     });
@@ -763,7 +712,7 @@ export default function Home() {
 
   const shareResult = async () => {
     if (!currentProduct) return;
-    const text = `[FIGSIGNAL] ${currentProduct.name}\n${reviewPathResult.label}${aiAnalysis ? ` · AI 위험 신호: ${result.label}` : ""}\n자료 충족도 ${confidence}% · No.${currentProduct.number} · 확인한 사진 ${completedCount}장`;
+    const text = `[FIGSIGNAL] ${currentProduct.name}\n${reviewPathResult.label}${aiAnalysis ? ` · AI 위험 신호: ${result.label}` : ""}\n자료 충족도 ${evidenceCompleteness}% · No.${currentProduct.number} · 확인한 사진 ${completedCount}장`;
     if (navigator.share) {
       try {
         await navigator.share({ title: "FIGSIGNAL 판정 결과", text });
@@ -790,7 +739,7 @@ export default function Home() {
       "[FIGSIGNAL 추가 검토 요청]",
       `${currentProduct.name} · No.${currentProduct.number}`,
       `제조사: ${currentProduct.maker}`,
-      `AI 위험 신호: ${result.label} · 자료 충족도 ${confidence}%`,
+      `AI 위험 신호: ${result.label} · 자료 충족도 ${evidenceCompleteness}%`,
       "제품별 비교 사례가 없어 커뮤니티 또는 전문가의 추가 검토를 요청합니다.",
       reviewFindings ? `\n확인이 필요한 항목\n${reviewFindings}` : "",
       "\n이 요청은 사진 기반 참고 의견이며 정품 보증서가 아닙니다.",
@@ -1007,7 +956,7 @@ export default function Home() {
           <article className={`verdict-card ${verdictCardResult.tone}`}>
             <div className="verdict-product"><ProductImage product={currentProduct} size="medium" /><span><small>No.{currentProduct.number}</small><strong>{currentProduct.name}</strong><em>{currentProduct.maker}</em></span></div>
             <div className="verdict-copy"><span>{hasUserOverride ? "사용자 확인 반영" : aiAnalysis ? "AI 판정" : "검토 결과"}</span><h1>{verdictCardResult.label}</h1><p>{verdictCardResult.summary}</p></div>
-            <div className="verdict-numbers"><div><strong>{reviewPath === "unsupported" ? "—" : `${confidence}%`}</strong><span>{reviewPath === "unsupported" ? "자료 미확인" : "자료 충족도"}</span></div><div><strong>{completedCount}</strong><span>분석 사진</span></div><div><strong>{reviewedCount}/{aiAnalysis?.findings.length ?? assessedCount}</strong><span>사용자 확인</span></div></div>
+            <div className="verdict-numbers"><div><strong>{reviewPath === "unsupported" ? "—" : `${evidenceCompleteness}%`}</strong><span>{reviewPath === "unsupported" ? "자료 미확인" : "자료 충족도"}</span></div><div><strong>{completedCount}</strong><span>분석 사진</span></div><div><strong>{reviewedCount}/{aiAnalysis?.findings.length ?? assessedCount}</strong><span>사용자 확인</span></div></div>
           </article>
 
           <ReviewPathSection
@@ -1181,7 +1130,7 @@ function EvidenceCard({ item, observation, fileName, preview, onFile, onRemove, 
 
 function VerificationCriteriaDialog({ onClose }: { onClose: () => void }) {
   const verdicts = [
-    { label: "진품 가능성 높음", tone: "safe", description: "핵심 사진이 충분하고 공식 정보와 뚜렷한 차이가 보이지 않을 때" },
+    { label: "뚜렷한 위험 신호 미확인", tone: "safe", description: "핵심 사진에서 현재 알려진 가품 위험 신호가 보이지 않을 때. 정품 확인을 뜻하지 않음" },
     { label: "판정이 애매함", tone: "caution", description: "일치·차이 근거가 섞이거나 중요한 표기를 선명하게 읽지 못할 때" },
     { label: "가품 가능성 높음", tone: "danger", description: "공식 제품과 다른 특징이 여러 곳에서 확인되거나 알려진 가품 사례와 겹칠 때" },
     { label: "사진이 더 필요함", tone: "neutral", description: "박스·각인·얼굴 등 핵심 사진이 부족해 비교 근거가 충분하지 않을 때" },
@@ -1220,8 +1169,8 @@ function VerificationCriteriaDialog({ onClose }: { onClose: () => void }) {
           <section className="criteria-section">
             <div className="criteria-section-title"><h3>함께 비교하는 정보</h3></div>
             <ul className="criteria-rules">
-              <li><span>01</span><p><strong>공식 제품 정보</strong>제품명·제조사·제품번호와 공식 전체 외형 이미지를 대조합니다.</p></li>
-              <li><span>02</span><p><strong>알려진 가품 사례</strong>같은 제품의 사례가 있을 때만 실제로 겹치는 모양과 표기를 비교합니다.</p></li>
+              <li><span>01</span><p><strong>공식 제품 정보</strong>서버에 등록된 제품명·제조사·제품번호와 사진 속 표기가 충돌하는지 확인합니다.</p></li>
+              <li><span>02</span><p><strong>알려진 가품 사례</strong>같은 제품의 검수된 텍스트 특징과 실제로 겹치는 모양·표기만 비교합니다.</p></li>
               <li><span>03</span><p><strong>사용자가 올린 원본 사진</strong>사진에서 직접 확인되는 내용만 근거로 사용하고 보이지 않는 부분은 추측하지 않습니다.</p></li>
             </ul>
           </section>
@@ -1314,15 +1263,17 @@ function CounterfeitCaseSection({ cases, observations, aiMatches }: {
     .filter((signal) => observations[signal.evidenceKey] === "concern").length;
   const aiMatchCount = aiMatches.filter((match) => match.similarity !== "low" && verdictCases.some((item) => item.id === match.caseId)).length;
   const previewCase = preview ? cases.find((item) => item.id === preview.caseId) : null;
+  const previewImages = previewCase ? displayableCaseImages(previewCase) : [];
 
   const movePreview = useCallback((direction: -1 | 1) => {
     setPreview((current) => {
       if (!current) return current;
       const currentCase = cases.find((item) => item.id === current.caseId);
-      if (!currentCase || currentCase.images.length < 2) return current;
+      const currentImages = currentCase ? displayableCaseImages(currentCase) : [];
+      if (currentImages.length < 2) return current;
       return {
         ...current,
-        imageIndex: (current.imageIndex + direction + currentCase.images.length) % currentCase.images.length,
+        imageIndex: (current.imageIndex + direction + currentImages.length) % currentImages.length,
       };
     });
   }, [cases]);
@@ -1352,6 +1303,7 @@ function CounterfeitCaseSection({ cases, observations, aiMatches }: {
         </header>
 
         {cases.map((item) => {
+          const displayImages = displayableCaseImages(item);
           const affectsVerdict = item.verdictImpact !== "none";
           const caseKind: CounterfeitCaseKind = item.caseKind ?? (item.sourceType === "official" ? "official" : "comparison");
           const caseKindLabel: Record<CounterfeitCaseKind, string> = {
@@ -1370,9 +1322,9 @@ function CounterfeitCaseSection({ cases, observations, aiMatches }: {
 
           return (
             <article className={`case-card ${hasOverlap ? "overlap" : ""}`} key={item.id}>
-              {item.images.length > 0 ? (
-                <div className={`case-images count-${Math.min(item.images.length, 4)}`}>
-                  {item.images.map((image, index) => (
+              {displayImages.length > 0 ? (
+                <div className={`case-images count-${Math.min(displayImages.length, 4)}`}>
+                  {displayImages.map((image, index) => (
                     <button
                       type="button"
                       className="case-image-button"
@@ -1443,7 +1395,7 @@ function CounterfeitCaseSection({ cases, observations, aiMatches }: {
         <p className="case-note">사례는 판정 근거 중 하나입니다. 모양이 다르다고 정품이라는 뜻은 아니므로 사진과 실물을 함께 비교하세요.</p>
       </section>
 
-      {preview && previewCase && typeof document !== "undefined" && createPortal(
+      {preview && previewCase && previewImages.length > 0 && typeof document !== "undefined" && createPortal(
         <div className="case-lightbox-backdrop" onMouseDown={() => setPreview(null)}>
           <section
             className="case-lightbox"
@@ -1454,23 +1406,23 @@ function CounterfeitCaseSection({ cases, observations, aiMatches }: {
           >
             <header>
               <div>
-                <span>비교 사진 {preview.imageIndex + 1} / {previewCase.images.length}</span>
+                <span>비교 사진 {preview.imageIndex + 1} / {previewImages.length}</span>
                 <h2 id="case-lightbox-title">{previewCase.title}</h2>
               </div>
               <button type="button" autoFocus onClick={() => setPreview(null)} aria-label="비교 사진 닫기"><X size={20} /></button>
             </header>
             <div className="case-lightbox-stage">
-              {previewCase.images.length > 1 && (
+              {previewImages.length > 1 && (
                 <button type="button" className="case-lightbox-arrow previous" onClick={() => movePreview(-1)} aria-label="이전 비교 사진"><ArrowLeft size={22} /></button>
               )}
-              <img src={previewCase.images[preview.imageIndex]} alt={`${previewCase.title} 비교 사진 ${preview.imageIndex + 1} 확대`} />
-              {previewCase.images.length > 1 && (
+              <img src={previewImages[preview.imageIndex]} alt={`${previewCase.title} 비교 사진 ${preview.imageIndex + 1} 확대`} />
+              {previewImages.length > 1 && (
                 <button type="button" className="case-lightbox-arrow next" onClick={() => movePreview(1)} aria-label="다음 비교 사진"><ArrowRight size={22} /></button>
               )}
             </div>
-            {previewCase.images.length > 1 && (
+            {previewImages.length > 1 && (
               <footer aria-label="비교 사진 목록">
-                {previewCase.images.map((image, index) => (
+                {previewImages.map((image, index) => (
                   <button
                     type="button"
                     className={preview.imageIndex === index ? "active" : ""}

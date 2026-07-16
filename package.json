@@ -9,13 +9,15 @@
     "dev": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext dev",
     "build": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext build",
     "start": "WRANGLER_LOG_PATH=.wrangler/wrangler.log vinext start",
-    "test": "npm run lint && npm run test:data && npm run build",
+    "test": "npm run lint && npm run typecheck && npm run test:data && npm run build",
     "test:data": "npm run catalog:check && node --test scripts/*.test.mjs",
     "catalog:sync": "node scripts/sync-nendoroids-1-500.mjs && node scripts/sync-nendoroids-all.mjs",
     "catalog:check": "node scripts/sync-nendoroids-1-500.mjs --check && node scripts/sync-nendoroids-all.mjs --check",
     "data:dry-run": "node scripts/import-counterfeit-dataset.mjs --dry-run",
     "data:import": "node scripts/import-counterfeit-dataset.mjs --check-links --write",
+    "expert:report": "node scripts/expert-readiness-report.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
+    "typecheck": "tsc --noEmit",
     "db:generate": "drizzle-kit generate"
   },
   "dependencies": {
@@ -27,6 +29,7 @@
   },
   "devDependencies": {
     "@cloudflare/vite-plugin": "1.37.1",
+    "@cloudflare/workers-types": "^4.20260702.1",
     "@tailwindcss/postcss": "4.2.1",
     "@types/node": "22.19.19",
     "@types/react": "19.2.14",

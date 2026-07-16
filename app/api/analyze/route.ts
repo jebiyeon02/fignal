@@ -1,12 +1,20 @@
 import { env } from "cloudflare:workers";
 
+import { expandedProducts } from "../../catalog";
+import { counterfeitCases } from "../../counterfeit-cases";
+import { getProductVerificationNotes } from "../../product-verification";
+import {
+  essentialEvidenceKeys,
+  evidenceKeys,
+  normalizeAnalysisOutput,
+  type EvidenceKey,
+} from "./analysis-contract";
+import { buildNendoroidAnalysisPrompt } from "./analysis-prompt";
 import { nendoroidAnalysisDomainKnowledge } from "./domain-knowledge";
 
 const MAX_FILES = 8;
 const MAX_FILE_BYTES = 6 * 1024 * 1024;
 const MAX_TOTAL_BYTES = 9 * 1024 * 1024;
-const MAX_REFERENCE_FILE_BYTES = 1536 * 1024;
-const MAX_REFERENCE_TOTAL_BYTES = 4 * 1024 * 1024;
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const RATE_LIMIT_REQUESTS = 6;
 
@@ -18,65 +26,13 @@ const supportedImageTypes = new Set([
   "image/heif",
 ]);
 
-const referenceImageHosts = new Set([
-  "www.goodsmile.com",
-  "images.goodsmile.info",
-  "www.nendo.guide",
-  "i0.wp.com",
-  "partner.goodsmile.info",
-  "stat.ameba.jp",
-  "support.goodsmile.com",
-]);
-
-const evidenceKeys = [
-  "boxFront",
-  "boxBack",
-  "barcode",
-  "baseMark",
-  "facePaint",
-  "figureFull",
-  "parts",
-  "purchaseProof",
-] as const;
-
-type EvidenceKey = (typeof evidenceKeys)[number];
-
 type ProductPayload = {
   id: string;
-  name: string;
-  englishName: string;
-  number: string;
-  maker: string;
-  seriesName?: string;
-  englishSeriesName?: string;
-  image: string;
-  officialUrl: string;
-  verified: boolean;
-  verificationNotes?: string[];
-};
-
-type CasePayload = {
-  id: string;
-  title: string;
-  summary: string;
-  images: string[];
-  signals: Array<{ evidenceKey: EvidenceKey; label: string }>;
-  sourceType?: "official" | "community";
-  sourceName?: string;
-  evidenceIds?: string[];
-  evidenceSummary?: string;
-  verificationStatus?: string;
 };
 
 type GeminiPart =
   | { text: string }
   | { inlineData: { mimeType: string; data: string } };
-
-type ReferenceImage = {
-  label: string;
-  byteLength: number;
-  part: GeminiPart;
-};
 
 const requestLog = new Map<string, number[]>();
 
@@ -99,15 +55,6 @@ function safeParse<T>(value: FormDataEntryValue | null): T | null {
     return JSON.parse(value) as T;
   } catch {
     return null;
-  }
-}
-
-function isHttpUrl(value: string) {
-  try {
-    const url = new URL(value);
-    return url.protocol === "https:" || url.protocol === "http:";
-  } catch {
-    return false;
   }
 }
 
@@ -146,40 +93,6 @@ async function fileToGeminiPart(file: File): Promise<GeminiPart> {
       data: bytesToBase64(bytes),
     },
   };
-}
-
-function isAllowedReferenceUrl(value: string) {
-  if (!isHttpUrl(value)) return false;
-  const url = new URL(value);
-  return url.protocol === "https:" && referenceImageHosts.has(url.hostname);
-}
-
-async function fetchReferenceImage(label: string, url: string): Promise<ReferenceImage | null> {
-  if (!isAllowedReferenceUrl(url)) return null;
-
-  try {
-    const response = await fetch(url, {
-      headers: { Accept: "image/*" },
-      redirect: "follow",
-      signal: AbortSignal.timeout(7_000),
-    });
-    if (!response.ok || !isAllowedReferenceUrl(response.url)) return null;
-
-    const mimeType = response.headers.get("content-type")?.split(";")[0]?.trim().toLowerCase() ?? "";
-    const statedLength = Number(response.headers.get("content-length") ?? "0");
-    if (!supportedImageTypes.has(mimeType) || statedLength > MAX_REFERENCE_FILE_BYTES) return null;
-
-    const bytes = new Uint8Array(await response.arrayBuffer());
-    if (bytes.byteLength === 0 || bytes.byteLength > MAX_REFERENCE_FILE_BYTES) return null;
-
-    return {
-      label,
-      byteLength: bytes.byteLength,
-      part: { inlineData: { mimeType, data: bytesToBase64(bytes) } },
-    };
-  } catch {
-    return null;
-  }
 }
 
 function extractGeminiOutputText(payload: unknown) {
@@ -234,11 +147,14 @@ export async function POST(request: Request) {
     return jsonError("사진 요청을 읽지 못했습니다.", 400, "INVALID_FORM");
   }
 
-  const product = safeParse<ProductPayload>(formData.get("product"));
-  const cases = safeParse<CasePayload[]>(formData.get("cases")) ?? [];
-  if (!product?.name || !product.number || !product.maker) {
+  const productRequest = safeParse<ProductPayload>(formData.get("product"));
+  const product = expandedProducts.find((candidate) => candidate.id === productRequest?.id && candidate.verified);
+  if (!product) {
     return jsonError("제품 정보가 올바르지 않습니다.", 400, "INVALID_PRODUCT");
   }
+  const cases = counterfeitCases
+    .filter((counterfeitCase) => counterfeitCase.productId === product.id && counterfeitCase.verdictImpact !== "none")
+    .slice(0, 3);
 
   const uploaded: Array<{ key: EvidenceKey; file: File }> = [];
   let totalBytes = 0;
@@ -261,6 +177,11 @@ export async function POST(request: Request) {
   if (uploaded.length > MAX_FILES || totalBytes > MAX_TOTAL_BYTES) {
     return jsonError("한 번에 올릴 수 있는 사진 용량을 초과했습니다.", 413, "PAYLOAD_TOO_LARGE");
   }
+  const uploadedKeySet = new Set(uploaded.map((item) => item.key));
+  const essentialUploadCount = essentialEvidenceKeys.filter((key) => uploadedKeySet.has(key)).length;
+  if (essentialUploadCount < 4) {
+    return jsonError("박스, 바코드, 각인, 얼굴 중 핵심 사진을 4장 이상 올려주세요.", 400, "INSUFFICIENT_EVIDENCE");
+  }
 
   const content: GeminiPart[] = [
     {
@@ -269,19 +190,17 @@ export async function POST(request: Request) {
         `제품번호: ${product.number}`,
         `작품: ${[product.seriesName, product.englishSeriesName].filter(Boolean).join(" / ") || "미확인"}`,
         `제조사: ${product.maker}`,
-        `공식 카탈로그 등록 여부: ${product.verified ? "등록됨" : "직접 입력"}`,
-        ...(product.verificationNotes?.length ? [`제품별 확인 메모:\n- ${product.verificationNotes.join("\n- ")}`] : []),
-        "아래에는 공식 참고 이미지, 알려진 가품 사례, 사용자가 올린 증거 사진이 순서대로 제공됩니다.",
+        "공식 카탈로그 등록 여부: 등록됨",
+        ...(getProductVerificationNotes(product).length
+          ? [`제품별 확인 메모:\n- ${getProductVerificationNotes(product).join("\n- ")}`]
+          : []),
+        "아래에는 서버에서 선택한 알려진 가품 특징과 사용자가 올린 증거 사진이 제공됩니다.",
+        "외부 참고 이미지는 권리 확인 전이므로 이 분석에 제공되지 않습니다.",
       ].join("\n"),
     },
   ];
 
-  const referenceRequests: Array<Promise<ReferenceImage | null>> = [];
-  if (product.image && isAllowedReferenceUrl(product.image)) {
-    referenceRequests.push(fetchReferenceImage("[공식 참고 이미지] 제품 전체 외형 참고용. 패키지 정답 이미지로 간주하지 마세요.", product.image));
-  }
-
-  for (const counterfeitCase of cases.slice(0, 3)) {
+  for (const counterfeitCase of cases) {
     content.push({
       text: [
         `[알려진 가품 사례 ${counterfeitCase.id}] ${counterfeitCase.title}`,
@@ -289,22 +208,9 @@ export async function POST(request: Request) {
         `출처: ${counterfeitCase.sourceName ?? "등록 자료"} (${counterfeitCase.sourceType ?? "출처 유형 미표기"})`,
         `검수 상태: ${counterfeitCase.verificationStatus ?? "기존 검수 완료"}`,
         counterfeitCase.summary,
-        `원문 근거 요약: ${counterfeitCase.evidenceSummary ?? counterfeitCase.summary}`,
         `특징: ${counterfeitCase.signals.map((signal) => signal.label).join(", ")}`,
       ].join("\n"),
     });
-    for (const image of counterfeitCase.images.filter(isAllowedReferenceUrl).slice(0, 2)) {
-      referenceRequests.push(fetchReferenceImage(`[가품 사례 이미지 ${counterfeitCase.id}]`, image));
-    }
-  }
-
-  const references = await Promise.all(referenceRequests);
-  let referenceBytes = 0;
-  for (const reference of references) {
-    if (!reference || referenceBytes + reference.byteLength > MAX_REFERENCE_TOTAL_BYTES) continue;
-    referenceBytes += reference.byteLength;
-    content.push({ text: reference.label });
-    content.push(reference.part);
   }
 
   for (const item of uploaded) {
@@ -316,9 +222,7 @@ export async function POST(request: Request) {
     type: "object",
     additionalProperties: false,
     properties: {
-      verdict: { type: "string", enum: ["likely_authentic", "needs_review", "counterfeit_suspected", "insufficient_photos"] },
-      confidence: { type: "integer", minimum: 0, maximum: 100 },
-      summary: { type: "string" },
+      verdict: { type: "string", enum: ["no_obvious_risk_signals", "needs_review", "counterfeit_suspected", "insufficient_photos"] },
       findings: {
         type: "array",
         items: {
@@ -327,12 +231,13 @@ export async function POST(request: Request) {
           properties: {
             key: { type: "string", enum: evidenceKeys },
             status: { type: "string", enum: ["match", "concern", "unclear"] },
+            textIntegrity: { type: "string", enum: ["not_applicable", "coherent", "limited_anomaly", "garbled", "unclear"] },
             title: { type: "string" },
             reason: { type: "string" },
             visibleEvidence: { type: "string" },
             userAction: { type: "string" },
           },
-          required: ["key", "status", "title", "reason", "visibleEvidence", "userAction"],
+          required: ["key", "status", "textIntegrity", "title", "reason", "visibleEvidence", "userAction"],
         },
       },
       caseMatches: {
@@ -349,28 +254,11 @@ export async function POST(request: Request) {
           required: ["caseId", "similarity", "reason", "evidenceKeys"],
         },
       },
-      caveat: { type: "string" },
     },
-    required: ["verdict", "confidence", "summary", "findings", "caseMatches", "caveat"],
+    required: ["verdict", "findings", "caseMatches"],
   };
 
-  const prompt = [
-    "당신은 중고 넨도로이드 거래 사진을 점검하는 보수적인 시각 검수 보조자입니다.",
-    "정품을 보증하거나 단정하지 말고, 사진에 실제로 보이는 근거만 한국어로 짧고 구체적으로 설명하세요.",
-    nendoroidAnalysisDomainKnowledge,
-    "공식 제품 이미지는 전체 외형 참고용이며 박스 뒷면, 바코드, 받침대 각인의 정답으로 추측하지 마세요.",
-    "가품 사례 이미지와 시각적으로 겹치는 특징이 있을 때만 caseMatches에 넣으세요.",
-    "comparison 이미지에는 정품과 가품이 함께 있을 수 있으므로 이미지 전체를 가품으로 간주하지 마세요.",
-    "official_confirmed는 제조사 확인 자료이고 side_by_side_author_asserted는 비교 작성자의 판단입니다. 두 출처 강도를 구분하세요.",
-    "제품별 확인 메모가 제공되면 단일 로고·스티커 유무로 단정하지 말고 발매판과 유통사 차이를 먼저 고려하세요.",
-    "caseMatches.reason에는 사용자 사진에서 관찰된 부분과 등록 사례의 어떤 특징이 겹치는지 구체적으로 적으세요.",
-    "보이지 않거나 해상도가 부족한 글자, 로고, JAN, 각인은 status=unclear로 처리하고 재촬영 방법을 userAction에 적으세요.",
-    "사진마다 해당 evidence_key로 findings를 정확히 하나씩 만들고, 업로드되지 않은 key는 만들지 마세요.",
-    "한 장의 일반 제품 사진만으로 정품 가능성 높음을 주지 마세요. 핵심 표기 사진이 부족하면 insufficient_photos를 선택하세요.",
-    "confidence는 정품 확률이 아니라 이번 판정의 자료 충족도입니다.",
-    "반드시 설명이나 마크다운 없이 아래 JSON 구조에 맞는 JSON 객체 하나만 출력하세요.",
-    `출력 JSON 구조: ${JSON.stringify(schema)}`,
-  ].join("\n");
+  const prompt = buildNendoroidAnalysisPrompt(nendoroidAnalysisDomainKnowledge, schema);
 
   let upstream: Response;
   try {
@@ -424,7 +312,12 @@ export async function POST(request: Request) {
   }
 
   try {
-    const analysis = parseGeminiJson(outputText);
+    const parsedAnalysis = parseGeminiJson(outputText);
+    const analysis = normalizeAnalysisOutput(parsedAnalysis, {
+      uploadedKeys: uploaded.map((item) => item.key),
+      allowedCaseIds: cases.map((counterfeitCase) => counterfeitCase.id),
+    });
+    if (!analysis) throw new Error("Invalid analysis contract");
     return Response.json(
       { analysis },
       { headers: { "Cache-Control": "no-store" } },
