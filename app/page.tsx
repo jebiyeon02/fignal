@@ -12,6 +12,7 @@ import {
   ChevronDown,
   CircleHelp,
   Clipboard,
+  Clock3,
   ExternalLink,
   FileCheck2,
   Image as ImageIcon,
@@ -50,6 +51,11 @@ import {
 } from "./counterfeit-cases";
 import { getProductVerificationNotes, myHeroVerificationNotes } from "./product-verification";
 import { resolveReviewPath, reviewPathCopy, type ReviewPath } from "./review-path";
+import {
+  parseVerificationHistoryItem,
+  verificationVerdictCopy,
+  type VerificationHistoryItem,
+} from "./verification-history";
 
 type Stage = "search" | "photos" | "result";
 type Observation = "missing" | "unverified" | "match" | "concern";
@@ -403,6 +409,16 @@ function isAiAnalysis(value: unknown): value is AiAnalysis {
   return isAnalysisResult(value);
 }
 
+async function fetchRecentVerifications() {
+  const response = await fetch("/api/verifications?limit=6", { cache: "no-store" });
+  const payload = await response.json().catch(() => null) as { verifications?: unknown } | null;
+  if (!response.ok || !Array.isArray(payload?.verifications)) throw new Error("Invalid history response");
+  return payload.verifications.flatMap((item) => {
+    const parsed = parseVerificationHistoryItem(item);
+    return parsed ? [parsed] : [];
+  });
+}
+
 export default function Home() {
   const [stage, setStage] = useState<Stage>("search");
   const [query, setQuery] = useState("");
@@ -426,10 +442,37 @@ export default function Home() {
   const [reviewRequestShared, setReviewRequestShared] = useState(false);
   const [toast, setToast] = useState("");
   const [criteriaOpen, setCriteriaOpen] = useState(false);
+  const [recentVerifications, setRecentVerifications] = useState<VerificationHistoryItem[]>([]);
+  const [historyStatus, setHistoryStatus] = useState<"loading" | "ready" | "error">("loading");
 
   const showToast = useCallback((message: string) => {
     setToast(message);
     window.setTimeout(() => setToast(""), 2200);
+  }, []);
+
+  const loadRecentVerifications = useCallback(async () => {
+    try {
+      setRecentVerifications(await fetchRecentVerifications());
+      setHistoryStatus("ready");
+    } catch {
+      setHistoryStatus("error");
+    }
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    void fetchRecentVerifications()
+      .then((items) => {
+        if (!active) return;
+        setRecentVerifications(items);
+        setHistoryStatus("ready");
+      })
+      .catch(() => {
+        if (active) setHistoryStatus("error");
+      });
+    return () => {
+      active = false;
+    };
   }, []);
 
   useEffect(() => {
@@ -673,7 +716,12 @@ export default function Home() {
 
     try {
       const response = await fetch("/api/analyze", { method: "POST", body: formData });
-      const payload = await response.json().catch(() => null) as { analysis?: unknown; error?: string; code?: string } | null;
+      const payload = await response.json().catch(() => null) as {
+        analysis?: unknown;
+        verification?: unknown;
+        error?: string;
+        code?: string;
+      } | null;
       if (!response.ok || !isAiAnalysis(payload?.analysis)) {
         throw new Error(payload?.error || "AI 분석 결과를 받지 못했습니다.");
       }
@@ -685,6 +733,14 @@ export default function Home() {
       });
       setObservations(nextObservations);
       setAiAnalysis(analysis);
+      const savedVerification = parseVerificationHistoryItem(payload?.verification);
+      if (savedVerification) {
+        setRecentVerifications((current) => [
+          savedVerification,
+          ...current.filter((item) => item.id !== savedVerification.id),
+        ].slice(0, 6));
+        setHistoryStatus("ready");
+      }
       setReviewedEvidence({});
       setUserOverrides({});
       setReviewRequestShared(false);
@@ -695,6 +751,42 @@ export default function Home() {
       setIsAnalyzing(false);
       setAnalysisError(error instanceof Error ? error.message : "AI 분석을 시작하지 못했습니다.");
     }
+  };
+
+  const openSavedVerification = (item: VerificationHistoryItem) => {
+    Object.values(filePreviews).forEach((preview) => preview && URL.revokeObjectURL(preview));
+    const savedProduct: Product = products.find((product) => product.id === item.productId) ?? {
+      id: item.productId,
+      name: item.productName,
+      englishName: item.productName,
+      aliases: [],
+      number: item.productNumber,
+      maker: item.productMaker,
+      release: "검증 당시 기록",
+      image: item.productImage,
+      officialUrl: item.productOfficialUrl,
+      verified: true,
+    };
+    const savedObservations = { ...initialObservations };
+    item.analysis.findings.forEach((finding) => {
+      savedObservations[finding.key] = finding.status === "unclear" ? "unverified" : finding.status;
+    });
+
+    setSelectedProduct(savedProduct);
+    setQuery(savedProduct.name);
+    setSearchOpen(false);
+    setManualOpen(false);
+    setFiles({});
+    setFileNames({});
+    setFilePreviews({});
+    setObservations(savedObservations);
+    setAiAnalysis(item.analysis);
+    setAnalysisError("");
+    setReviewedEvidence({});
+    setUserOverrides({});
+    setReviewRequestShared(false);
+    setStage("result");
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const reviewFinding = (finding: AiFinding, value: Observation) => {
@@ -793,6 +885,10 @@ export default function Home() {
           <button className="logo" onClick={resetAll}>FIGSIGNAL</button>
           <div className="top-nav">
             <span>넨도로이드 검증</span>
+            <button onClick={() => {
+              if (stage !== "search") resetAll();
+              window.setTimeout(() => document.getElementById("recent-verifications")?.scrollIntoView({ behavior: "smooth" }), 0);
+            }}><Clock3 size={16} /> 최근 사례</button>
             <button onClick={() => setCriteriaOpen(true)}><FileCheck2 size={16} /> 판정 기준</button>
             <button onClick={resetAll}><Plus size={16} /> 새 검증</button>
           </div>
@@ -902,6 +998,13 @@ export default function Home() {
           </div>
 
           <button className="black-button full" disabled={!currentProduct} onClick={() => { setStage(currentProduct?.verified ? "photos" : "result"); window.scrollTo({ top: 0, behavior: "smooth" }); }}>{currentProduct?.verified ? "이 제품 확인하기" : "지원 여부 확인하기"} <ArrowRight size={18} /></button>
+
+          <RecentVerificationSection
+            items={recentVerifications}
+            status={historyStatus}
+            onOpen={openSavedVerification}
+            onRetry={loadRecentVerifications}
+          />
         </section>
       )}
 
@@ -1004,6 +1107,87 @@ export default function Home() {
       {criteriaOpen && <VerificationCriteriaDialog onClose={() => setCriteriaOpen(false)} />}
       {toast && <div className="toast" role="status"><Check size={16} /> {toast}</div>}
     </main>
+  );
+}
+
+function formatVerificationDate(value: string) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "최근";
+  return new Intl.DateTimeFormat("ko-KR", {
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  }).format(date);
+}
+
+function RecentVerificationSection({
+  items,
+  status,
+  onOpen,
+  onRetry,
+}: {
+  items: VerificationHistoryItem[];
+  status: "loading" | "ready" | "error";
+  onOpen: (item: VerificationHistoryItem) => void;
+  onRetry: () => Promise<void>;
+}) {
+  return (
+    <section className="recent-verifications" id="recent-verifications" aria-labelledby="recent-verifications-title">
+      <header>
+        <div>
+          <span>RECENT CHECKS</span>
+          <h2 id="recent-verifications-title">최근 검증 사례</h2>
+          <p>사진과 개인 정보는 저장하지 않고, 비식별 판정 결과만 보여드려요.</p>
+        </div>
+        {items.length > 0 && <em>최근 {items.length}건</em>}
+      </header>
+
+      {status === "loading" && items.length === 0 && (
+        <div className="recent-state" role="status"><LoaderCircle className="spin" size={18} /> 최근 사례를 불러오는 중이에요.</div>
+      )}
+      {status === "error" && items.length === 0 && (
+        <div className="recent-state error"><TriangleAlert size={18} /><span>최근 사례를 불러오지 못했어요.</span><button onClick={() => void onRetry()}>다시 시도</button></div>
+      )}
+      {status === "ready" && items.length === 0 && (
+        <div className="recent-state empty"><Clock3 size={20} /><span><strong>아직 저장된 검증 사례가 없어요</strong>첫 검증이 완료되면 여기에 결과가 쌓입니다.</span></div>
+      )}
+
+      {items.length > 0 && (
+        <div className="recent-verification-list">
+          {items.map((item) => {
+            const verdict = verificationVerdictCopy[item.verdict];
+            const product: Product = products.find((candidate) => candidate.id === item.productId) ?? {
+              id: item.productId,
+              name: item.productName,
+              englishName: item.productName,
+              aliases: [],
+              number: item.productNumber,
+              maker: item.productMaker,
+              release: "검증 당시 기록",
+              image: item.productImage,
+              officialUrl: item.productOfficialUrl,
+              verified: true,
+            };
+            return (
+              <button key={item.id} className={`recent-verification-card ${verdict.tone}`} onClick={() => onOpen(item)}>
+                <ProductImage product={product} size="medium" />
+                <span className="recent-verification-copy">
+                  <small><time dateTime={item.createdAt}>{formatVerificationDate(item.createdAt)}</time> · No.{item.productNumber}</small>
+                  <strong>{item.productName}</strong>
+                  <em>{verdict.label}</em>
+                </span>
+                <span className="recent-verification-metrics">
+                  <strong>{item.evidenceCompleteness}%</strong>
+                  <small>사진 {item.photoCount}장 · 위험 신호 {item.riskSignalCount}개</small>
+                </span>
+                <ArrowRight size={17} />
+              </button>
+            );
+          })}
+        </div>
+      )}
+    </section>
   );
 }
 

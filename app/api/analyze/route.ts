@@ -1,4 +1,5 @@
 import { env } from "cloudflare:workers";
+import { saveVerificationHistory } from "../../../db/verification-history";
 
 import { expandedProducts } from "../../catalog";
 import { counterfeitCases } from "../../counterfeit-cases";
@@ -272,8 +273,27 @@ export async function POST(request: Request) {
       allowedCaseIds: cases.map((counterfeitCase) => counterfeitCase.id),
     });
     if (!analysis) throw new Error("Invalid analysis contract");
+
+    let verification = null;
+    try {
+      verification = await saveVerificationHistory({
+        product,
+        analysis,
+        promptVersion: analysisPromptVersion,
+      });
+    } catch (error) {
+      console.error("Failed to save verification history", error);
+    }
+
     return Response.json(
-      { analysis, meta: { promptVersion: analysisPromptVersion } },
+      {
+        analysis,
+        verification,
+        meta: {
+          promptVersion: analysisPromptVersion,
+          historySaved: Boolean(verification),
+        },
+      },
       { headers: { "Cache-Control": "no-store" } },
     );
   } catch {
