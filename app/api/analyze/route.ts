@@ -47,6 +47,7 @@ type ProductPayload = {
   image: string;
   officialUrl: string;
   verified: boolean;
+  verificationNotes?: string[];
 };
 
 type CasePayload = {
@@ -263,6 +264,7 @@ export async function POST(request: Request) {
         `제품번호: ${product.number}`,
         `제조사: ${product.maker}`,
         `공식 카탈로그 등록 여부: ${product.verified ? "등록됨" : "직접 입력"}`,
+        ...(product.verificationNotes?.length ? [`제품별 확인 메모:\n- ${product.verificationNotes.join("\n- ")}`] : []),
         "아래에는 공식 참고 이미지, 알려진 가품 사례, 사용자가 올린 증거 사진이 순서대로 제공됩니다.",
       ].join("\n"),
     },
@@ -353,6 +355,7 @@ export async function POST(request: Request) {
     "가품 사례 이미지와 시각적으로 겹치는 특징이 있을 때만 caseMatches에 넣으세요.",
     "comparison 이미지에는 정품과 가품이 함께 있을 수 있으므로 이미지 전체를 가품으로 간주하지 마세요.",
     "official_confirmed는 제조사 확인 자료이고 side_by_side_author_asserted는 비교 작성자의 판단입니다. 두 출처 강도를 구분하세요.",
+    "제품별 확인 메모가 제공되면 단일 로고·스티커 유무로 단정하지 말고 발매판과 유통사 차이를 먼저 고려하세요.",
     "caseMatches.reason에는 사용자 사진에서 관찰된 부분과 등록 사례의 어떤 특징이 겹치는지 구체적으로 적으세요.",
     "보이지 않거나 해상도가 부족한 글자, 로고, JAN, 각인은 status=unclear로 처리하고 재촬영 방법을 userAction에 적으세요.",
     "사진마다 해당 evidence_key로 findings를 정확히 하나씩 만들고, 업로드되지 않은 key는 만들지 마세요.",

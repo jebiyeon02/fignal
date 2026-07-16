@@ -58,6 +58,7 @@ type Product = {
   image: string;
   officialUrl: string;
   verified: boolean;
+  series?: string;
 };
 
 type EvidenceItem = {
@@ -209,7 +210,18 @@ const products: Product[] = [...curatedProducts, ...expandedProducts].filter(
   (product, index, allProducts) => allProducts.findIndex((item) => item.id === product.id) === index,
 );
 
-const catalogShortcuts = ["봇치 더 록", "귀멸의 칼날", "주술회전", "체인소맨", "나루토", "블리치"];
+const catalogShortcuts = ["히로아카", "봇치 더 록", "귀멸의 칼날", "주술회전", "체인소맨", "나루토", "블리치"];
+
+const myHeroVerificationNotes = [
+  "발매판·유통사에 따라 박스 우측 상단의 굿스마일 로고가 없을 수 있어, 로고 부재만으로 가품을 판단하지 않습니다.",
+  "제품 번호와 히어로·교복·스텔스·결전 코스튬 버전을 정확히 고른 뒤 표정, 이펙트, 텍스트 플레이트 구성을 공식 페이지와 대조합니다.",
+  "박스 뒷면의 작품 저작권과 TOMY·TOHO·Good Smile 유통 표기, 받침대 저작권 각인은 같은 발매판 기준으로 확인합니다.",
+  "과도한 광택, 굵거나 번진 눈·입 인쇄, 머리 파츠 단차, 지나치게 투명한 받침대, 결합 불량이 함께 나타나는지 확인합니다.",
+];
+
+function getProductVerificationNotes(product: Product) {
+  return product.series === "my-hero-academia" ? myHeroVerificationNotes : [];
+}
 
 const manufacturers = [
   "Good Smile Company",
@@ -641,6 +653,7 @@ export default function Home() {
       image: currentProduct.image,
       officialUrl: currentProduct.officialUrl,
       verified: currentProduct.verified,
+      verificationNotes: getProductVerificationNotes(currentProduct),
     }));
     formData.set("cases", JSON.stringify(aiProductCases.map(({ id, title, summary, images, signals, sourceType, sourceName, evidenceIds, evidenceSummary, verificationStatus }) => ({
       id,
@@ -861,6 +874,13 @@ export default function Home() {
 
           <ProductStrip product={currentProduct} />
 
+          {getProductVerificationNotes(currentProduct).length > 0 && (
+            <details className="series-verification-guide">
+              <summary><span><ShieldCheck size={16} /> 히로아카 확인 포인트</span><ChevronDown size={17} /></summary>
+              <ul>{getProductVerificationNotes(currentProduct).map((note) => <li key={note}>{note}</li>)}</ul>
+            </details>
+          )}
+
           <div className="photo-topline"><div><strong>필수 사진</strong><span>{essentialCompleted}/5</span></div><button onClick={copySellerMessage}><Clipboard size={14} /> 판매자에게 요청</button></div>
           <div className="photo-grid">
             {evidenceItems.filter((item) => item.essential).map((item) => (
@@ -1032,6 +1052,13 @@ function VerificationCriteriaDialog({ onClose }: { onClose: () => void }) {
               <p>재판·유통 지역에 따른 패키지 차이가 있을 수 있어 여러 근거를 함께 봅니다.</p>
               <p>표시되는 퍼센트는 정품 확률이 아니라 사진과 자료의 충족도입니다.</p>
             </div>
+          </section>
+
+          <section className="criteria-section">
+            <div className="criteria-section-title"><h3>히로아카 제품별 주의사항</h3><span>My Hero Academia</span></div>
+            <ul className="criteria-rules">
+              {myHeroVerificationNotes.map((note, index) => <li key={note}><span>{String(index + 1).padStart(2, "0")}</span><p>{note}</p></li>)}
+            </ul>
           </section>
 
           <section className="criteria-section">

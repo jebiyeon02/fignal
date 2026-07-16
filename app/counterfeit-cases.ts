@@ -1,4 +1,5 @@
 import evidenceDataset from "./data/counterfeit-evidence.generated.json";
+import { myHeroCounterfeitCases } from "./my-hero-counterfeit-cases";
 import { researchedCommunityCases } from "./researched-counterfeit-cases";
 
 export type CounterfeitEvidenceKey =
@@ -751,4 +752,5 @@ export const counterfeitCases: CounterfeitCase[] = [
   ...enrichedCuratedCases,
   ...importedNewCases,
   ...researchedCommunityCases,
+  ...myHeroCounterfeitCases,
 ];
