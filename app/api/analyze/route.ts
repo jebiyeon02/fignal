@@ -1,5 +1,10 @@
 import { env } from "cloudflare:workers";
 import { saveVerificationHistory } from "../../../db/verification-history";
+import {
+  deleteVerificationReportImages,
+  storeVerificationReportImages,
+  type StoredReportImage,
+} from "../../../db/verification-report-images";
 
 import { expandedProducts } from "../../catalog";
 import { counterfeitCases } from "../../counterfeit-cases";
@@ -133,6 +138,9 @@ export async function POST(request: Request) {
     formData = await request.formData();
   } catch {
     return jsonError("사진 요청을 읽지 못했습니다.", 400, "INVALID_FORM");
+  }
+  if (formData.get("publishReport") !== "true") {
+    return jsonError("사진이 포함된 공개 리포트 저장에 동의해 주세요.", 400, "REPORT_CONSENT_REQUIRED");
   }
 
   const productRequest = safeParse<ProductPayload>(formData.get("product"));
@@ -275,14 +283,30 @@ export async function POST(request: Request) {
     if (!analysis) throw new Error("Invalid analysis contract");
 
     let verification = null;
+    let storedImages: StoredReportImage[] = [];
     try {
+      const verificationId = crypto.randomUUID();
+      storedImages = await storeVerificationReportImages(
+        verificationId,
+        uploaded.filter((item) => item.key !== "purchaseProof").map((item) => ({
+          evidenceKey: item.key,
+          file: item.file,
+        })),
+      );
       verification = await saveVerificationHistory({
+        id: verificationId,
         product,
         analysis,
         promptVersion: analysisPromptVersion,
+        images: storedImages,
       });
     } catch (error) {
       console.error("Failed to save verification history", error);
+      try {
+        await deleteVerificationReportImages(storedImages);
+      } catch (cleanupError) {
+        console.error("Failed to clean up report images", cleanupError);
+      }
     }
 
     return Response.json(

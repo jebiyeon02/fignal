@@ -350,7 +350,6 @@ async function prepareImageFile(file: File) {
     if (supportedImageTypes.has(file.type)) return file;
     throw new Error("이 사진 형식을 변환하지 못했습니다.");
   }
-  if (supportedImageTypes.has(file.type) && scale === 1 && blob.size >= file.size) return file;
   const baseName = file.name.replace(/\.[^.]+$/, "") || "figure-photo";
   return new File([blob], `${baseName}.jpg`, { type: "image/jpeg" });
 }
@@ -444,6 +443,8 @@ export default function Home() {
   const [criteriaOpen, setCriteriaOpen] = useState(false);
   const [recentVerifications, setRecentVerifications] = useState<VerificationHistoryItem[]>([]);
   const [historyStatus, setHistoryStatus] = useState<"loading" | "ready" | "error">("loading");
+  const [reportConsent, setReportConsent] = useState(false);
+  const [savedReportId, setSavedReportId] = useState<string | null>(null);
 
   const showToast = useCallback((message: string) => {
     setToast(message);
@@ -505,6 +506,8 @@ export default function Home() {
       setReviewedEvidence({});
       setUserOverrides({});
       setReviewRequestShared(false);
+      setReportConsent(false);
+      setSavedReportId(null);
       return true;
     } catch (error) {
       if (!silent) showToast(error instanceof Error ? error.message : "사진을 추가하지 못했습니다.");
@@ -706,10 +709,15 @@ export default function Home() {
       return;
     }
     if (Object.keys(files).length === 0) return;
+    if (!reportConsent) {
+      showToast("사진이 포함된 공개 리포트 저장에 동의해 주세요.");
+      return;
+    }
     setIsAnalyzing(true);
     setAnalysisError("");
     const formData = new FormData();
     formData.set("product", JSON.stringify({ id: currentProduct.id }));
+    formData.set("publishReport", "true");
     Object.entries(files).forEach(([key, file]) => {
       if (file) formData.set(`evidence:${key}`, file);
     });
@@ -740,6 +748,9 @@ export default function Home() {
           ...current.filter((item) => item.id !== savedVerification.id),
         ].slice(0, 6));
         setHistoryStatus("ready");
+        setSavedReportId(savedVerification.id);
+      } else {
+        showToast("분석은 완료됐지만 공개 리포트를 저장하지 못했습니다.");
       }
       setReviewedEvidence({});
       setUserOverrides({});
@@ -751,42 +762,6 @@ export default function Home() {
       setIsAnalyzing(false);
       setAnalysisError(error instanceof Error ? error.message : "AI 분석을 시작하지 못했습니다.");
     }
-  };
-
-  const openSavedVerification = (item: VerificationHistoryItem) => {
-    Object.values(filePreviews).forEach((preview) => preview && URL.revokeObjectURL(preview));
-    const savedProduct: Product = products.find((product) => product.id === item.productId) ?? {
-      id: item.productId,
-      name: item.productName,
-      englishName: item.productName,
-      aliases: [],
-      number: item.productNumber,
-      maker: item.productMaker,
-      release: "검증 당시 기록",
-      image: item.productImage,
-      officialUrl: item.productOfficialUrl,
-      verified: true,
-    };
-    const savedObservations = { ...initialObservations };
-    item.analysis.findings.forEach((finding) => {
-      savedObservations[finding.key] = finding.status === "unclear" ? "unverified" : finding.status;
-    });
-
-    setSelectedProduct(savedProduct);
-    setQuery(savedProduct.name);
-    setSearchOpen(false);
-    setManualOpen(false);
-    setFiles({});
-    setFileNames({});
-    setFilePreviews({});
-    setObservations(savedObservations);
-    setAiAnalysis(item.analysis);
-    setAnalysisError("");
-    setReviewedEvidence({});
-    setUserOverrides({});
-    setReviewRequestShared(false);
-    setStage("result");
-    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const reviewFinding = (finding: AiFinding, value: Observation) => {
@@ -803,10 +778,20 @@ export default function Home() {
 
   const shareResult = async () => {
     if (!currentProduct) return;
-    const text = `[FIGSIGNAL] ${currentProduct.name}\n${reviewPathResult.label}${aiAnalysis ? ` · AI 위험 신호: ${result.label}` : ""}\n자료 충족도 ${evidenceCompleteness}% · No.${currentProduct.number} · 확인한 사진 ${completedCount}장`;
+    const reportUrl = savedReportId ? `${window.location.origin}/reports/${savedReportId}` : "";
+    const text = [
+      `[FIGSIGNAL] ${currentProduct.name}`,
+      `${reviewPathResult.label}${aiAnalysis ? ` · AI 위험 신호: ${result.label}` : ""}`,
+      `자료 충족도 ${evidenceCompleteness}% · No.${currentProduct.number} · 확인한 사진 ${completedCount}장`,
+      reportUrl,
+    ].filter(Boolean).join("\n");
     if (navigator.share) {
       try {
-        await navigator.share({ title: "FIGSIGNAL 판정 결과", text });
+        await navigator.share({
+          title: "FIGSIGNAL 판정 결과",
+          text,
+          ...(reportUrl ? { url: reportUrl } : {}),
+        });
         return;
       } catch {
         return;
@@ -875,6 +860,8 @@ export default function Home() {
     setReviewedEvidence({});
     setUserOverrides({});
     setReviewRequestShared(false);
+    setReportConsent(false);
+    setSavedReportId(null);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -1002,7 +989,6 @@ export default function Home() {
           <RecentVerificationSection
             items={recentVerifications}
             status={historyStatus}
-            onOpen={openSavedVerification}
             onRetry={loadRecentVerifications}
           />
         </section>
@@ -1047,8 +1033,12 @@ export default function Home() {
           </details>
 
           <div className="photo-note"><Info size={16} /><span>라이선스 씰은 복제되거나 발매판마다 달라질 수 있어 단독으로 판단하지 않습니다.</span></div>
+          <label className={`report-consent ${reportConsent ? "checked" : ""}`}>
+            <input type="checkbox" checked={reportConsent} onChange={(event) => setReportConsent(event.target.checked)} />
+            <span><strong>사진이 포함된 공개 검증 리포트 저장에 동의합니다.</strong>검증 사진과 판정 근거는 고유한 읽기 전용 리포트로 공개됩니다. 구매내역 사진은 저장하지 않으며, 사진 속 이름·주소 등 개인정보는 직접 가린 뒤 올려주세요.</span>
+          </label>
           {analysisError && <div className="analysis-error" role="alert"><TriangleAlert size={17} /><span><strong>분석을 시작하지 못했어요</strong>{analysisError}</span></div>}
-          <button className="black-button full" disabled={completedCount === 0 || isAnalyzing} onClick={analyze}>{isAnalyzing ? <><LoaderCircle className="spin" size={18} /> 사진 분석 중</> : evidenceReady ? <><ShieldCheck size={18} /> AI로 분석</> : <><CircleHelp size={18} /> 부족한 사진 확인</>}</button>
+          <button className="black-button full" disabled={completedCount === 0 || isAnalyzing || (evidenceReady && !reportConsent)} onClick={analyze}>{isAnalyzing ? <><LoaderCircle className="spin" size={18} /> 사진 분석 중</> : evidenceReady && !reportConsent ? <><FileCheck2 size={18} /> 공개 리포트 동의 필요</> : evidenceReady ? <><ShieldCheck size={18} /> AI로 분석하고 리포트 만들기</> : <><CircleHelp size={18} /> 부족한 사진 확인</>}</button>
         </section>
       )}
 
@@ -1099,7 +1089,7 @@ export default function Home() {
             {currentProduct.officialUrl && <a href={currentProduct.officialUrl} target="_blank" rel="noreferrer">제품 정보 페이지 <ExternalLink size={14} /></a>}
           </section>
 
-          <div className="result-actions"><button className="line-button" onClick={shareResult}><Share2 size={17} /> 공유</button><button className="black-button" onClick={resetAll}><RotateCcw size={16} /> 새 검증</button></div>
+          <div className="result-actions">{savedReportId && <a className="line-button" href={`/reports/${savedReportId}`}><FileCheck2 size={17} /> 읽기 전용 리포트</a>}<button className="line-button" onClick={shareResult}><Share2 size={17} /> 공유</button><button className="black-button" onClick={resetAll}><RotateCcw size={16} /> 새 검증</button></div>
           <p className="disclaimer">AI 시각 분석과 사용자 확인을 정리한 참고 의견이며 정품 보증서가 아닙니다.</p>
         </section>
       )}
@@ -1124,12 +1114,10 @@ function formatVerificationDate(value: string) {
 function RecentVerificationSection({
   items,
   status,
-  onOpen,
   onRetry,
 }: {
   items: VerificationHistoryItem[];
   status: "loading" | "ready" | "error";
-  onOpen: (item: VerificationHistoryItem) => void;
   onRetry: () => Promise<void>;
 }) {
   return (
@@ -1138,7 +1126,7 @@ function RecentVerificationSection({
         <div>
           <span>RECENT CHECKS</span>
           <h2 id="recent-verifications-title">최근 검증 사례</h2>
-          <p>사진과 개인 정보는 저장하지 않고, 비식별 판정 결과만 보여드려요.</p>
+          <p>실제 검증 사진과 판정 근거를 읽기 전용 리포트로 확인하세요.</p>
         </div>
         {items.length > 0 && <em>최근 {items.length}건</em>}
       </header>
@@ -1157,21 +1145,10 @@ function RecentVerificationSection({
         <div className="recent-verification-list">
           {items.map((item) => {
             const verdict = verificationVerdictCopy[item.verdict];
-            const product: Product = products.find((candidate) => candidate.id === item.productId) ?? {
-              id: item.productId,
-              name: item.productName,
-              englishName: item.productName,
-              aliases: [],
-              number: item.productNumber,
-              maker: item.productMaker,
-              release: "검증 당시 기록",
-              image: item.productImage,
-              officialUrl: item.productOfficialUrl,
-              verified: true,
-            };
+            const previewImage = item.images[0];
             return (
-              <button key={item.id} className={`recent-verification-card ${verdict.tone}`} onClick={() => onOpen(item)}>
-                <ProductImage product={product} size="medium" />
+              <a key={item.id} className={`recent-verification-card ${verdict.tone}`} href={`/reports/${item.id}`}>
+                <span className="recent-verification-thumb">{previewImage ? <img src={previewImage.url} alt={`${item.productName} 검증 사진`} /> : <ImageIcon size={22} />}</span>
                 <span className="recent-verification-copy">
                   <small><time dateTime={item.createdAt}>{formatVerificationDate(item.createdAt)}</time> · No.{item.productNumber}</small>
                   <strong>{item.productName}</strong>
@@ -1182,7 +1159,7 @@ function RecentVerificationSection({
                   <small>사진 {item.photoCount}장 · 위험 신호 {item.riskSignalCount}개</small>
                 </span>
                 <ArrowRight size={17} />
-              </button>
+              </a>
             );
           })}
         </div>

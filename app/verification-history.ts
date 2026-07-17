@@ -1,8 +1,15 @@
 import {
+  evidenceKeys,
   isAnalysisResult,
   type AnalysisResult,
   type AnalysisVerdict,
+  type EvidenceKey,
 } from "./api/analyze/analysis-contract.ts";
+
+export type VerificationReportImage = {
+  evidenceKey: EvidenceKey;
+  url: string;
+};
 
 export type VerificationHistoryItem = {
   id: string;
@@ -19,6 +26,7 @@ export type VerificationHistoryItem = {
   riskSignalCount: number;
   matchedCaseCount: number;
   analysis: AnalysisResult;
+  images: VerificationReportImage[];
   createdAt: string;
 };
 
@@ -55,6 +63,14 @@ export function parseVerificationHistoryItem(value: unknown): VerificationHistor
     "matchedCaseCount",
   ] as const;
   if (integers.some((key) => !Number.isInteger(item[key]) || Number(item[key]) < 0)) return null;
+  if (!Array.isArray(item.images) || item.images.some((image) => {
+    if (!image || typeof image !== "object" || Array.isArray(image)) return true;
+    const candidate = image as Record<string, unknown>;
+    return typeof candidate.evidenceKey !== "string"
+      || !evidenceKeys.includes(candidate.evidenceKey as EvidenceKey)
+      || typeof candidate.url !== "string"
+      || !candidate.url.startsWith("/api/verifications/");
+  })) return null;
 
   return item as VerificationHistoryItem;
 }

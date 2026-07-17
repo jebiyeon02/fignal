@@ -1,12 +1,13 @@
 import { env } from "cloudflare:workers";
-import { desc } from "drizzle-orm";
+import { and, desc, eq, inArray } from "drizzle-orm";
 import type { AnalysisResult } from "../app/api/analyze/analysis-contract";
 import {
   sanitizeAnalysisForHistory,
+  type VerificationReportImage,
   type VerificationHistoryItem,
 } from "../app/verification-history";
 import { getDb } from ".";
-import { verificationHistory } from "./schema";
+import { verificationHistory, verificationReportImages } from "./schema";
 
 let schemaReady: Promise<void> | null = null;
 
@@ -32,6 +33,17 @@ async function ensureVerificationHistorySchema() {
       created_at text NOT NULL
     )`),
     env.DB.prepare("CREATE INDEX IF NOT EXISTS verification_history_created_at_idx ON verification_history (created_at)"),
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS verification_report_images (
+      id integer PRIMARY KEY AUTOINCREMENT NOT NULL,
+      verification_id text NOT NULL,
+      evidence_key text NOT NULL,
+      object_key text NOT NULL,
+      content_type text NOT NULL,
+      byte_size integer NOT NULL,
+      created_at text NOT NULL
+    )`),
+    env.DB.prepare("CREATE UNIQUE INDEX IF NOT EXISTS verification_report_images_verification_evidence_idx ON verification_report_images (verification_id, evidence_key)"),
+    env.DB.prepare("CREATE INDEX IF NOT EXISTS verification_report_images_object_key_idx ON verification_report_images (object_key)"),
   ]).then(() => undefined);
   await schemaReady;
 }
@@ -45,7 +57,24 @@ type VerificationProduct = {
   officialUrl: string;
 };
 
-function toHistoryItem(row: typeof verificationHistory.$inferSelect): VerificationHistoryItem | null {
+type StoredReportImage = {
+  evidenceKey: VerificationReportImage["evidenceKey"];
+  objectKey: string;
+  contentType: string;
+  byteSize: number;
+};
+
+function publicReportImage(verificationId: string, evidenceKey: VerificationReportImage["evidenceKey"]): VerificationReportImage {
+  return {
+    evidenceKey,
+    url: `/api/verifications/${encodeURIComponent(verificationId)}/images/${encodeURIComponent(evidenceKey)}`,
+  };
+}
+
+function toHistoryItem(
+  row: typeof verificationHistory.$inferSelect,
+  imageRows: Array<typeof verificationReportImages.$inferSelect>,
+): VerificationHistoryItem | null {
   try {
     const analysis = JSON.parse(row.analysisJson) as AnalysisResult;
     return {
@@ -63,6 +92,7 @@ function toHistoryItem(row: typeof verificationHistory.$inferSelect): Verificati
       riskSignalCount: row.riskSignalCount,
       matchedCaseCount: row.matchedCaseCount,
       analysis,
+      images: imageRows.map((image) => publicReportImage(row.id, image.evidenceKey as VerificationReportImage["evidenceKey"])),
       createdAt: row.createdAt,
     };
   } catch {
@@ -71,15 +101,17 @@ function toHistoryItem(row: typeof verificationHistory.$inferSelect): Verificati
 }
 
 export async function saveVerificationHistory(input: {
+  id: string;
   product: VerificationProduct;
   analysis: AnalysisResult;
   promptVersion: string;
+  images: StoredReportImage[];
 }): Promise<VerificationHistoryItem> {
   await ensureVerificationHistorySchema();
   const createdAt = new Date().toISOString();
   const analysis = sanitizeAnalysisForHistory(input.analysis);
-  const [row] = await getDb().insert(verificationHistory).values({
-    id: crypto.randomUUID(),
+  const historyValues = {
+    id: input.id,
     productId: input.product.id,
     productName: input.product.name,
     productNumber: input.product.number,
@@ -95,9 +127,26 @@ export async function saveVerificationHistory(input: {
     analysisJson: JSON.stringify(analysis),
     promptVersion: input.promptVersion,
     createdAt,
-  }).returning();
+  };
 
-  const historyItem = toHistoryItem(row);
+  const db = getDb();
+  if (input.images.length > 0) {
+    await db.batch([
+      db.insert(verificationHistory).values(historyValues),
+      db.insert(verificationReportImages).values(input.images.map((image) => ({
+        verificationId: input.id,
+        evidenceKey: image.evidenceKey,
+        objectKey: image.objectKey,
+        contentType: image.contentType,
+        byteSize: image.byteSize,
+        createdAt,
+      }))),
+    ]);
+  } else {
+    await db.insert(verificationHistory).values(historyValues);
+  }
+
+  const historyItem = await getVerificationHistoryById(input.id);
   if (!historyItem) throw new Error("Saved verification history could not be read");
   return historyItem;
 }
@@ -105,14 +154,42 @@ export async function saveVerificationHistory(input: {
 export async function listRecentVerificationHistory(limit = 6): Promise<VerificationHistoryItem[]> {
   await ensureVerificationHistorySchema();
   const safeLimit = Math.min(Math.max(Math.trunc(limit), 1), 12);
-  const rows = await getDb()
+  const db = getDb();
+  const rows = await db
     .select()
     .from(verificationHistory)
     .orderBy(desc(verificationHistory.createdAt))
     .limit(safeLimit);
 
+  const imageRows = rows.length > 0
+    ? await db.select().from(verificationReportImages).where(inArray(verificationReportImages.verificationId, rows.map((row) => row.id)))
+    : [];
+
   return rows.flatMap((row) => {
-    const item = toHistoryItem(row);
+    const item = toHistoryItem(row, imageRows.filter((image) => image.verificationId === row.id));
     return item ? [item] : [];
   });
+}
+
+export async function getVerificationHistoryById(id: string): Promise<VerificationHistoryItem | null> {
+  await ensureVerificationHistorySchema();
+  const db = getDb();
+  const [row] = await db.select().from(verificationHistory).where(eq(verificationHistory.id, id)).limit(1);
+  if (!row) return null;
+  const imageRows = await db.select().from(verificationReportImages).where(eq(verificationReportImages.verificationId, id));
+  return toHistoryItem(row, imageRows);
+}
+
+export async function getVerificationReportImageMetadata(id: string, evidenceKey: string) {
+  await ensureVerificationHistorySchema();
+  const [row] = await getDb()
+    .select()
+    .from(verificationReportImages)
+    .where(and(
+      eq(verificationReportImages.verificationId, id),
+      eq(verificationReportImages.evidenceKey, evidenceKey),
+    ))
+    .limit(1);
+  if (!row) return null;
+  return row;
 }

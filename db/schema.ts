@@ -1,4 +1,4 @@
-import { index, integer, sqliteTable, text } from "drizzle-orm/sqlite-core";
+import { index, integer, sqliteTable, text, uniqueIndex } from "drizzle-orm/sqlite-core";
 
 export const verificationHistory = sqliteTable(
   "verification_history",
@@ -21,4 +21,21 @@ export const verificationHistory = sqliteTable(
     createdAt: text("created_at").notNull(),
   },
   (table) => [index("verification_history_created_at_idx").on(table.createdAt)],
+);
+
+export const verificationReportImages = sqliteTable(
+  "verification_report_images",
+  {
+    id: integer("id").primaryKey({ autoIncrement: true }),
+    verificationId: text("verification_id").notNull(),
+    evidenceKey: text("evidence_key").notNull(),
+    objectKey: text("object_key").notNull(),
+    contentType: text("content_type").notNull(),
+    byteSize: integer("byte_size").notNull(),
+    createdAt: text("created_at").notNull(),
+  },
+  (table) => [
+    uniqueIndex("verification_report_images_verification_evidence_idx").on(table.verificationId, table.evidenceKey),
+    index("verification_report_images_object_key_idx").on(table.objectKey),
+  ],
 );

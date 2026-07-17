@@ -31,6 +31,10 @@ function historyItem(overrides = {}) {
     riskSignalCount: 0,
     matchedCaseCount: 0,
     analysis,
+    images: [{
+      evidenceKey: "boxFront",
+      url: "/api/verifications/verification-1/images/boxFront",
+    }],
     createdAt: "2026-07-17T03:00:00.000Z",
     ...overrides,
   };
@@ -47,6 +51,12 @@ test("recent verification history rejects unknown verdicts and malformed analysi
 
 test("recent verification history rejects negative counts", () => {
   assert.equal(parseVerificationHistoryItem(historyItem({ riskSignalCount: -1 })), null);
+});
+
+test("recent verification history rejects arbitrary external image URLs", () => {
+  assert.equal(parseVerificationHistoryItem(historyItem({
+    images: [{ evidenceKey: "boxFront", url: "https://example.com/user-photo.jpg" }],
+  })), null);
 });
 
 test("purchase proof details are redacted before history persistence", () => {
