@@ -1,4 +1,5 @@
 import generatedCommunityMentions from "./data/community-mentions.generated.json";
+import domesticCommunityMentions from "./data/domestic-community-mentions.generated.json";
 
 export type CommunityMentionStatus =
   | "community_catalog_asserted"
@@ -18,6 +19,8 @@ export type CommunityMention = {
   publicSummary: string;
   sourceUrl: string;
   sourcePublishedAt: string | null;
+  sourceName?: string;
+  sourceLocale?: "domestic" | "international";
   signalTags: string[];
   imageReferenceCount: number;
   rightsStatus: string;
@@ -26,4 +29,7 @@ export type CommunityMention = {
   requiresHumanReview: true;
 };
 
-export const communityMentions = generatedCommunityMentions.mentions as CommunityMention[];
+export const communityMentions = [
+  ...domesticCommunityMentions.mentions,
+  ...generatedCommunityMentions.mentions,
+] as CommunityMention[];

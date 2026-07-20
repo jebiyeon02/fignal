@@ -433,7 +433,8 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .community-mention-list article { padding: 18px 2px; border-bottom: 1px solid #eee; }
 .community-mention-list article:last-child { padding-bottom: 2px; border-bottom: 0; }
 .community-mention-meta { display: flex; align-items: center; gap: 7px; }
-.community-mention-meta > span:last-child { color: #aaa; font-size: 8px; }
+.community-source-badge { padding: 4px 6px; border-radius: 4px; background: #f1f1f1; color: #777; font-size: 8px; font-weight: 700; }
+.community-source-badge.domestic { background: #eef5ff; color: #376895; }
 .community-status { padding: 4px 6px; border-radius: 4px; background: #f1f1f1; color: #666; font-size: 8px; font-weight: 700; }
 .community-status.community_catalog_asserted, .community-status.author_asserted { background: var(--amber-bg); color: var(--amber); }
 .community-mention-list h3 { margin: 10px 0 0; font-size: 13px; }

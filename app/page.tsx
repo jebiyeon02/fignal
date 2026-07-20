@@ -888,7 +888,7 @@ export default function Home() {
         setRecentVerifications((current) => [
           savedVerification,
           ...current.filter((item) => item.id !== savedVerification.id),
-        ].slice(0, 6));
+        ].slice(0, 10));
         setHistoryStatus("ready");
         setSavedReportId(savedVerification.id);
         setCommunityPublishToken(typeof payload?.communityPublishToken === "string" ? payload.communityPublishToken : "");
@@ -1258,7 +1258,7 @@ export default function Home() {
           )}
 
           {productCommunityMentions.length > 0 && (
-            <CommunityMentionsSection mentions={productCommunityMentions} />
+            <CommunityMentionsSection key={currentProduct?.id} mentions={productCommunityMentions} />
           )}
 
           {reviewPath !== "more_photos_needed" && reviewPath !== "unsupported" && pendingItems.some((item) => observations[item.key] === "missing") && <div className="pending-line"><CircleHelp size={16} /><span><strong>올리지 않은 사진</strong>{pendingItems.filter((item) => observations[item.key] === "missing").map((item) => item.title).join(" · ")}</span></div>}
@@ -1926,27 +1926,38 @@ const communitySignalLabels: Record<string, string> = {
 };
 
 function CommunityMentionsSection({ mentions }: { mentions: CommunityMention[] }) {
+  const domesticCount = mentions.filter((mention) => mention.sourceLocale === "domestic").length;
+  const [isOpen, setIsOpen] = useState(domesticCount > 0);
+  const sortedMentions = [...mentions].sort((a, b) => {
+    const localeOrder = Number(b.sourceLocale === "domestic") - Number(a.sourceLocale === "domestic");
+    if (localeOrder !== 0) return localeOrder;
+    return (b.sourcePublishedAt ?? "").localeCompare(a.sourcePublishedAt ?? "");
+  });
+
   return (
-    <details className="community-mentions">
+    <details className="community-mentions" open={isOpen} onToggle={(event) => setIsOpen(event.currentTarget.open)}>
       <summary>
         <span className="community-summary-title">
           <MessageCircle size={18} />
-          <span><strong>관련 커뮤니티 언급</strong><small>검증 전 참고자료 {mentions.length}건</small></span>
+          <span>
+            <strong>국내·해외 커뮤니티 유사 사례</strong>
+            <small>{domesticCount > 0 ? `국내 원문 ${domesticCount}건 · 전체 ${mentions.length}건` : `검증 전 참고자료 ${mentions.length}건`}</small>
+          </span>
         </span>
         <span className="community-impact">판정 미반영</span>
         <ChevronDown className="community-chevron" size={17} />
       </summary>
       <div className="community-mentions-body">
-        <p className="community-caution"><Info size={15} /> 커뮤니티 게시물의 주장과 질문은 사실 확인 전 자료입니다. AI 판정과 점수에는 사용하지 않았으며, 제품이 같은지 확인된 원문만 참고용으로 연결했습니다.</p>
+        <p className="community-caution"><Info size={15} /> 커뮤니티 작성자와 댓글의 주장·질문은 제조사 판정이 아닙니다. AI 판정과 점수에는 반영하지 않았으며, 제품명이나 번호를 확인한 원문만 참고용으로 연결했습니다.</p>
         <div className="community-mention-list">
-          {mentions.map((mention) => {
+          {sortedMentions.map((mention) => {
             const signalLabels = [...new Set(mention.signalTags.map((tag) => communitySignalLabels[tag]).filter(Boolean))];
             const publishedDate = mention.sourcePublishedAt?.slice(0, 10).replaceAll("-", ".");
             return (
               <article key={mention.mentionId}>
                 <div className="community-mention-meta">
+                  <span className={`community-source-badge ${mention.sourceLocale === "domestic" ? "domestic" : "international"}`}>{mention.sourceName ?? "해외 커뮤니티"}</span>
                   <span className={`community-status ${mention.status}`}>{mention.statusLabel}</span>
-                  <span>검증 전</span>
                 </div>
                 <h3>{mention.publicTitle}</h3>
                 <p>{mention.publicSummary}</p>
@@ -1958,7 +1969,7 @@ function CommunityMentionsSection({ mentions }: { mentions: CommunityMention[] }
                 )}
                 <div className="community-mention-source">
                   <span>{publishedDate ?? "게시일 미확인"}</span>
-                  <a href={mention.sourceUrl} target="_blank" rel="noreferrer">외부 커뮤니티 원문 <ExternalLink size={12} /></a>
+                  <a href={mention.sourceUrl} target="_blank" rel="noreferrer">{mention.sourceName ?? "외부 커뮤니티"} 원문 <ExternalLink size={12} /></a>
                 </div>
               </article>
             );
