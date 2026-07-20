@@ -59,7 +59,6 @@ export default async function VerificationReportPage({
             <ReportProductImage sources={productImageSources} alt={`${report.productName} 제품 이미지`} />
           </div>
           <div className="report-hero-copy">
-            <span>VERIFICATION REPORT · No.{report.productNumber}</span>
             <h1>{report.productName}</h1>
             <p>{report.productMaker} · {formatReportDate(report.createdAt)}</p>
             <strong>{verdict.label}</strong>

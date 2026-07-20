@@ -1069,7 +1069,6 @@ export default function Home() {
       {stage === "search" && (
         <section className="search-page page-enter">
           <div className="intro">
-            <span>FIGURE CHECK</span>
             <h1>피규어 이름을<br />검색해보세요</h1>
             <p>공식 제품 {products.length}개 · 제품을 고르면 제조사와 번호를 자동으로 찾습니다.</p>
           </div>
@@ -1355,7 +1354,6 @@ function RecentVerificationSection({
     <section className="recent-verifications" id="recent-verifications" aria-labelledby="recent-verifications-title">
       <header>
         <div>
-          <span>RECENT CHECKS</span>
           <h2 id="recent-verifications-title">최근 검증 사례</h2>
           <p>실제 검증 사진과 판정 근거를 읽기 전용 리포트로 확인하세요.</p>
         </div>
@@ -1567,7 +1565,7 @@ function VerificationCriteriaDialog({ onClose }: { onClose: () => void }) {
     <div className="criteria-backdrop" onMouseDown={onClose}>
       <aside className="criteria-dialog" role="dialog" aria-modal="true" aria-labelledby="criteria-title" onMouseDown={(event) => event.stopPropagation()}>
         <header className="criteria-header">
-          <div><span>AUTHENTICITY STANDARD</span><h2 id="criteria-title">사용 중인 판정 기준</h2><p>현재 넨도로이드 검증에 실제로 반영되는 기준입니다.</p></div>
+          <div><h2 id="criteria-title">사용 중인 판정 기준</h2><p>현재 넨도로이드 검증에 실제로 반영되는 기준입니다.</p></div>
           <button autoFocus onClick={onClose} aria-label="판정 기준 닫기"><X size={20} /></button>
         </header>
 
@@ -1927,7 +1925,8 @@ const communitySignalLabels: Record<string, string> = {
 
 function CommunityMentionsSection({ mentions }: { mentions: CommunityMention[] }) {
   const domesticCount = mentions.filter((mention) => mention.sourceLocale === "domestic").length;
-  const [isOpen, setIsOpen] = useState(domesticCount > 0);
+  const internationalCount = mentions.length - domesticCount;
+  const [isOpen, setIsOpen] = useState(mentions.length > 0);
   const sortedMentions = [...mentions].sort((a, b) => {
     const localeOrder = Number(b.sourceLocale === "domestic") - Number(a.sourceLocale === "domestic");
     if (localeOrder !== 0) return localeOrder;
@@ -1941,7 +1940,9 @@ function CommunityMentionsSection({ mentions }: { mentions: CommunityMention[] }
           <MessageCircle size={18} />
           <span>
             <strong>국내·해외 커뮤니티 유사 사례</strong>
-            <small>{domesticCount > 0 ? `국내 원문 ${domesticCount}건 · 전체 ${mentions.length}건` : `검증 전 참고자료 ${mentions.length}건`}</small>
+            <small>{domesticCount > 0
+              ? `국내 ${domesticCount}건 · 해외 ${internationalCount}건 · 전체 ${mentions.length}건`
+              : `해외 원문 ${internationalCount}건`}</small>
           </span>
         </span>
         <span className="community-impact">판정 미반영</span>

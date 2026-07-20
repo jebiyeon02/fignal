@@ -28,7 +28,6 @@ export default async function CommunityPage() {
       <div className="community-shell">
         <Link href="/" className="report-back"><ArrowLeft size={16} /> 피규어 검증</Link>
         <section className="community-intro">
-          <span>VERIFICATION CASE BOARD</span>
           <h1>검증 사례</h1>
           <p>실제 사진 검증을 완료한 결과만 게시됩니다. 의견은 참고 자료이며 제조사 판정이나 정품 보증이 아닙니다.</p>
           <div><strong>{posts.length}</strong><span>공개 사례</span></div>
