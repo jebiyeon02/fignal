@@ -4,6 +4,7 @@ import test from "node:test";
 import {
   parseVerificationHistoryItem,
   sanitizeAnalysisForHistory,
+  selectVerificationPreviewImage,
 } from "../app/verification-history.ts";
 
 const analysis = {
@@ -57,6 +58,18 @@ test("recent verification history rejects arbitrary external image URLs", () => 
   assert.equal(parseVerificationHistoryItem(historyItem({
     images: [{ evidenceKey: "boxFront", url: "https://example.com/user-photo.jpg" }],
   })), null);
+});
+
+test("recent verification preview prioritizes the user's figure photo", () => {
+  const images = [
+    { evidenceKey: "boxFront", url: "/api/verifications/verification-1/images/boxFront" },
+    { evidenceKey: "barcode", url: "/api/verifications/verification-1/images/barcode" },
+    { evidenceKey: "facePaint", url: "/api/verifications/verification-1/images/facePaint" },
+    { evidenceKey: "figureFull", url: "/api/verifications/verification-1/images/figureFull" },
+  ];
+
+  assert.deepEqual(selectVerificationPreviewImage(images), images[3]);
+  assert.deepEqual(selectVerificationPreviewImage(images.slice(0, 3)), images[2]);
 });
 
 test("purchase proof details are redacted before history persistence", () => {

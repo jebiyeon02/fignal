@@ -53,6 +53,7 @@ import { getProductVerificationNotes } from "./product-verification";
 import { resolveReviewPath, reviewPathCopy, type ReviewPath } from "./review-path";
 import {
   parseVerificationHistoryItem,
+  selectVerificationPreviewImage,
   verificationVerdictCopy,
   type VerificationHistoryItem,
 } from "./verification-history";
@@ -1138,10 +1139,10 @@ function RecentVerificationSection({
         <div className="recent-verification-list">
           {items.map((item) => {
             const verdict = verificationVerdictCopy[item.verdict];
-            const previewImage = item.images[0];
+            const previewImage = selectVerificationPreviewImage(item.images);
             return (
               <a key={item.id} className={`recent-verification-card ${verdict.tone}`} href={`/reports/${item.id}`}>
-                <span className="recent-verification-thumb">{previewImage ? <img src={previewImage.url} alt={`${item.productName} 검증 사진`} /> : <ImageIcon size={22} />}</span>
+                <span className="recent-verification-thumb">{previewImage ? <img src={previewImage.url} alt={`${item.productName} 피규어 검증 사진`} /> : <ImageIcon size={22} />}</span>
                 <span className="recent-verification-copy">
                   <small><time dateTime={item.createdAt}>{formatVerificationDate(item.createdAt)}</time> · No.{item.productNumber}</small>
                   <strong>{item.productName}</strong>
