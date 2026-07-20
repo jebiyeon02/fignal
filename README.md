@@ -45,7 +45,8 @@ Gemini 분석에는 배포 환경의 `GEMINI_API_KEY`가 필요합니다. 선택
 
 - `app/catalog.ts`: 수기 검수 제품과 생성 카탈로그를 합쳐 자동완성에 제공
 - `app/data/nendoroids-1-500.generated.json`: 굿스마일 공식 목록·제품 상세에서 동기화한 No.1–500 제품
-- `app/data/nendoroids-all.generated.json`: GSInfo의 전체 넨도로이드 제품·번역·이미지 데이터를 동기화한 카탈로그
+- `app/data/nendoroids-all.generated.json`: GSInfo의 전체 넨도로이드 제품·번역과 이미지 보존 주소를 동기화한 카탈로그
+- `app/data/nendoroid-official-images.generated.json`: 굿스마일 공식 제품 페이지에서 확인한 대표 이미지 원본 주소 캐시
 - `app/counterfeit-cases.ts`: 제품별 공식·커뮤니티 가품 사례, 비교 이미지, 판별 특징과 출처
 - `app/data/counterfeit-evidence.generated.json`: 자동 등록된 증빙과 외부 이미지 참조
 - `app/data/counterfeit-review-queue.generated.json`: 제품 매핑 또는 관리자 검수가 필요한 자료
@@ -217,14 +218,18 @@ npm run data:import -- \
 
 굿스마일의 번호 구간별 공식 목록에서 숫자부가 1–500인 기본판과 `a`·`b` 파생 번호를 수집하고, 각 공식 제품 상세 페이지의 제조사·발매월·작품명·대표 이미지를 연결했습니다. 웹 목록에서 내려간 초기 한정판과 라이선스 제품은 굿스마일의 공식 스탠드 호환표와 NendoGuide 번호 목록으로 교차 보완했습니다.
 
-여기에 [GSInfo 전체 카테고리](https://gsinfoproject.com/ko/category)의 넨도로이드 타입을 합쳐 한글·영문 제품명, 작품명, 대표 이미지와 발매월을 제공합니다. 2026-07-17 동기화 기준 GSInfo 제품은 3,201개이며 최고 번호는 No.3333입니다. No.1–500 공식 자료와 수기 검수 제품은 GSInfo 데이터보다 우선합니다.
+여기에 [GSInfo 전체 카테고리](https://gsinfoproject.com/ko/category)의 넨도로이드 타입을 합쳐 한글·영문 제품명, 작품명, 대표 이미지와 발매월을 제공합니다. 2026-07-20 동기화 기준 GSInfo 제품은 3,201개이며 최고 번호는 No.3333입니다. No.1–500 공식 자료와 수기 검수 제품은 GSInfo 데이터보다 우선합니다.
+
+대표 이미지는 굿스마일 공식 제품 페이지에서 확인한 원본 주소를 우선 사용합니다. 공식 페이지가 내려갔거나 이미지 주소를 확인하지 못한 상품은 기존 GSInfo 대표 이미지 주소를 보존용 fallback으로 유지합니다. 화면에서도 원본 이미지 로드가 실패하면 fallback으로 자동 전환하므로, 원본 전환 때문에 기존 3,201개 상품 이미지가 사라지지 않습니다. 저장소에는 이미지 파일 자체가 아니라 출처 URL과 fallback 관계만 보관하며, 이미지 파일을 별도 저장소에 복제하는 작업은 권리자의 허락을 받은 뒤 진행해야 합니다.
 
 ```bash
 npm run catalog:sync
 npm run catalog:check
 ```
 
-No.1–500 공식 동기화 결과는 기본 번호 1–500을 모두 포함하는 535개 제품입니다. `a`·`b` 등 파생판은 57개이며, GSInfo와 합친 생성 카탈로그는 중복 제거 후 3,207개입니다. 공식 대표 이미지 주소를 더 이상 확인할 수 없는 초기 제품 29개는 깨진 이미지를 노출하지 않고 이미지 자리표시자로 표시합니다.
+공식 이미지 동기화는 이미 확인한 결과를 캐시하고 새 상품이나 확인 실패 상품만 다시 조회합니다. 전체 재확인이 필요할 때는 `node scripts/sync-nendoroid-official-images.mjs --retry-unavailable`을 사용합니다. 굿스마일 `robots.txt`는 제품 상세 경로를 금지하지 않지만 검색 경로는 금지하므로, 동기화 스크립트는 검색 페이지에 접근하지 않습니다.
+
+No.1–500 공식 동기화 결과는 기본 번호 1–500을 모두 포함하는 535개 제품입니다. `a`·`b` 등 파생판은 57개이며, GSInfo와 합친 생성 카탈로그는 중복 제거 후 3,207개입니다. 정확히 대응하는 이미지 출처가 어느 쪽에도 없는 초기 파생판은 추측성 이미지를 붙이지 않고 자리표시자로 표시합니다.
 
 ## 배포 구조
 

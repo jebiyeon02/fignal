@@ -4,8 +4,10 @@ import { ArrowLeft, ExternalLink, FileCheck2, ImageOff, LockKeyhole, ShieldCheck
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { AnalysisFinding } from "../../api/analyze/analysis-contract";
+import { expandedProducts } from "../../catalog";
 import { verificationVerdictCopy } from "../../verification-history";
 import { getVerificationHistoryById } from "../../../db/verification-history";
+import { ReportProductImage } from "./report-product-image";
 
 const findingStatusCopy: Record<AnalysisFinding["status"], { label: string; tone: string }> = {
   match: { label: "일치", tone: "match" },
@@ -36,6 +38,12 @@ export default async function VerificationReportPage({
 
   const verdict = verificationVerdictCopy[report.verdict];
   const imagesByEvidenceKey = new Map(report.images.map((image) => [image.evidenceKey, image.url]));
+  const currentCatalogProduct = expandedProducts.find((product) => product.id === report.productId);
+  const productImageSources = [
+    report.productImage,
+    currentCatalogProduct?.image ?? "",
+    currentCatalogProduct?.fallbackImage ?? "",
+  ];
 
   return (
     <main className="readonly-report">
@@ -49,9 +57,7 @@ export default async function VerificationReportPage({
 
         <section className={`report-hero ${verdict.tone}`}>
           <div className="report-product-image">
-            {report.productImage
-              ? <img src={report.productImage} alt={`${report.productName} 공식 제품 이미지`} />
-              : <ShieldCheck size={32} />}
+            <ReportProductImage sources={productImageSources} alt={`${report.productName} 제품 이미지`} />
           </div>
           <div className="report-hero-copy">
             <span>VERIFICATION REPORT · No.{report.productNumber}</span>

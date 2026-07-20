@@ -49,7 +49,7 @@ import {
   type CounterfeitCase,
   type CounterfeitCaseKind,
 } from "./counterfeit-cases";
-import { getProductVerificationNotes, myHeroVerificationNotes } from "./product-verification";
+import { getProductVerificationNotes } from "./product-verification";
 import { resolveReviewPath, reviewPathCopy, type ReviewPath } from "./review-path";
 import {
   parseVerificationHistoryItem,
@@ -69,6 +69,9 @@ type Product = {
   maker: string;
   release: string;
   image: string;
+  fallbackImage?: string;
+  imageSource?: "official" | "catalog-fallback" | "none";
+  imageSourceUrl?: string;
   officialUrl: string;
   verified: boolean;
   series?: string;
@@ -956,6 +959,7 @@ export default function Home() {
                   {seriesLabel(selectedProduct) && <div><dt>작품</dt><dd>{seriesLabel(selectedProduct)}</dd></div>}
                   <div><dt>제조사</dt><dd>{selectedProduct.maker}</dd></div>
                   <div><dt>발매</dt><dd>{selectedProduct.release}</dd></div>
+                  <div><dt>대표 이미지</dt><dd>{selectedProduct.imageSource === "official" ? "제조사 원본" : selectedProduct.image ? "카탈로그 보존 이미지" : "확인 가능한 이미지 없음"}</dd></div>
                 </dl>
                 <div className="selected-links"><a href={selectedProduct.officialUrl} target="_blank" rel="noreferrer">제품 정보 페이지 <ExternalLink size={14} /></a><button onClick={() => { setSelectedProduct(null); setQuery(""); }}>다른 제품 찾기</button></div>
               </div>
@@ -979,12 +983,7 @@ export default function Home() {
             </div>
           )}
 
-          <div className="photo-answer">
-            <Camera size={21} />
-            <div><strong>사진은 제품을 고를 때 필요 없어요</strong><p>실물 판정 단계에서 핵심 사진만 받습니다.</p></div>
-          </div>
-
-          <button className="black-button full" disabled={!currentProduct} onClick={() => { setStage(currentProduct?.verified ? "photos" : "result"); window.scrollTo({ top: 0, behavior: "smooth" }); }}>{currentProduct?.verified ? "이 제품 확인하기" : "지원 여부 확인하기"} <ArrowRight size={18} /></button>
+          <button className="black-button full" disabled={!currentProduct} onClick={() => { setStage(currentProduct?.verified ? "photos" : "result"); window.scrollTo({ top: 0, behavior: "smooth" }); }}>이 제품 확인하기 <ArrowRight size={18} /></button>
 
           <RecentVerificationSection
             items={recentVerifications}
@@ -1267,8 +1266,30 @@ function StepBar({ stage }: { stage: Stage }) {
 }
 
 function ProductImage({ product, size }: { product: Product; size: "small" | "medium" | "large" }) {
-  if (!product.image) return <div className={`product-image placeholder ${size}`}><ImageIcon size={size === "large" ? 40 : 22} /></div>;
-  return <div className={`product-image ${size}`}><img src={product.image} alt={`${product.name} 공식 제품 이미지`} /></div>;
+  const sources = [product.image, product.fallbackImage].filter((source, index, values): source is string => (
+    Boolean(source) && values.indexOf(source) === index
+  ));
+  const [failures, setFailures] = useState<{ productId: string; sources: string[] }>({
+    productId: product.id,
+    sources: [],
+  });
+  const failedSources = failures.productId === product.id ? failures.sources : [];
+  const source = sources.find((candidate) => !failedSources.includes(candidate));
+  if (!source) return <div className={`product-image placeholder ${size}`}><ImageIcon size={size === "large" ? 40 : 22} /></div>;
+  return (
+    <div className={`product-image ${size}`}>
+      <img
+        src={source}
+        alt={`${product.name} 제품 이미지`}
+        onError={() => setFailures((current) => ({
+          productId: product.id,
+          sources: current.productId === product.id
+            ? [...new Set([...current.sources, source])]
+            : [source],
+        }))}
+      />
+    </div>
+  );
 }
 
 function ProductStrip({ product }: { product: Product }) {
@@ -1364,13 +1385,6 @@ function VerificationCriteriaDialog({ onClose }: { onClose: () => void }) {
               <p>재판·유통 지역에 따른 패키지 차이가 있을 수 있어 여러 근거를 함께 봅니다.</p>
               <p>표시되는 퍼센트는 정품 확률이 아니라 사진과 자료의 충족도입니다.</p>
             </div>
-          </section>
-
-          <section className="criteria-section">
-            <div className="criteria-section-title"><h3>히로아카 제품별 주의사항</h3><span>My Hero Academia</span></div>
-            <ul className="criteria-rules">
-              {myHeroVerificationNotes.map((note, index) => <li key={note}><span>{String(index + 1).padStart(2, "0")}</span><p>{note}</p></li>)}
-            </ul>
           </section>
 
           <section className="criteria-section">

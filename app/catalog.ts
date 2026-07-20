@@ -1,5 +1,8 @@
 import nendoroidsOneToFiveHundred from "./data/nendoroids-1-500.generated.json";
 import allGsInfoNendoroids from "./data/nendoroids-all.generated.json";
+import officialImageCatalog from "./data/nendoroid-official-images.generated.json";
+
+export type CatalogImageSource = "official" | "catalog-fallback" | "none";
 
 export type CatalogProduct = {
   id: string;
@@ -10,11 +13,24 @@ export type CatalogProduct = {
   maker: string;
   release: string;
   image: string;
+  fallbackImage?: string;
+  imageSource?: CatalogImageSource;
+  imageSourceUrl?: string;
   officialUrl: string;
+  officialProductId?: string;
+  catalogSourceUrl?: string;
   verified: boolean;
   series?: string;
   seriesName?: string;
   englishSeriesName?: string;
+};
+
+type OfficialImageRecord = {
+  id: string;
+  officialProductId: string;
+  officialUrl: string;
+  image: string;
+  status: "available" | "unavailable";
 };
 
 const curatedCatalogProducts: CatalogProduct[] = [
@@ -1739,12 +1755,66 @@ const curatedCatalogProducts: CatalogProduct[] = [
 
 const curatedProductIds = new Set(curatedCatalogProducts.map((product) => product.id));
 const gsInfoProductsById = new Map((allGsInfoNendoroids as CatalogProduct[]).map((product) => [product.id, product]));
-const enrichWithSeries = (product: CatalogProduct): CatalogProduct => {
+const officialImagesById = new Map(
+  (officialImageCatalog.records as OfficialImageRecord[]).map((record) => [record.id, record]),
+);
+
+function isOfficialImage(image: string) {
+  if (!image) return false;
+  try {
+    const hostname = new URL(image).hostname;
+    return hostname === "www.goodsmile.com"
+      || hostname === "images.goodsmile.info"
+      || hostname.endsWith(".goodsmile.info");
+  } catch {
+    return false;
+  }
+}
+
+const enrichWithSources = (product: CatalogProduct): CatalogProduct => {
   const gsInfoProduct = gsInfoProductsById.get(product.id);
-  if (!gsInfoProduct) return product;
+  const officialImage = officialImagesById.get(product.id);
+  const productImageIsOfficial = isOfficialImage(product.image);
+  const image = productImageIsOfficial
+    ? product.image
+    : officialImage?.image || product.image || gsInfoProduct?.image || "";
+  const fallbackImage = gsInfoProduct?.image && gsInfoProduct.image !== image
+    ? gsInfoProduct.image
+    : undefined;
+  const imageSource: CatalogImageSource = isOfficialImage(image)
+    ? "official"
+    : image
+      ? "catalog-fallback"
+      : "none";
+  const productInformationUrl = officialImage?.status === "available"
+    ? officialImage.officialUrl
+    : product.catalogSourceUrl
+      ? product.catalogSourceUrl
+      : product.officialUrl;
+
+  if (!gsInfoProduct) {
+    return {
+      ...product,
+      image,
+      fallbackImage,
+      imageSource,
+      imageSourceUrl: imageSource === "official" ? productInformationUrl : product.imageSourceUrl,
+      officialUrl: productInformationUrl,
+    };
+  }
+
   return {
     ...product,
     aliases: [...new Set([...product.aliases, ...gsInfoProduct.aliases])],
+    image,
+    fallbackImage,
+    imageSource,
+    imageSourceUrl: imageSource === "official"
+      ? productInformationUrl
+      : gsInfoProduct.catalogSourceUrl ?? gsInfoProduct.officialUrl,
+    officialUrl: productInformationUrl || gsInfoProduct.officialUrl,
+    officialProductId: product.officialProductId ?? gsInfoProduct.officialProductId,
+    catalogSourceUrl: gsInfoProduct.catalogSourceUrl,
     series: product.series ?? gsInfoProduct.series,
     seriesName: product.seriesName ?? gsInfoProduct.seriesName,
     englishSeriesName: product.englishSeriesName ?? gsInfoProduct.englishSeriesName,
@@ -1752,14 +1822,16 @@ const enrichWithSeries = (product: CatalogProduct): CatalogProduct => {
 };
 const officialOneToFiveHundred = (nendoroidsOneToFiveHundred as CatalogProduct[]).filter(
   (product) => !curatedProductIds.has(product.id),
-).map(enrichWithSeries);
+).map(enrichWithSources);
 const preferredProductIds = new Set([
   ...curatedProductIds,
   ...officialOneToFiveHundred.map((product) => product.id),
 ]);
 
 export const expandedProducts: CatalogProduct[] = [
-  ...curatedCatalogProducts.map(enrichWithSeries),
+  ...curatedCatalogProducts.map(enrichWithSources),
   ...officialOneToFiveHundred,
-  ...(allGsInfoNendoroids as CatalogProduct[]).filter((product) => !preferredProductIds.has(product.id)),
+  ...(allGsInfoNendoroids as CatalogProduct[])
+    .filter((product) => !preferredProductIds.has(product.id))
+    .map(enrichWithSources),
 ];

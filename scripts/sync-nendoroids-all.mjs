@@ -6,6 +6,7 @@ const OUTPUT = resolve(ROOT, "app/data/nendoroids-all.generated.json");
 const API_URL = "https://gsinfoproject.com/api/searchAllData?keys=nedo&keys=series&keys=trans";
 const CATALOG_URL = "https://gsinfoproject.com/ko/category";
 const IMAGE_BASE_URL = "https://gsinfoproject.com/api/images/thumbnail";
+const OFFICIAL_CATALOG_URL = "https://www.goodsmile.com/en/product";
 const MINIMUM_PRODUCT_COUNT = 3201;
 const isCheck = process.argv.includes("--check");
 
@@ -51,6 +52,10 @@ function transform(payload) {
       const englishShortName = productTranslation.EN || productTranslation.KO || number;
       const koreanSeries = seriesTranslation.KO || seriesTranslation.EN || "";
       const englishSeries = seriesTranslation.EN || seriesTranslation.KO || "";
+      const officialProductId = String(
+        product.linkCloseDt?.find(({ linkType, gsProductNo }) => linkType === "N" && gsProductNo)?.gsProductNo ?? "",
+      ).trim();
+      const catalogSourceUrl = `${CATALOG_URL}/detail?type=NEN&num=${encodeURIComponent(product.num)}`;
 
       return {
         id: `nendoroid-${numberId(number)}`,
@@ -61,7 +66,11 @@ function transform(payload) {
         maker: "Good Smile Company",
         release: formatRelease(product.relPrice),
         image: `${IMAGE_BASE_URL}/${product.thumbnailImage}.webp`,
-        officialUrl: `${CATALOG_URL}/detail?type=NEN&num=${encodeURIComponent(product.num)}`,
+        officialUrl: officialProductId
+          ? `${OFFICIAL_CATALOG_URL}/${encodeURIComponent(officialProductId)}`
+          : catalogSourceUrl,
+        officialProductId,
+        catalogSourceUrl,
         verified: true,
         series: seriesSlug(product.seriesCd),
         seriesName: koreanSeries,
@@ -83,7 +92,14 @@ function validate(products) {
     if (!product.name.startsWith("넨도로이드 ")) errors.push(`${product.id}: invalid Korean name`);
     if (!product.englishName.startsWith("Nendoroid ")) errors.push(`${product.id}: invalid English name`);
     if (!product.image.startsWith(`${IMAGE_BASE_URL}/`)) errors.push(`${product.id}: invalid image URL`);
-    if (!product.officialUrl.startsWith(`${CATALOG_URL}/detail?`)) errors.push(`${product.id}: invalid source URL`);
+    if (!product.catalogSourceUrl.startsWith(`${CATALOG_URL}/detail?`)) errors.push(`${product.id}: invalid catalog source URL`);
+    if (product.officialProductId) {
+      if (product.officialUrl !== `${OFFICIAL_CATALOG_URL}/${product.officialProductId}`) {
+        errors.push(`${product.id}: invalid official product URL`);
+      }
+    } else if (product.officialUrl !== product.catalogSourceUrl) {
+      errors.push(`${product.id}: source URL must fall back to the GSInfo detail page`);
+    }
     if (!product.seriesName) errors.push(`${product.id}: missing series name`);
   }
   if (products.length < MINIMUM_PRODUCT_COUNT) {
