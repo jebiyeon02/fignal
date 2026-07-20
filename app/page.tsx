@@ -586,6 +586,15 @@ export default function Home() {
     };
   }, [criteriaOpen]);
 
+  useEffect(() => {
+    if (!isAnalyzing) return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = previousOverflow;
+    };
+  }, [isAnalyzing]);
+
   const storeEvidenceFile = useCallback(async (key: EvidenceKey, file: File, silent = false) => {
     const previousSource = sourceFilesRef.current[key];
     sourceFilesRef.current = { ...sourceFilesRef.current, [key]: file };
@@ -782,6 +791,10 @@ export default function Home() {
   };
 
   const handleFile = (key: EvidenceKey, event: ChangeEvent<HTMLInputElement>) => {
+    if (isAnalyzing) {
+      event.target.value = "";
+      return;
+    }
     const file = event.target.files?.[0];
     if (!file) return;
     void storeEvidenceFile(key, file);
@@ -789,6 +802,7 @@ export default function Home() {
   };
 
   const pasteFromClipboard = async (key: EvidenceKey) => {
+    if (isAnalyzing) return;
     try {
       const file = await readClipboardImage();
       if (file) await storeEvidenceFile(key, file, true);
@@ -798,6 +812,7 @@ export default function Home() {
   };
 
   const removeEvidence = (key: EvidenceKey) => {
+    if (isAnalyzing) return;
     delete sourceFilesRef.current[key];
     imagePreparationVersionRef.current += 1;
     setIsPreparingImages(false);
@@ -981,6 +996,7 @@ export default function Home() {
   };
 
   const resetAll = () => {
+    if (isAnalyzing) return;
     Object.values(filePreviews).forEach((preview) => {
       if (preview) URL.revokeObjectURL(preview);
     });
@@ -1051,7 +1067,8 @@ export default function Home() {
   };
 
   return (
-    <main className="site">
+    <>
+    <main className="site" aria-busy={isAnalyzing} inert={isAnalyzing ? true : undefined}>
       <header className="top-header">
         <div className="top-inner">
           <button className="logo" onClick={resetAll}>FIGSIGNAL</button>
@@ -1295,6 +1312,16 @@ export default function Home() {
       {criteriaOpen && <VerificationCriteriaDialog onClose={() => setCriteriaOpen(false)} />}
       {toast && <div className="toast" role="status"><Check size={16} /> {toast}</div>}
     </main>
+    {isAnalyzing && (
+      <div className="analysis-interaction-lock" role="dialog" aria-modal="true" aria-labelledby="analysis-lock-title" aria-describedby="analysis-lock-description">
+        <div className="analysis-interaction-lock-card">
+          <span><LoaderCircle className="spin" size={24} /></span>
+          <strong id="analysis-lock-title">사진을 분석하고 있어요</strong>
+          <p id="analysis-lock-description">결과가 나올 때까지 사진 추가·삭제와 페이지 이동을 잠시 막아두었습니다.</p>
+        </div>
+      </div>
+    )}
+    </>
   );
 }
 
