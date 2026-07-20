@@ -24,8 +24,9 @@ export const metadata: Metadata = {
   title,
   description,
   icons: {
-    icon: "/favicon.svg",
-    shortcut: "/favicon.svg",
+    icon: [{ url: "/images/brand-character-icon.png", type: "image/png", sizes: "512x512" }],
+    shortcut: "/images/brand-character-icon.png",
+    apple: "/images/brand-character-icon.png",
   },
   openGraph: {
     title,

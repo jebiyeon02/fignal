@@ -28,7 +28,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .top-header { position: sticky; top: 0; z-index: 50; height: 70px; border-bottom: 1px solid #eee; background: rgba(255,255,255,.96); backdrop-filter: blur(12px); }
 .top-inner { width: min(1180px, calc(100% - 40px)); height: 100%; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
 .logo { display: inline-flex; align-items: center; gap: 7px; padding: 0; border: 0; background: transparent; color: #111; font-size: 17px; font-weight: 850; letter-spacing: .055em; cursor: pointer; }
-.brand-symbol { width: 28px; height: 28px; flex: 0 0 auto; border: 1px solid #ddd; border-radius: 50%; background: #eee url("/images/default-product-image.jpg") center / cover no-repeat; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+.brand-symbol { width: 38px; height: 38px; flex: 0 0 auto; background: url("/images/brand-character-icon.png") center bottom / contain no-repeat; filter: drop-shadow(0 2px 3px rgba(0,0,0,.12)); }
 .brand-beta { display: inline-flex; align-items: center; min-height: 14px; padding: 1px 4px 0; border: 1px solid #bbb; border-radius: 4px; color: #777; font-size: 6px; font-weight: 800; letter-spacing: .08em; line-height: 1; }
 .top-nav { display: flex; align-items: center; gap: 8px; }
 .top-nav > span { color: #777; font-size: 12px; }
