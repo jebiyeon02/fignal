@@ -41,6 +41,18 @@ export const communityPosts = sqliteTable(
   ],
 );
 
+export const communityComments = sqliteTable(
+  "community_comments",
+  {
+    id: text("id").primaryKey(),
+    postId: text("post_id").notNull(),
+    nickname: text("nickname").notNull(),
+    body: text("body").notNull(),
+    createdAt: text("created_at").notNull(),
+  },
+  (table) => [index("community_comments_post_created_at_idx").on(table.postId, table.createdAt)],
+);
+
 export const verificationReportImages = sqliteTable(
   "verification_report_images",
   {

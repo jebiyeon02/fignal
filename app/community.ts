@@ -13,6 +13,14 @@ export type CommunityPost = {
   verification: VerificationHistoryItem;
 };
 
+export type CommunityComment = {
+  id: string;
+  postId: string;
+  nickname: string;
+  body: string;
+  createdAt: string;
+};
+
 export const communityPostStatusCopy: Record<CommunityPostStatus, string> = {
   collecting: "의견 수집 중",
   supplemented: "근거 보완됨",
