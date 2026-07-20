@@ -33,7 +33,7 @@ import {
   X,
   ZoomIn,
 } from "lucide-react";
-import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useMemo, useState } from "react";
+import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import {
   isAnalysisResult,
@@ -50,6 +50,11 @@ import {
   type CounterfeitCaseKind,
 } from "./counterfeit-cases";
 import { resolveReviewPath, reviewPathCopy, type ReviewPath } from "./review-path";
+import {
+  CLIENT_UPLOAD_TARGET_BYTES,
+  allocateImageByteBudgets,
+  totalImageBytes,
+} from "./image-upload-budget";
 import {
   parseVerificationHistoryItem,
   verificationVerdictCopy,
@@ -316,8 +321,11 @@ const initialObservations = Object.fromEntries(
 ) as Record<EvidenceKey, Observation>;
 
 const supportedImageTypes = new Set(["image/jpeg", "image/png", "image/webp"]);
+const imageCompressionSides = [1600, 1440, 1280, 1120, 960, 800, 640];
+const imageCompressionQualities = [0.84, 0.76, 0.68, 0.6, 0.52];
+type EvidenceFiles = Partial<Record<EvidenceKey, File>>;
 
-async function prepareImageFile(file: File) {
+async function prepareImageFile(file: File, maxBytes = Number.POSITIVE_INFINITY) {
   if (!file.type.startsWith("image/")) {
     throw new Error("이미지 파일만 올릴 수 있습니다.");
   }
@@ -329,30 +337,71 @@ async function prepareImageFile(file: File) {
     throw new Error("이 사진을 읽을 수 없습니다. JPG 또는 PNG로 다시 저장해 주세요.");
   }
 
-  const maxSide = 1600;
-  const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
-  const width = Math.max(1, Math.round(bitmap.width * scale));
-  const height = Math.max(1, Math.round(bitmap.height * scale));
   const canvas = document.createElement("canvas");
-  canvas.width = width;
-  canvas.height = height;
-  const context = canvas.getContext("2d");
-  if (!context) {
-    bitmap.close();
-    return file;
-  }
-  context.fillStyle = "#fff";
-  context.fillRect(0, 0, width, height);
-  context.drawImage(bitmap, 0, 0, width, height);
-  bitmap.close();
-
-  const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/jpeg", 0.84));
-  if (!blob) {
-    if (supportedImageTypes.has(file.type)) return file;
-    throw new Error("이 사진 형식을 변환하지 못했습니다.");
-  }
   const baseName = file.name.replace(/\.[^.]+$/, "") || "figure-photo";
-  return new File([blob], `${baseName}.jpg`, { type: "image/jpeg" });
+  const renderedDimensions = new Set<string>();
+
+  try {
+    for (const maxSide of imageCompressionSides) {
+      const scale = Math.min(1, maxSide / Math.max(bitmap.width, bitmap.height));
+      const width = Math.max(1, Math.round(bitmap.width * scale));
+      const height = Math.max(1, Math.round(bitmap.height * scale));
+      const dimensionKey = `${width}x${height}`;
+      if (renderedDimensions.has(dimensionKey)) continue;
+      renderedDimensions.add(dimensionKey);
+
+      canvas.width = width;
+      canvas.height = height;
+      const context = canvas.getContext("2d");
+      if (!context) break;
+      context.fillStyle = "#fff";
+      context.fillRect(0, 0, width, height);
+      context.drawImage(bitmap, 0, 0, width, height);
+
+      for (const quality of imageCompressionQualities) {
+        const blob = await new Promise<Blob | null>((resolve) => canvas.toBlob(resolve, "image/jpeg", quality));
+        if (!blob) continue;
+        if (blob.size <= maxBytes) {
+          return new File([blob], `${baseName}.jpg`, { type: "image/jpeg" });
+        }
+      }
+    }
+  } finally {
+    bitmap.close();
+  }
+
+  if (supportedImageTypes.has(file.type) && file.size <= maxBytes) return file;
+  throw new Error("사진 용량을 충분히 줄이지 못했습니다. 다른 사진으로 다시 시도해 주세요.");
+}
+
+async function prepareEvidenceFiles(sourceFiles: EvidenceFiles) {
+  const entries = Object.entries(sourceFiles) as Array<[EvidenceKey, File]>;
+  const initiallyPrepared: Array<[EvidenceKey, File]> = [];
+
+  for (const [key, source] of entries) {
+    initiallyPrepared.push([key, await prepareImageFile(source)]);
+  }
+
+  const initialSizes = initiallyPrepared.map(([, file]) => file.size);
+  if (totalImageBytes(initialSizes) <= CLIENT_UPLOAD_TARGET_BYTES) {
+    return { files: Object.fromEntries(initiallyPrepared) as EvidenceFiles, recompressed: false };
+  }
+
+  const budgets = allocateImageByteBudgets(initialSizes);
+  const prepared: Array<[EvidenceKey, File]> = [];
+  for (let index = 0; index < entries.length; index += 1) {
+    const [key, source] = entries[index];
+    const initialFile = initiallyPrepared[index][1];
+    const file = initialFile.size <= budgets[index]
+      ? initialFile
+      : await prepareImageFile(source, budgets[index]);
+    prepared.push([key, file]);
+  }
+
+  if (totalImageBytes(prepared.map(([, file]) => file.size)) > CLIENT_UPLOAD_TARGET_BYTES) {
+    throw new Error("사진 전체 용량을 줄이지 못했습니다. 사진을 한 장 줄여 다시 시도해 주세요.");
+  }
+  return { files: Object.fromEntries(prepared) as EvidenceFiles, recompressed: true };
 }
 
 function fileFromImageBlob(blob: Blob) {
@@ -432,6 +481,8 @@ export default function Home() {
   const [manualNumber, setManualNumber] = useState("");
   const [observations, setObservations] = useState(initialObservations);
   const [files, setFiles] = useState<Partial<Record<EvidenceKey, File>>>({});
+  const sourceFilesRef = useRef<EvidenceFiles>({});
+  const imagePreparationVersionRef = useRef(0);
   const [fileNames, setFileNames] = useState<Partial<Record<EvidenceKey, string>>>({});
   const [filePreviews, setFilePreviews] = useState<Partial<Record<EvidenceKey, string>>>({});
   const [aiAnalysis, setAiAnalysis] = useState<AiAnalysis | null>(null);
@@ -439,6 +490,7 @@ export default function Home() {
   const [reviewedEvidence, setReviewedEvidence] = useState<Partial<Record<EvidenceKey, boolean>>>({});
   const [userOverrides, setUserOverrides] = useState<Partial<Record<EvidenceKey, Observation>>>({});
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [isPreparingImages, setIsPreparingImages] = useState(false);
   const [reviewRequestShared, setReviewRequestShared] = useState(false);
   const [toast, setToast] = useState("");
   const [criteriaOpen, setCriteriaOpen] = useState(false);
@@ -492,14 +544,24 @@ export default function Home() {
   }, [criteriaOpen]);
 
   const storeEvidenceFile = useCallback(async (key: EvidenceKey, file: File, silent = false) => {
+    const previousSource = sourceFilesRef.current[key];
+    sourceFilesRef.current = { ...sourceFilesRef.current, [key]: file };
+    const preparationVersion = imagePreparationVersionRef.current + 1;
+    imagePreparationVersionRef.current = preparationVersion;
+    setIsPreparingImages(true);
     try {
-      const prepared = await prepareImageFile(file);
-      const nextPreview = URL.createObjectURL(prepared);
-      setFiles((current) => ({ ...current, [key]: prepared }));
-      setFileNames((current) => ({ ...current, [key]: prepared.name }));
+      const prepared = await prepareEvidenceFiles(sourceFilesRef.current);
+      if (imagePreparationVersionRef.current !== preparationVersion) return false;
+      const nextPreviews = Object.fromEntries(
+        (Object.entries(prepared.files) as Array<[EvidenceKey, File]>).map(([evidenceKey, preparedFile]) => [evidenceKey, URL.createObjectURL(preparedFile)]),
+      ) as Partial<Record<EvidenceKey, string>>;
+      setFiles(prepared.files);
+      setFileNames(Object.fromEntries(
+        (Object.entries(prepared.files) as Array<[EvidenceKey, File]>).map(([evidenceKey, preparedFile]) => [evidenceKey, preparedFile.name]),
+      ));
       setFilePreviews((current) => {
-        if (current[key]) URL.revokeObjectURL(current[key]!);
-        return { ...current, [key]: nextPreview };
+        Object.values(current).forEach((preview) => preview && URL.revokeObjectURL(preview));
+        return nextPreviews;
       });
       setObservations((current) => ({ ...current, [key]: "unverified" }));
       setAiAnalysis(null);
@@ -509,8 +571,15 @@ export default function Home() {
       setReviewRequestShared(false);
       setReportConsent(false);
       setSavedReportId(null);
+      setIsPreparingImages(false);
+      if (prepared.recompressed) showToast("사진 용량을 분석에 맞게 자동으로 줄였습니다.");
       return true;
     } catch (error) {
+      if (imagePreparationVersionRef.current !== preparationVersion) return false;
+      sourceFilesRef.current = { ...sourceFilesRef.current };
+      if (previousSource) sourceFilesRef.current[key] = previousSource;
+      else delete sourceFilesRef.current[key];
+      setIsPreparingImages(false);
       if (!silent) showToast(error instanceof Error ? error.message : "사진을 추가하지 못했습니다.");
       return false;
     }
@@ -602,6 +671,9 @@ export default function Home() {
     if (selectedProduct?.id && selectedProduct.id !== product.id) {
       Object.values(filePreviews).forEach((preview) => preview && URL.revokeObjectURL(preview));
       setFiles({});
+      sourceFilesRef.current = {};
+      imagePreparationVersionRef.current += 1;
+      setIsPreparingImages(false);
       setFileNames({});
       setFilePreviews({});
       setObservations(initialObservations);
@@ -659,6 +731,9 @@ export default function Home() {
   };
 
   const removeEvidence = (key: EvidenceKey) => {
+    delete sourceFilesRef.current[key];
+    imagePreparationVersionRef.current += 1;
+    setIsPreparingImages(false);
     if (filePreviews[key]) URL.revokeObjectURL(filePreviews[key]!);
     setObservations((current) => ({ ...current, [key]: "missing" }));
     setFiles((current) => {
@@ -849,6 +924,9 @@ export default function Home() {
     setManualNumber("");
     setObservations(initialObservations);
     setFiles({});
+    sourceFilesRef.current = {};
+    imagePreparationVersionRef.current += 1;
+    setIsPreparingImages(false);
     setFileNames({});
     setFilePreviews({});
     setAiAnalysis(null);
@@ -1023,7 +1101,7 @@ export default function Home() {
             <span><strong>사진이 포함된 공개 검증 리포트 저장에 동의합니다.</strong>검증 사진과 판정 근거는 고유한 읽기 전용 리포트로 공개됩니다. 구매내역 사진은 저장하지 않으며, 사진 속 이름·주소 등 개인정보는 직접 가린 뒤 올려주세요.</span>
           </label>
           {analysisError && <div className="analysis-error" role="alert"><TriangleAlert size={17} /><span><strong>분석을 시작하지 못했어요</strong>{analysisError}</span></div>}
-          <button className="black-button full" disabled={completedCount === 0 || isAnalyzing || (evidenceReady && !reportConsent)} onClick={analyze}>{isAnalyzing ? <><LoaderCircle className="spin" size={18} /> 사진 분석 중</> : evidenceReady && !reportConsent ? <><FileCheck2 size={18} /> 공개 리포트 동의 필요</> : evidenceReady ? <><ShieldCheck size={18} /> AI로 분석하기</> : <><CircleHelp size={18} /> 부족한 사진 확인</>}</button>
+          <button className="black-button full" disabled={completedCount === 0 || isAnalyzing || isPreparingImages || (evidenceReady && !reportConsent)} onClick={analyze}>{isPreparingImages ? <><LoaderCircle className="spin" size={18} /> 사진 용량 최적화 중</> : isAnalyzing ? <><LoaderCircle className="spin" size={18} /> 사진 분석 중</> : evidenceReady && !reportConsent ? <><FileCheck2 size={18} /> 공개 리포트 동의 필요</> : evidenceReady ? <><ShieldCheck size={18} /> AI로 분석하기</> : <><CircleHelp size={18} /> 부족한 사진 확인</>}</button>
         </section>
       )}
 
@@ -1031,7 +1109,7 @@ export default function Home() {
         <section className="result-page page-enter">
           <PageBack onClick={reviewPath === "unsupported" ? resetAll : () => setStage("photos")} label={reviewPath === "unsupported" ? "제품 다시 선택" : "사진 수정"} />
           <article className={`verdict-card ${verdictCardResult.tone}`}>
-            <div className="verdict-product"><ProductImage product={currentProduct} size="medium" /><span><small>No.{currentProduct.number}</small><strong>{currentProduct.name}</strong><em>{currentProduct.maker}</em></span></div>
+            <div className="verdict-product"><ProductImage product={currentProduct} size="medium" /><span><small>No.{currentProduct.number}</small><strong>{currentProduct.name}</strong><em>{currentProduct.maker}</em>{currentProduct.officialUrl && <a href={currentProduct.officialUrl} target="_blank" rel="noreferrer">공식 제품 바로가기</a>}</span></div>
             <div className="verdict-copy"><span>{hasUserOverride ? "사용자 확인 반영" : aiAnalysis ? "AI 판정" : "검토 결과"}</span><h1>{verdictCardResult.label}</h1><p>{verdictCardResult.summary}</p></div>
             <div className="verdict-numbers"><div><strong>{completedCount}</strong><span>분석 사진</span></div><div><strong>{reviewedCount}/{aiAnalysis?.findings.length ?? assessedCount}</strong><span>사용자 확인</span></div></div>
           </article>
@@ -1071,7 +1149,6 @@ export default function Home() {
 
           <section className="lookup-source">
             <div><ShieldCheck size={19} /><span><strong>{currentProduct.verified ? "공식 제품 정보 확인됨" : "직접 입력한 제품"}</strong><small>{currentProduct.verified ? [seriesLabel(currentProduct), currentProduct.maker, `No.${currentProduct.number}`].filter(Boolean).join(" · ") : "공식 제품 페이지를 추가로 확인하세요."}</small></span></div>
-            {currentProduct.officialUrl && <a href={currentProduct.officialUrl} target="_blank" rel="noreferrer">제품 정보 페이지 <ExternalLink size={14} /></a>}
           </section>
 
           <div className="result-actions">{savedReportId && <a className="line-button" href={`/reports/${savedReportId}`}><FileCheck2 size={17} /> 읽기 전용 리포트</a>}<button className="line-button" onClick={shareResult}><Share2 size={17} /> 공유</button><button className="black-button" onClick={resetAll}><RotateCcw size={16} /> 새 검증</button></div>

@@ -228,6 +228,8 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .verdict-product small { display: block; color: #999; font-size: 9px; }
 .verdict-product strong { display: block; margin-top: 5px; overflow: hidden; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }
 .verdict-product em { display: block; margin-top: 5px; color: #999; font-size: 9px; font-style: normal; }
+.verdict-product a { display: inline-block; margin-top: 7px; color: #777; font-size: 8px; text-decoration: underline; text-underline-offset: 2px; }
+.verdict-product a:hover { color: #222; }
 .verdict-copy > span { color: #999; font-size: 9px; font-weight: 700; letter-spacing: .09em; }
 .verdict-copy h1 { margin: 10px 0 0; font-size: clamp(32px, 5vw, 46px); font-weight: 760; letter-spacing: -.055em; }
 .verdict-card.safe .verdict-copy h1 { color: var(--green); }
