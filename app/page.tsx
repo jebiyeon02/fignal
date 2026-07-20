@@ -34,6 +34,7 @@ import {
   ZoomIn,
 } from "lucide-react";
 import { BrandMark } from "./brand-mark";
+import { FeedbackWidget } from "./feedback-widget";
 import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
@@ -1338,6 +1339,7 @@ export default function Home() {
       {criteriaOpen && <VerificationCriteriaDialog onClose={() => setCriteriaOpen(false)} />}
       {toast && <div className="toast" role="status"><Check size={16} /> {toast}</div>}
     </main>
+    <FeedbackWidget context={stage} />
     {isAnalyzing && (
       <div className="analysis-interaction-lock" role="dialog" aria-modal="true" aria-labelledby="analysis-lock-title">
         <div className="analysis-interaction-lock-card">

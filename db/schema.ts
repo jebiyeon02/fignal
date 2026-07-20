@@ -71,3 +71,15 @@ export const verificationReportImages = sqliteTable(
     index("verification_report_images_object_key_idx").on(table.objectKey),
   ],
 );
+
+export const siteFeedback = sqliteTable(
+  "site_feedback",
+  {
+    id: text("id").primaryKey(),
+    message: text("message").notNull(),
+    pagePath: text("page_path").notNull().default("/"),
+    pageContext: text("page_context").notNull().default("search"),
+    createdAt: text("created_at").notNull(),
+  },
+  (table) => [index("site_feedback_created_at_idx").on(table.createdAt)],
+);
