@@ -207,6 +207,16 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .optional-photos summary > svg { color: #999; transition: transform .18s; }
 .optional-photos[open] summary > svg { transform: rotate(180deg); }
 .optional-grid { padding-bottom: 18px; }
+.upload-capacity { margin-top: 16px; padding: 13px 14px; border-radius: 9px; background: #f7f7f7; }
+.upload-capacity > div:first-child { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+.upload-capacity > div:first-child > span { display: grid; gap: 3px; }
+.upload-capacity > div:first-child > span strong { font-size: 10px; }
+.upload-capacity small { color: #999; font-size: 8px; }
+.upload-capacity p { margin: 0; color: #888; font-size: 9px; white-space: nowrap; }
+.upload-capacity p strong { color: #333; font-size: 10px; }
+.upload-capacity-track { height: 3px; overflow: hidden; margin-top: 10px; border-radius: 999px; background: #e5e5e5; }
+.upload-capacity-track span { display: block; height: 100%; border-radius: inherit; background: var(--green); transition: width .2s ease, background .2s ease; }
+.upload-capacity.near-limit .upload-capacity-track span { background: var(--amber); }
 .photo-note { display: flex; align-items: flex-start; gap: 8px; margin: 18px 2px 22px; color: #888; font-size: 9px; line-height: 1.5; }
 .photo-note svg { flex: 0 0 auto; margin-top: 1px; }
 .report-consent { display: grid; grid-template-columns: 20px 1fr; align-items: start; gap: 11px; padding: 15px 16px; margin: 0 0 12px; border: 1px solid #ddd; border-radius: 10px; background: #fafafa; color: #777; cursor: pointer; }

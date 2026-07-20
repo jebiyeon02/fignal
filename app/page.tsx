@@ -458,6 +458,10 @@ function isAiAnalysis(value: unknown): value is AiAnalysis {
   return isAnalysisResult(value);
 }
 
+function formatUploadMegabytes(bytes: number) {
+  return `${(bytes / 1024 / 1024).toFixed(1)}MB`;
+}
+
 async function fetchRecentVerifications() {
   const response = await fetch("/api/verifications?limit=6", { cache: "no-store" });
   const payload = await response.json().catch(() => null) as { verifications?: unknown } | null;
@@ -613,6 +617,8 @@ export default function Home() {
   } : null);
 
   const completedCount = Object.values(observations).filter((value) => value !== "missing").length;
+  const uploadedImageBytes = totalImageBytes(Object.values(files).map((file) => file?.size ?? 0));
+  const uploadCapacityPercent = Math.min(100, (uploadedImageBytes / CLIENT_UPLOAD_TARGET_BYTES) * 100);
   const assessedCount = Object.values(observations).filter((value) => value === "match" || value === "concern").length;
   const essentialCompleted = evidenceItems.filter((item) => item.essential && observations[item.key] !== "missing").length;
   const concernItems = evidenceItems.filter((item) => observations[item.key] === "concern");
@@ -1094,6 +1100,11 @@ export default function Home() {
               ))}
             </div>
           </details>
+
+          <div className={`upload-capacity ${uploadCapacityPercent >= 85 ? "near-limit" : ""}`} role="status" aria-live="polite">
+            <div><span><strong>사진 용량</strong><small>{isPreparingImages ? "자동 최적화 중" : "업로드 전 자동 압축 적용"}</small></span><p><strong>현재 {formatUploadMegabytes(uploadedImageBytes)}</strong><span> / 최대 {formatUploadMegabytes(CLIENT_UPLOAD_TARGET_BYTES)}</span></p></div>
+            <div className="upload-capacity-track" role="progressbar" aria-label="사진 업로드 용량" aria-valuemin={0} aria-valuemax={CLIENT_UPLOAD_TARGET_BYTES} aria-valuenow={uploadedImageBytes}><span style={{ width: `${uploadCapacityPercent}%` }} /></div>
+          </div>
 
           <div className="photo-note"><Info size={16} /><span>라이선스 씰은 복제되거나 발매판마다 달라질 수 있어 단독으로 판단하지 않습니다.</span></div>
           <label className={`report-consent ${reportConsent ? "checked" : ""}`}>
