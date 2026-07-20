@@ -24,7 +24,16 @@ test("anonymous comment writing has length and rate limits", () => {
 });
 
 test("post detail exposes a comment composer and explains verdict separation", () => {
-  assert.match(commentUiSource, /의견 등록/);
+  assert.match(commentUiSource, /댓글 쓰기/);
   assert.match(commentUiSource, /댓글 수가 AI 판정을 바꾸지는 않습니다/);
   assert.match(commentUiSource, /판매자 개인정보나 단정적인 비방/);
+});
+
+test("comment composer follows the comment list like a community board", () => {
+  const listIndex = commentUiSource.indexOf('className="community-comment-list"');
+  const emptyIndex = commentUiSource.indexOf('className="community-comments-empty"');
+  const formIndex = commentUiSource.indexOf('className="community-comment-form"');
+
+  assert.ok(listIndex > -1 && emptyIndex > -1 && formIndex > listIndex && formIndex > emptyIndex);
+  assert.match(commentUiSource, /전체 댓글 <em>\{comments\.length\}<\/em>개/);
 });

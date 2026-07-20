@@ -46,7 +46,7 @@ import {
 } from "./api/analyze/analysis-contract";
 import { displayableCaseImages } from "./case-image-rights";
 import { expandedProducts } from "./catalog";
-import { communityPostStatusCopy, type CommunityPostStatus } from "./community";
+import { isCommunityPostStatus, type CommunityPostStatus } from "./community";
 import { communityMentions, type CommunityMention } from "./community-mentions";
 import {
   counterfeitCases,
@@ -493,8 +493,7 @@ function parseRelatedCommunityPost(value: unknown): RelatedCommunityPost | null 
     typeof post.id !== "string"
     || typeof post.title !== "string"
     || typeof post.createdAt !== "string"
-    || typeof post.status !== "string"
-    || !(post.status in communityPostStatusCopy)
+    || !isCommunityPostStatus(post.status)
     || typeof result.verdict !== "string"
     || !(result.verdict in verificationVerdictCopy)
     || typeof result.summary !== "string"
@@ -1338,7 +1337,7 @@ function RelatedCommunityPosts({ posts, productName }: { posts: RelatedCommunity
           const verdict = verificationVerdictCopy[post.verification.verdict];
           return (
             <Link href={`/community/${post.id}`} className={`related-community-card ${verdict.tone}`} key={post.id}>
-              <span><em>{communityPostStatusCopy[post.status]}</em><time dateTime={post.createdAt}>{formatVerificationDate(post.createdAt)}</time></span>
+              <span><time dateTime={post.createdAt}>{formatVerificationDate(post.createdAt)}</time></span>
               <strong>{post.title}</strong>
               <small>{verdict.label} · 사진 {post.verification.photoCount}장</small>
               <ArrowRight size={16} />

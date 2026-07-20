@@ -21,8 +21,6 @@ export type CommunityComment = {
   createdAt: string;
 };
 
-export const communityPostStatusCopy: Record<CommunityPostStatus, string> = {
-  collecting: "의견 수집 중",
-  supplemented: "근거 보완됨",
-  reviewed: "검토 완료",
-};
+export function isCommunityPostStatus(value: unknown): value is CommunityPostStatus {
+  return value === "collecting" || value === "supplemented" || value === "reviewed";
+}

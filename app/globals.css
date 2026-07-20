@@ -266,7 +266,6 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .related-community-card.caution { border-left-color: var(--amber); }
 .related-community-card.danger { border-left-color: var(--red); }
 .related-community-card > span { display: flex; align-items: center; gap: 6px; }
-.related-community-card em { padding: 3px 5px; border-radius: 4px; background: #f1f1f1; color: #777; font-size: 7px; font-style: normal; font-weight: 700; }
 .related-community-card time { color: #aaa; font-size: 7px; }
 .related-community-card > strong { overflow: hidden; font-size: 10px; text-overflow: ellipsis; white-space: nowrap; }
 .related-community-card > small { color: #888; font-size: 7px; }
@@ -518,7 +517,6 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .community-post-thumb img { width: 100%; height: 100%; object-fit: contain; background: #fff; mix-blend-mode: multiply; }
 .community-post-content { min-width: 0; }
 .community-post-meta { display: flex; align-items: center; gap: 7px; }
-.community-post-meta em { padding: 4px 6px; border-radius: 4px; background: #f1f1f1; color: #666; font-size: 7px; font-style: normal; font-weight: 750; }
 .community-post-meta time { color: #aaa; font-size: 8px; }
 .community-post-content > strong { display: -webkit-box; overflow: hidden; margin-top: 10px; font-size: 13px; line-height: 1.4; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
 .community-post-content > small { display: block; overflow: hidden; margin-top: 6px; color: #999; font-size: 8px; text-overflow: ellipsis; white-space: nowrap; }
@@ -532,9 +530,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .community-author-avatar { width: 38px; height: 38px; display: grid; place-items: center; flex: 0 0 auto; border-radius: 50%; background: #f1f1f1; color: #777; }
 .community-author-copy { min-width: 0; display: grid; gap: 3px; }
 .community-author-copy strong { font-size: 11px; }
-.community-author-copy small { color: #999; font-size: 8px; }
 .community-post-state { display: flex; align-items: center; gap: 8px; margin-left: auto; }
-.community-post-state em { padding: 5px 7px; border-radius: 5px; background: #f1f1f1; color: #666; font-size: 8px; font-style: normal; font-weight: 750; }
 .community-post-state time { color: #aaa; font-size: 8px; }
 .community-post-body { min-height: 230px; padding: 44px 40px 38px; }
 .community-post-body h1 { max-width: 860px; margin: 0; font-size: clamp(27px, 4.6vw, 42px); line-height: 1.18; letter-spacing: -.05em; }
@@ -579,36 +575,41 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .community-comments > header { display: flex; align-items: flex-end; justify-content: space-between; gap: 30px; padding-bottom: 14px; border-bottom: 2px solid #222; }
 .community-comments > header > span { display: flex; align-items: center; gap: 8px; }
 .community-comments > header h2 { margin: 0; font-size: 18px; }
-.community-comments > header h2 strong { margin-left: 4px; color: var(--green); font-size: 15px; }
 .community-comments > header p { margin: 0; color: #888; font-size: 8px; line-height: 1.5; text-align: right; }
-.community-comment-form { padding: 18px; margin-top: 18px; border: 1px solid #d7d7d7; border-radius: 12px; background: #f3f3f3; }
-.community-comment-form-head { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 13px; }
-.community-comment-form-head > span { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 700; }
+.community-comment-toolbar { min-height: 42px; display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 0 12px; border-bottom: 1px solid #d8d8d8; background: #fafafa; }
+.community-comment-toolbar strong { color: #444; font-size: 9px; }
+.community-comment-toolbar strong em { margin: 0 2px 0 4px; color: var(--green); font-size: 10px; font-style: normal; }
+.community-comment-toolbar > span { color: #999; font-size: 8px; }
+.community-comment-form { padding: 16px; margin-top: 20px; border: 1px solid #d3d3d3; border-top: 2px solid #444; border-radius: 3px; background: #f7f7f7; }
+.community-comment-form-head { display: flex; align-items: center; justify-content: space-between; gap: 20px; margin-bottom: 12px; padding-bottom: 10px; border-bottom: 1px solid #e1e1e1; }
+.community-comment-form-head > span { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 750; }
 .community-comment-form-head small { color: #aaa; font-size: 8px; }
-.community-comment-fields { display: grid; grid-template-columns: minmax(150px, 210px) minmax(0, 1fr); gap: 12px; align-items: start; }
+.community-comment-fields { display: grid; grid-template-columns: minmax(140px, 190px) minmax(0, 1fr); gap: 10px; align-items: start; }
 .community-comment-form label { display: grid; gap: 6px; }
 .community-comment-form label > span { color: #666; font-size: 9px; font-weight: 650; }
-.community-comment-form input, .community-comment-form textarea { width: 100%; border: 1px solid #d2d2d2; border-radius: 8px; background: #fff; color: #222; outline: 0; }
-.community-comment-form input { height: 42px; padding: 0 11px; font-size: 10px; }
-.community-comment-form textarea { min-height: 84px; padding: 11px; font-size: 10px; line-height: 1.6; resize: vertical; }
+.community-comment-form input, .community-comment-form textarea { width: 100%; border: 1px solid #ccc; border-radius: 2px; background: #fff; color: #222; outline: 0; }
+.community-comment-form input { height: 40px; padding: 0 10px; font-size: 10px; }
+.community-comment-form textarea { min-height: 76px; padding: 10px; font-size: 10px; line-height: 1.6; resize: vertical; }
 .community-comment-form input:focus, .community-comment-form textarea:focus { border-color: #555; box-shadow: 0 0 0 2px rgba(34,34,34,.06); }
 .community-comment-form-footer { display: flex; align-items: center; gap: 12px; margin-top: 10px; }
 .community-comment-form-footer > span { min-width: 0; flex: 1; color: #999; font-size: 8px; }
 .community-comment-form-footer > em { color: #aaa; font-size: 8px; font-style: normal; }
-.community-comment-form-footer > button { min-height: 38px; display: inline-flex; align-items: center; gap: 5px; padding: 0 13px; border: 1px solid #222; border-radius: 7px; background: #222; color: #fff; font-size: 9px; font-weight: 700; cursor: pointer; }
+.community-comment-form-footer > button { min-width: 72px; min-height: 36px; display: inline-flex; align-items: center; justify-content: center; gap: 5px; padding: 0 13px; border: 1px solid #222; border-radius: 2px; background: #222; color: #fff; font-size: 9px; font-weight: 700; cursor: pointer; }
 .community-comment-form-footer > button:disabled { border-color: #ddd; background: #ddd; color: #aaa; cursor: not-allowed; }
-.community-comments-empty { min-height: 170px; display: grid; place-items: center; align-content: center; gap: 6px; margin-top: 14px; border: 1px dashed #ccc; border-radius: 11px; background: #fff; color: #aaa; text-align: center; }
+.community-comments-empty { min-height: 150px; display: grid; place-items: center; align-content: center; gap: 6px; border-bottom: 1px solid #ddd; background: #fff; color: #aaa; text-align: center; }
 .community-comments-empty strong { margin-top: 5px; color: #555; font-size: 11px; }
 .community-comments-empty p { margin: 0; font-size: 8px; }
-.community-comment-list { display: grid; gap: 9px; margin-top: 16px; padding: 10px; border: 1px solid #d8d8d8; border-radius: 13px; background: #ececec; }
-.community-comment-list > article { display: grid; grid-template-columns: 38px 1fr; gap: 12px; padding: 16px; border: 1px solid #dedede; border-radius: 9px; background: #fff; box-shadow: 0 1px 0 rgba(0,0,0,.02); }
-.community-comment-avatar { width: 36px; height: 36px; display: grid; place-items: center; border-radius: 50%; background: #292929; color: #fff; font-size: 10px; font-weight: 800; }
+.community-comment-list { border-bottom: 1px solid #ccc; background: #fff; }
+.community-comment-list > article { display: grid; grid-template-columns: 32px 1fr; gap: 11px; padding: 15px 12px; border-bottom: 1px solid #e5e5e5; background: #fff; }
+.community-comment-list > article:last-child { border-bottom: 0; }
+.community-comment-list > article:hover { background: #fcfcfc; }
+.community-comment-avatar { width: 28px; height: 28px; display: grid; place-items: center; border-radius: 50%; background: #333; color: #fff; font-size: 9px; font-weight: 800; }
 .community-comment-copy { min-width: 0; }
 .community-comment-list article header { display: flex; align-items: center; gap: 8px; }
 .community-comment-list article header strong { font-size: 10px; }
-.community-comment-number { padding: 2px 5px; border-radius: 4px; background: #f1f1f1; color: #888; font-size: 7px; font-weight: 700; }
+.community-comment-number { color: #aaa; font-size: 7px; font-weight: 700; }
 .community-comment-list article time { margin-left: auto; color: #999; font-size: 8px; }
-.community-comment-list article p { margin: 9px 0 0; padding: 11px 13px; border-left: 2px solid #d84b3f; border-radius: 0 7px 7px 0; background: #f5f5f5; color: #444; font-size: 10px; line-height: 1.7; white-space: pre-wrap; overflow-wrap: anywhere; }
+.community-comment-list article p { margin: 8px 0 0; color: #444; font-size: 10px; line-height: 1.7; white-space: pre-wrap; overflow-wrap: anywhere; }
 
 .criteria-backdrop { position: fixed; inset: 0; z-index: 90; display: flex; justify-content: flex-end; background: rgba(0,0,0,.36); animation: backdrop-in .18s ease both; }
 .criteria-dialog { width: min(620px, 100%); height: 100%; display: flex; flex-direction: column; background: #fff; box-shadow: -18px 0 50px rgba(0,0,0,.14); animation: drawer-in .22s ease both; }
@@ -829,9 +830,8 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
   .community-comment-form-footer { align-items: flex-start; flex-wrap: wrap; }
   .community-comment-form-footer > span { width: 100%; flex-basis: 100%; }
   .community-comment-form-footer > button { margin-left: auto; }
-  .community-comment-list { padding: 7px; }
-  .community-comment-list > article { grid-template-columns: 34px 1fr; gap: 10px; padding: 13px 11px; }
-  .community-comment-avatar { width: 32px; height: 32px; }
+  .community-comment-list > article { grid-template-columns: 29px 1fr; gap: 9px; padding: 13px 8px; }
+  .community-comment-avatar { width: 26px; height: 26px; }
 }
 
 @media (prefers-reduced-motion: reduce) {

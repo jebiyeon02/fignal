@@ -63,25 +63,17 @@ export function CommunityComments({ postId, initialComments }: {
   return (
     <section className="community-comments" id="community-comments" aria-labelledby="community-comments-title">
       <header>
-        <span><MessageCircle size={20} /><h2 id="community-comments-title">의견 <strong>{comments.length}</strong></h2></span>
+        <span><MessageCircle size={20} /><h2 id="community-comments-title">댓글</h2></span>
         <p>사진이나 판본 차이에 대한 근거를 남겨주세요. 댓글 수가 AI 판정을 바꾸지는 않습니다.</p>
       </header>
 
-      <form className="community-comment-form" onSubmit={(event) => void submitComment(event)}>
-        <div className="community-comment-form-head"><span><UserRound size={16} /> 의견 작성</span><small>로그인 없이 작성할 수 있어요</small></div>
-        <div className="community-comment-fields">
-          <label><span>닉네임</span><input value={nickname} maxLength={20} onChange={(event) => setNickname(event.target.value)} placeholder="2~20자" /></label>
-          <label><span>의견</span><textarea value={body} maxLength={500} onChange={(event) => setBody(event.target.value)} placeholder="예: 이 제품은 재판판에서 박스 씰 위치가 달라진 것으로 알고 있어요. 받침대 각인 사진도 확인해 보면 좋겠습니다." /></label>
-        </div>
-        <div className="community-comment-form-footer">
-          <span>{error || "판매자 개인정보나 단정적인 비방은 작성하지 마세요."}</span>
-          <em>{body.length}/500</em>
-          <button type="submit" disabled={nickname.trim().length < 2 || body.trim().length < 2 || isSubmitting}><Send size={15} /> {isSubmitting ? "등록 중" : "의견 등록"}</button>
-        </div>
-      </form>
+      <div className="community-comment-toolbar">
+        <strong>전체 댓글 <em>{comments.length}</em>개</strong>
+        <span>등록순</span>
+      </div>
 
       {comments.length === 0 ? (
-        <div className="community-comments-empty"><MessageCircle size={22} /><strong>아직 등록된 의견이 없어요</strong><p>이 검증 결과에서 놓친 부분이나 판본 정보를 첫 번째로 남겨주세요.</p></div>
+        <div className="community-comments-empty"><MessageCircle size={22} /><strong>아직 등록된 댓글이 없어요</strong><p>이 검증 결과에서 놓친 부분이나 판본 정보를 첫 번째로 남겨주세요.</p></div>
       ) : (
         <div className="community-comment-list">
           {comments.map((comment, index) => (
@@ -99,6 +91,19 @@ export function CommunityComments({ postId, initialComments }: {
           ))}
         </div>
       )}
+
+      <form className="community-comment-form" onSubmit={(event) => void submitComment(event)}>
+        <div className="community-comment-form-head"><span><UserRound size={16} /> 댓글 쓰기</span><small>로그인 없이 작성할 수 있어요</small></div>
+        <div className="community-comment-fields">
+          <label><span>닉네임</span><input value={nickname} maxLength={20} onChange={(event) => setNickname(event.target.value)} placeholder="2~20자" /></label>
+          <label><span>댓글</span><textarea value={body} maxLength={500} onChange={(event) => setBody(event.target.value)} placeholder="예: 이 제품은 재판판에서 박스 씰 위치가 달라진 것으로 알고 있어요. 받침대 각인 사진도 확인해 보면 좋겠습니다." /></label>
+        </div>
+        <div className="community-comment-form-footer">
+          <span>{error || "판매자 개인정보나 단정적인 비방은 작성하지 마세요."}</span>
+          <em>{body.length}/500</em>
+          <button type="submit" disabled={nickname.trim().length < 2 || body.trim().length < 2 || isSubmitting}><Send size={15} /> {isSubmitting ? "등록 중" : "등록"}</button>
+        </div>
+      </form>
     </section>
   );
 }

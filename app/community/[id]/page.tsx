@@ -8,7 +8,6 @@ import { getCommunityPostById } from "../../../db/community-posts";
 import { listCommunityComments } from "../../../db/community-comments";
 import type { AnalysisFinding } from "../../api/analyze/analysis-contract";
 import { expandedProducts, isOfficialProductImage } from "../../catalog";
-import { communityPostStatusCopy } from "../../community";
 import { verificationVerdictCopy } from "../../verification-history";
 import { ReportProductImage } from "../../reports/[id]/report-product-image";
 import { CommunityComments } from "./comments";
@@ -60,8 +59,8 @@ export default async function CommunityPostPage({
         <article className="community-post-article">
           <header>
             <span className="community-author-avatar"><UserRound size={18} /></span>
-            <span className="community-author-copy"><strong>익명 검증자</strong><small>검증 완료 결과로 작성한 게시글</small></span>
-            <span className="community-post-state"><em>{communityPostStatusCopy[post.status]}</em><time dateTime={post.createdAt}>{formatDate(post.createdAt)}</time></span>
+            <span className="community-author-copy"><strong>익명 검증자</strong></span>
+            <span className="community-post-state"><time dateTime={post.createdAt}>{formatDate(post.createdAt)}</time></span>
           </header>
           <div className="community-post-body">
             <h1>{post.title}</h1>

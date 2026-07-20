@@ -5,7 +5,6 @@ import Link from "next/link";
 import { BrandMark } from "../brand-mark";
 import { listCommunityPosts } from "../../db/community-posts";
 import { expandedProducts, isOfficialProductImage } from "../catalog";
-import { communityPostStatusCopy } from "../community";
 import { verificationVerdictCopy } from "../verification-history";
 
 export const dynamic = "force-dynamic";
@@ -51,7 +50,7 @@ export default async function CommunityPage() {
                 <Link href={`/community/${post.id}`} className={`community-post-card ${verdict.tone}`} key={post.id}>
                   <span className="community-post-thumb">{image ? <img src={image} alt={`${post.verification.productName} 공식 제품 이미지`} /> : <ImageIcon size={25} />}</span>
                   <span className="community-post-content">
-                    <span className="community-post-meta"><em>{communityPostStatusCopy[post.status]}</em><time dateTime={post.createdAt}>{formatPostDate(post.createdAt)}</time></span>
+                    <span className="community-post-meta"><time dateTime={post.createdAt}>{formatPostDate(post.createdAt)}</time></span>
                     <strong>{post.title}</strong>
                     <small>No.{post.verification.productNumber} · {post.verification.productName}</small>
                     <span className="community-post-verdict">{verdict.label}</span>
