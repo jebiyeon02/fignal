@@ -97,7 +97,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .recent-verification-card.caution { border-left-color: var(--amber); }
 .recent-verification-card.danger { border-left-color: var(--red); }
 .recent-verification-thumb { width: 78px; height: 88px; display: grid; place-items: center; overflow: hidden; border-radius: 9px; background: #f1f1f1; color: #aaa; }
-.recent-verification-thumb img { width: 100%; height: 100%; display: block; object-fit: cover; }
+.recent-verification-thumb img { width: 100%; height: 100%; display: block; object-fit: contain; background: #fff; }
 .recent-verification-copy { min-width: 0; }
 .recent-verification-copy small { display: block; color: #aaa; font-size: 8px; }
 .recent-verification-copy strong { display: block; overflow: hidden; margin-top: 6px; font-size: 12px; text-overflow: ellipsis; white-space: nowrap; }

@@ -82,24 +82,6 @@ export const verificationVerdictCopy: Record<AnalysisVerdict, { label: string; t
   insufficient_photos: { label: "사진이 더 필요함", tone: "neutral" },
 };
 
-const previewEvidencePriority: EvidenceKey[] = [
-  "figureFull",
-  "facePaint",
-  "parts",
-  "baseMark",
-  "boxFront",
-  "boxBack",
-  "barcode",
-];
-
-export function selectVerificationPreviewImage(images: VerificationReportImage[]) {
-  for (const evidenceKey of previewEvidencePriority) {
-    const image = images.find((candidate) => candidate.evidenceKey === evidenceKey);
-    if (image) return image;
-  }
-  return images[0];
-}
-
 export function sanitizeAnalysisForHistory(analysis: AnalysisResult): AnalysisResult {
   return {
     ...analysis,

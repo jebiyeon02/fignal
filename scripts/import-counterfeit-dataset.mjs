@@ -615,7 +615,7 @@ function parseArguments(argv) {
 
 async function main() {
   const options = parseArguments(process.argv.slice(2));
-  const [caseText, allCaseText, imageText, uniqueImageText, mapText, catalogText, generatedCatalogText, pageText] = await Promise.all([
+  const [caseText, allCaseText, imageText, uniqueImageText, mapText, catalogText, generatedCatalogText, fullCatalogText, pageText] = await Promise.all([
     readFile(path.join(options.dataset, "candidate_counterfeit_cases.csv"), "utf8"),
     readFile(path.join(options.dataset, "cases.csv"), "utf8"),
     readFile(path.join(options.dataset, "image_manifest.csv"), "utf8"),
@@ -623,11 +623,13 @@ async function main() {
     readFile(options.map, "utf8"),
     readFile(path.resolve(scriptDirectory, "../app/catalog.ts"), "utf8"),
     readFile(path.resolve(scriptDirectory, "../app/data/nendoroids-1-500.generated.json"), "utf8"),
+    readFile(path.resolve(scriptDirectory, "../app/data/nendoroids-catalog.generated.json"), "utf8"),
     readFile(path.resolve(scriptDirectory, "../app/page.tsx"), "utf8"),
   ]);
   const catalogProducts = [
     ...extractCatalogProductsFromTs(catalogText, "catalog.ts"),
     ...JSON.parse(generatedCatalogText),
+    ...JSON.parse(fullCatalogText),
     ...extractCatalogProductsFromTs(pageText, "page.tsx"),
   ].filter((product, index, allProducts) => allProducts.findIndex((candidate) => candidate.id === product.id) === index);
   const result = await buildEvidenceDataset({

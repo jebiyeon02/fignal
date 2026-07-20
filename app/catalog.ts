@@ -1,4 +1,5 @@
 import nendoroidsOneToFiveHundred from "./data/nendoroids-1-500.generated.json";
+import nendoroidCatalogSnapshot from "./data/nendoroids-catalog.generated.json";
 
 export type CatalogImageSource = "official" | "none";
 
@@ -1741,6 +1742,8 @@ const curatedCatalogProducts: CatalogProduct[] = [
   }
 ];
 
+const catalogSnapshotProducts = nendoroidCatalogSnapshot as CatalogProduct[];
+const catalogSnapshotProductsById = new Map(catalogSnapshotProducts.map((product) => [product.id, product]));
 const curatedProductIds = new Set(curatedCatalogProducts.map((product) => product.id));
 
 export function isOfficialProductImage(image: string) {
@@ -1756,19 +1759,37 @@ export function isOfficialProductImage(image: string) {
 }
 
 const withOfficialImageOnly = (product: CatalogProduct): CatalogProduct => {
-  const image = isOfficialProductImage(product.image) ? product.image : "";
+  const snapshotProduct = catalogSnapshotProductsById.get(product.id);
+  const image = isOfficialProductImage(product.image)
+    ? product.image
+    : isOfficialProductImage(snapshotProduct?.image ?? "")
+      ? snapshotProduct?.image ?? ""
+      : "";
+  const officialUrl = isOfficialProductImage(product.officialUrl)
+    ? product.officialUrl
+    : isOfficialProductImage(snapshotProduct?.officialUrl ?? "")
+      ? snapshotProduct?.officialUrl ?? ""
+      : "";
   return {
     ...product,
     image,
     imageSource: image ? "official" : "none",
-    imageSourceUrl: image ? product.officialUrl : undefined,
+    imageSourceUrl: image ? officialUrl : undefined,
+    officialUrl,
   };
 };
 const officialOneToFiveHundred = (nendoroidsOneToFiveHundred as CatalogProduct[]).filter(
   (product) => !curatedProductIds.has(product.id),
 ).map(withOfficialImageOnly);
+const preferredProductIds = new Set([
+  ...curatedProductIds,
+  ...officialOneToFiveHundred.map((product) => product.id),
+]);
 
 export const expandedProducts: CatalogProduct[] = [
   ...curatedCatalogProducts.map(withOfficialImageOnly),
   ...officialOneToFiveHundred,
+  ...catalogSnapshotProducts
+    .filter((product) => !preferredProductIds.has(product.id))
+    .map(withOfficialImageOnly),
 ];

@@ -53,7 +53,6 @@ import { getProductVerificationNotes } from "./product-verification";
 import { resolveReviewPath, reviewPathCopy, type ReviewPath } from "./review-path";
 import {
   parseVerificationHistoryItem,
-  selectVerificationPreviewImage,
   verificationVerdictCopy,
   type VerificationHistoryItem,
 } from "./verification-history";
@@ -956,7 +955,7 @@ export default function Home() {
                   <div><dt>발매</dt><dd>{selectedProduct.release}</dd></div>
                   <div><dt>대표 이미지</dt><dd>{selectedProduct.imageSource === "official" ? "제조사 원본" : "확인 가능한 공식 이미지 없음"}</dd></div>
                 </dl>
-                <div className="selected-links"><a href={selectedProduct.officialUrl} target="_blank" rel="noreferrer">제품 정보 페이지 <ExternalLink size={14} /></a><button onClick={() => { setSelectedProduct(null); setQuery(""); }}>다른 제품 찾기</button></div>
+                <div className="selected-links">{selectedProduct.officialUrl && <a href={selectedProduct.officialUrl} target="_blank" rel="noreferrer">제품 정보 페이지 <ExternalLink size={14} /></a>}<button onClick={() => { setSelectedProduct(null); setQuery(""); }}>다른 제품 찾기</button></div>
               </div>
             </article>
           )}
@@ -1139,10 +1138,10 @@ function RecentVerificationSection({
         <div className="recent-verification-list">
           {items.map((item) => {
             const verdict = verificationVerdictCopy[item.verdict];
-            const previewImage = selectVerificationPreviewImage(item.images);
+            const productImage = expandedProductsById.get(item.productId)?.image ?? "";
             return (
               <a key={item.id} className={`recent-verification-card ${verdict.tone}`} href={`/reports/${item.id}`}>
-                <span className="recent-verification-thumb">{previewImage ? <img src={previewImage.url} alt={`${item.productName} 피규어 검증 사진`} /> : <ImageIcon size={22} />}</span>
+                <span className="recent-verification-thumb">{productImage ? <img src={productImage} alt={`${item.productName} 공식 제품 이미지`} /> : <ImageIcon size={22} />}</span>
                 <span className="recent-verification-copy">
                   <small><time dateTime={item.createdAt}>{formatVerificationDate(item.createdAt)}</time> · No.{item.productNumber}</small>
                   <strong>{item.productName}</strong>
