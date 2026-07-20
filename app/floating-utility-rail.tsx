@@ -1,6 +1,6 @@
 "use client";
 
-import { Cpu, FileCheck2, Image as ImageIcon, Info, TriangleAlert, X } from "lucide-react";
+import { Cpu, FileCheck2, Image as ImageIcon, Info, TriangleAlert } from "lucide-react";
 import { useState } from "react";
 import { FeedbackWidget } from "./feedback-widget";
 import styles from "./floating-utility-rail.module.css";
@@ -25,7 +25,6 @@ export function FloatingUtilityRail() {
         <div className={styles.betaPanel} id="floating-beta-guide">
           <header>
             <span><em>BETA GUIDE</em><strong>함께 정확해지는 검증을 만들고 있어요</strong></span>
-            <button type="button" onClick={() => setBetaOpen(false)} aria-label="BETA 안내 닫기"><X size={15} /></button>
           </header>
           <p>FIGNAL은 아직 초기 단계의 사진 기반 검증 보조 서비스입니다.</p>
           <ul>
