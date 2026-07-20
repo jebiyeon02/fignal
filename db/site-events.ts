@@ -14,6 +14,15 @@ export type SiteAnalytics = {
   eventCounts: SiteEventCount[];
   daily: Array<{ date: string; sessions: number; completed: number; failed: number }>;
   products: Array<{ productId: string; selected: number; started: number; completed: number; sourceClicks: number }>;
+  journey: {
+    sellerMessageCopied: number;
+    photoUploadStarted: number;
+    evidenceReady: number;
+    analysisCompleted: number;
+    aiResultViewed: number;
+    blocked: number;
+    blockedReasons: Array<{ reason: string; sessions: number }>;
+  };
 };
 
 let schemaReady: Promise<void> | null = null;
@@ -81,7 +90,7 @@ export async function getSiteAnalytics(days = 30): Promise<SiteAnalytics> {
   await ensureSiteEventSchema();
   const safeDays = Math.min(Math.max(Math.trunc(days), 1), 90);
   const since = new Date(Date.now() - safeDays * 24 * 60 * 60 * 1000).toISOString();
-  const [summary, eventCounts, daily, products] = await env.DB.batch([
+  const [summary, eventCounts, daily, products, journey, blockedReasons] = await env.DB.batch([
     env.DB.prepare(`SELECT COUNT(*) AS total_events, COUNT(DISTINCT session_hash) AS unique_sessions
       FROM site_events WHERE created_at >= ?1`).bind(since),
     env.DB.prepare(`SELECT event_name, COUNT(*) AS event_count, COUNT(DISTINCT session_hash) AS session_count
@@ -98,9 +107,23 @@ export async function getSiteAnalytics(days = 30): Promise<SiteAnalytics> {
       SUM(CASE WHEN event_name = 'case_source_clicked' THEN 1 ELSE 0 END) AS source_click_count
       FROM site_events WHERE created_at >= ?1 AND product_id IS NOT NULL
       GROUP BY product_id ORDER BY completed_count DESC, selected_count DESC LIMIT 8`).bind(since),
+    env.DB.prepare(`SELECT
+      COUNT(DISTINCT CASE WHEN event_name = 'seller_message_copied' THEN session_hash END) AS seller_message_copied,
+      COUNT(DISTINCT CASE WHEN event_name = 'photo_upload_started' THEN session_hash END) AS photo_upload_started,
+      COUNT(DISTINCT CASE WHEN event_name = 'evidence_ready' THEN session_hash END) AS evidence_ready,
+      COUNT(DISTINCT CASE WHEN event_name = 'analysis_completed' THEN session_hash END) AS analysis_completed,
+      COUNT(DISTINCT CASE WHEN event_name = 'result_viewed'
+        AND json_extract(properties_json, '$.has_ai_analysis') = 1 THEN session_hash END) AS ai_result_viewed,
+      COUNT(DISTINCT CASE WHEN event_name = 'analysis_blocked' THEN session_hash END) AS blocked
+      FROM site_events WHERE created_at >= ?1`).bind(since),
+    env.DB.prepare(`SELECT COALESCE(CAST(json_extract(properties_json, '$.blocked_reason') AS TEXT), 'unknown') AS blocked_reason,
+      COUNT(DISTINCT session_hash) AS session_count
+      FROM site_events WHERE created_at >= ?1 AND event_name = 'analysis_blocked'
+      GROUP BY blocked_reason ORDER BY session_count DESC`).bind(since),
   ]);
 
   const summaryRow = summary.results[0] as Record<string, unknown> | undefined;
+  const journeyRow = journey.results[0] as Record<string, unknown> | undefined;
   const dailyRows = (daily.results as Array<Record<string, unknown>>).map((row) => ({
     date: String(row.event_date),
     sessions: Number(row.session_count ?? 0),
@@ -130,5 +153,17 @@ export async function getSiteAnalytics(days = 30): Promise<SiteAnalytics> {
       completed: Number(row.completed_count ?? 0),
       sourceClicks: Number(row.source_click_count ?? 0),
     })),
+    journey: {
+      sellerMessageCopied: Number(journeyRow?.seller_message_copied ?? 0),
+      photoUploadStarted: Number(journeyRow?.photo_upload_started ?? 0),
+      evidenceReady: Number(journeyRow?.evidence_ready ?? 0),
+      analysisCompleted: Number(journeyRow?.analysis_completed ?? 0),
+      aiResultViewed: Number(journeyRow?.ai_result_viewed ?? 0),
+      blocked: Number(journeyRow?.blocked ?? 0),
+      blockedReasons: (blockedReasons.results as Array<Record<string, unknown>>).map((row) => ({
+        reason: String(row.blocked_reason),
+        sessions: Number(row.session_count ?? 0),
+      })),
+    },
   };
 }

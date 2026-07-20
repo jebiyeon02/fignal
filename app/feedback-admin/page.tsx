@@ -38,6 +38,13 @@ function percentage(numerator: number, denominator: number) {
   return Math.round((numerator / denominator) * 100);
 }
 
+const blockedReasonLabels: Record<string, string> = {
+  consent_missing: "공개 리포트 동의 전 중단",
+  insufficient_photos: "필수 사진 부족",
+  unsupported_product: "지원하지 않는 제품",
+  unknown: "원인 미확인",
+};
+
 export default async function FeedbackAdminPage() {
   const user = await requireChatGPTUser("/feedback-admin");
   const access = feedbackAdminAccess(user.email);
@@ -68,7 +75,9 @@ export default async function FeedbackAdminPage() {
   const funnelEvents: SiteEventName[] = [
     "search_performed",
     "product_selected",
+    "seller_message_copied",
     "photo_upload_started",
+    "evidence_ready",
     "analysis_started",
     "analysis_completed",
     "result_viewed",
@@ -78,6 +87,13 @@ export default async function FeedbackAdminPage() {
   const funnelMax = Math.max(1, ...funnelEvents.map(eventSessions));
   const dailyMax = Math.max(1, ...analytics.daily.slice(-14).map((item) => Math.max(item.sessions, item.completed)));
   const productsById = new Map(expandedProducts.map((product) => [product.id, product]));
+  const journeyRows = [
+    { label: "판매자 사진 요청", value: analytics.journey.sellerMessageCopied, denominator: analytics.uniqueSessions, basis: "전체 세션 대비" },
+    { label: "첫 사진 등록", value: analytics.journey.photoUploadStarted, denominator: analytics.uniqueSessions, basis: "전체 세션 대비" },
+    { label: "필수 사진 준비", value: analytics.journey.evidenceReady, denominator: analytics.journey.photoUploadStarted, basis: "첫 등록 대비" },
+    { label: "AI 분석 완료", value: analytics.journey.analysisCompleted, denominator: analytics.journey.evidenceReady, basis: "사진 준비 대비" },
+    { label: "AI 결과 확인", value: analytics.journey.aiResultViewed, denominator: analytics.journey.analysisCompleted, basis: "분석 완료 대비" },
+  ];
 
   return (
     <main className={styles.page}>
@@ -100,6 +116,28 @@ export default async function FeedbackAdminPage() {
             <article><span><MousePointerClick size={16} /> 근거 확인</span><strong>{eventCount("case_source_clicked").toLocaleString("ko-KR")}</strong><small>결과 세션 대비 {percentage(sourceClickSessions, resultSessions)}%</small></article>
             <article><span><Activity size={16} /> 분석 실패</span><strong>{eventCount("analysis_failed").toLocaleString("ko-KR")}</strong><small>시작 대비 {percentage(eventCount("analysis_failed"), analysisStarted)}%</small></article>
           </div>
+
+          <article className={styles.behaviorCard}>
+            <header>
+              <div><strong>핵심 행동 흐름</strong><small>말로 남긴 의견이 아니라 실제 사용 행동을 익명 세션 기준으로 봅니다.</small></div>
+              <span>최근 30일</span>
+            </header>
+            <div className={styles.behaviorGrid}>
+              {journeyRows.map((item) => (
+                <div key={item.label}>
+                  <span>{item.label}</span>
+                  <strong>{item.value}<small>명</small></strong>
+                  <em>{item.basis} {percentage(item.value, item.denominator)}%</em>
+                </div>
+              ))}
+            </div>
+            <footer>
+              <strong>분석 진행이 막힌 세션 {analytics.journey.blocked}명</strong>
+              <div>{analytics.journey.blockedReasons.length > 0
+                ? analytics.journey.blockedReasons.map((item) => <span key={item.reason}>{blockedReasonLabels[item.reason] ?? item.reason} {item.sessions}</span>)
+                : <span>아직 중단 신호가 없습니다.</span>}</div>
+            </footer>
+          </article>
 
           <div className={styles.analyticsGrid}>
             <article className={styles.funnelCard}>

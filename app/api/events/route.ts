@@ -11,7 +11,7 @@ const allowedPropertyKeys = new Set([
   "upload_method", "evidence_key", "photo_count", "evidence_ready", "duration_ms", "failure_code",
   "verdict", "risk_signal_count", "case_match_count", "report_saved", "review_path",
   "has_ai_analysis", "case_id", "source_kind", "source_locale", "source_name",
-  "from_stage", "had_result",
+  "from_stage", "had_result", "blocked_reason",
 ]);
 
 function cleanText(value: unknown, maxLength: number) {

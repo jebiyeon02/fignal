@@ -15,6 +15,23 @@
 .metricGrid article > span { display: flex; align-items: center; gap: 6px; color: #777; font-size: 9px; font-weight: 700; }
 .metricGrid article > strong { margin-top: 15px; font-size: 27px; line-height: 1; letter-spacing: -.04em; }
 .metricGrid article > small { margin-top: 7px; color: #999; font-size: 8px; line-height: 1.45; }
+.behaviorCard { overflow: hidden; border: 1px solid #ccdcd1; border-radius: 11px; background: #fff; }
+.behaviorCard > header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 17px 18px; border-bottom: 1px solid #e7eee9; background: #f7fbf8; }
+.behaviorCard > header div { display: grid; gap: 4px; }
+.behaviorCard > header strong { font-size: 11px; }
+.behaviorCard > header small { color: #7e8c83; font-size: 8px; font-weight: 400; }
+.behaviorCard > header > span { padding: 5px 7px; border-radius: 6px; color: #286944; background: #e7f1ea; font-size: 8px; font-weight: 800; white-space: nowrap; }
+.behaviorGrid { display: grid; grid-template-columns: repeat(5, 1fr); }
+.behaviorGrid > div { display: grid; gap: 7px; padding: 17px; border-right: 1px solid #eee; }
+.behaviorGrid > div:last-child { border-right: 0; }
+.behaviorGrid span { color: #777; font-size: 8px; font-weight: 700; }
+.behaviorGrid strong { font-size: 22px; letter-spacing: -.04em; }
+.behaviorGrid strong small { color: #aaa; font-size: 8px; font-weight: 500; }
+.behaviorGrid em { color: #999; font-size: 7px; font-style: normal; }
+.behaviorCard > footer { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 13px 18px; border-top: 1px solid #eee; color: #777; background: #fafafa; }
+.behaviorCard > footer > strong { font-size: 8px; }
+.behaviorCard > footer > div { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 5px; }
+.behaviorCard > footer span { padding: 4px 6px; border-radius: 5px; color: #8a6154; background: #f7ede9; font-size: 7px; }
 .analyticsGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
 .funnelCard, .dailyCard, .productCard { overflow: hidden; border: 1px solid #ddd; border-radius: 11px; background: #fff; }
 .funnelCard > header, .dailyCard > header, .productCard > header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 17px 18px; border-bottom: 1px solid #eee; }
@@ -84,6 +101,10 @@
   .analyticsHeading h1 { font-size: 29px; }
   .metricGrid { grid-template-columns: 1fr 1fr; }
   .metricGrid article { padding: 14px; }
+  .behaviorGrid { grid-template-columns: 1fr 1fr; }
+  .behaviorGrid > div { border-bottom: 1px solid #eee; }
+  .behaviorCard > footer { align-items: flex-start; flex-direction: column; }
+  .behaviorCard > footer > div { justify-content: flex-start; }
   .analyticsGrid { grid-template-columns: 1fr; }
   .productTable { overflow-x: auto; }
   .productTable > div { width: 660px; }

@@ -544,6 +544,7 @@ export default function Home() {
   const [shareOptionsOpen, setShareOptionsOpen] = useState(false);
   const lastTrackedSearchRef = useRef("");
   const resultViewedRef = useRef("");
+  const evidenceReadyTrackedRef = useRef("");
 
   const showToast = useCallback((message: string) => {
     setToast(message);
@@ -727,6 +728,16 @@ export default function Home() {
   const reviewedCount = Object.values(reviewedEvidence).filter(Boolean).length;
   const hasUserOverride = Object.keys(userOverrides).length > 0;
   const evidenceReady = essentialCompleted >= 4;
+
+  useEffect(() => {
+    if (!evidenceReady || !currentProduct?.id) return;
+    if (evidenceReadyTrackedRef.current === currentProduct.id) return;
+    evidenceReadyTrackedRef.current = currentProduct.id;
+    trackSiteEvent("evidence_ready", {
+      productId: currentProduct.id,
+      properties: { photo_count: completedCount, evidence_ready: true },
+    });
+  }, [completedCount, currentProduct?.id, evidenceReady]);
   const reviewPath = resolveReviewPath({
     supported: Boolean(currentProduct?.verified),
     evidenceReady,
@@ -795,6 +806,7 @@ export default function Home() {
       },
     });
     if (selectedProduct?.id && selectedProduct.id !== product.id) {
+      evidenceReadyTrackedRef.current = "";
       Object.values(filePreviews).forEach((preview) => preview && URL.revokeObjectURL(preview));
       setFiles({});
       sourceFilesRef.current = {};
@@ -915,6 +927,9 @@ export default function Home() {
   const copySellerMessage = async () => {
     try {
       await navigator.clipboard.writeText(sellerMessage);
+      trackSiteEvent("seller_message_copied", {
+        productId: currentProduct?.id,
+      });
       showToast("사진 요청 문구를 복사했습니다.");
     } catch {
       showToast("복사하지 못했습니다.");
@@ -924,6 +939,14 @@ export default function Home() {
   const analyze = async () => {
     if (!currentProduct) return;
     if (!currentProduct.verified || !evidenceReady) {
+      trackSiteEvent("analysis_blocked", {
+        productId: currentProduct.id,
+        properties: {
+          blocked_reason: currentProduct.verified ? "insufficient_photos" : "unsupported_product",
+          photo_count: Object.keys(files).length,
+          evidence_ready: evidenceReady,
+        },
+      });
       setAiAnalysis(null);
       setAnalysisError("");
       setReviewRequestShared(false);
@@ -933,6 +956,14 @@ export default function Home() {
     }
     if (Object.keys(files).length === 0) return;
     if (!reportConsent) {
+      trackSiteEvent("analysis_blocked", {
+        productId: currentProduct.id,
+        properties: {
+          blocked_reason: "consent_missing",
+          photo_count: Object.keys(files).length,
+          evidence_ready: evidenceReady,
+        },
+      });
       showToast("사진이 포함된 공개 리포트 저장에 동의해 주세요.");
       return;
     }
@@ -1105,6 +1136,7 @@ export default function Home() {
       if (preview) URL.revokeObjectURL(preview);
     });
     setStage("search");
+    evidenceReadyTrackedRef.current = "";
     setQuery("");
     setSelectedProduct(null);
     setManualOpen(false);
@@ -1285,6 +1317,12 @@ export default function Home() {
             if (currentProduct?.id === "manual") {
               trackSiteEvent("product_selected", { productId: currentProduct.id, properties: { selection_position: 0, verified: false } });
             }
+            if (currentProduct && !currentProduct.verified) {
+              trackSiteEvent("analysis_blocked", {
+                productId: currentProduct.id,
+                properties: { blocked_reason: "unsupported_product", photo_count: 0, evidence_ready: false },
+              });
+            }
             setStage(currentProduct?.verified ? "photos" : "result");
             window.scrollTo({ top: 0, behavior: "smooth" });
           }}>이 제품 확인하기 <ArrowRight size={18} /></button>
@@ -1338,7 +1376,7 @@ export default function Home() {
             <span><strong>사진이 포함된 공개 검증 리포트 저장에 동의합니다.</strong>검증 사진과 판정 근거는 고유한 읽기 전용 리포트로 공개됩니다. 구매내역 사진은 저장하지 않으며, 사진 속 이름·주소 등 개인정보는 직접 가린 뒤 올려주세요.</span>
           </label>
           {analysisError && <div className="analysis-error" role="alert"><TriangleAlert size={17} /><span><strong>분석을 시작하지 못했어요</strong>{analysisError}</span></div>}
-          <button className="black-button full" disabled={completedCount === 0 || isAnalyzing || isPreparingImages || (evidenceReady && !reportConsent)} onClick={analyze}>{isPreparingImages ? <><LoaderCircle className="spin" size={18} /> 사진 용량 최적화 중</> : isAnalyzing ? <><LoaderCircle className="spin" size={18} /> 사진 분석 중</> : evidenceReady && !reportConsent ? <><FileCheck2 size={18} /> 공개 리포트 동의 필요</> : evidenceReady ? <><ShieldCheck size={18} /> AI로 분석하기</> : <><CircleHelp size={18} /> 부족한 사진 확인</>}</button>
+          <button className="black-button full" disabled={completedCount === 0 || isAnalyzing || isPreparingImages} onClick={analyze}>{isPreparingImages ? <><LoaderCircle className="spin" size={18} /> 사진 용량 최적화 중</> : isAnalyzing ? <><LoaderCircle className="spin" size={18} /> 사진 분석 중</> : evidenceReady && !reportConsent ? <><FileCheck2 size={18} /> 공개 리포트 동의 필요</> : evidenceReady ? <><ShieldCheck size={18} /> AI로 분석하기</> : <><CircleHelp size={18} /> 부족한 사진 확인</>}</button>
         </section>
       )}
 
