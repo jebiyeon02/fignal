@@ -54,6 +54,21 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .intro h1, .simple-heading h1 { margin: 0; color: #111; font-size: clamp(31px, 5vw, 42px); font-weight: 760; letter-spacing: -.055em; line-height: 1.18; }
 .intro p, .simple-heading p { margin: 14px 0 0; color: #888; font-size: 13px; }
 
+.beta-notice { margin-top: 28px; overflow: hidden; border: 1px solid #dcdcdc; border-radius: 14px; background: #fff; }
+.beta-notice-head { padding: 22px 22px 18px; }
+.beta-notice-badge { display: inline-flex; align-items: center; min-height: 23px; padding: 0 8px; border: 1px solid #bad8c7; border-radius: 999px; background: #eef8f2; color: #27784d; font-size: 8px; font-weight: 800; letter-spacing: .08em; }
+.beta-notice-head h2 { margin: 12px 0 0; color: #222; font-size: 18px; letter-spacing: -.035em; line-height: 1.4; }
+.beta-notice-head p { margin: 6px 0 0; color: #888; font-size: 10px; line-height: 1.6; }
+.beta-notice-points { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 0; padding: 0; border-top: 1px solid #ececec; border-bottom: 1px solid #e2ebe6; background: #fafafa; }
+.beta-notice-points li { min-width: 0; display: grid; grid-template-columns: 20px minmax(0, 1fr); align-items: start; gap: 9px; padding: 16px; color: #555; font-size: 9px; line-height: 1.65; list-style: none; }
+.beta-notice-points li:not(:last-child) { border-right: 1px solid #e7e7e7; }
+.beta-notice-points svg { margin-top: 1px; color: #777; }
+.beta-notice-purpose { padding: 18px 22px 19px; background: #f3f8f5; }
+.beta-notice-purpose strong { display: block; color: #28563d; font-size: 10px; }
+.beta-notice-purpose p { margin: 7px 0 0; color: #52645a; font-size: 9px; line-height: 1.7; }
+.beta-notice-purpose small { display: block; margin-top: 10px; color: #849088; font-size: 8px; line-height: 1.5; }
+.beta-notice + .product-search { margin-top: 28px; }
+
 .product-search { position: relative; z-index: 10; margin-top: 38px; }
 .search-input { height: 62px; display: flex; align-items: center; gap: 13px; padding: 0 18px; border: 1px solid #d8d8d8; border-radius: 12px; background: #fff; transition: border-color .16s, box-shadow .16s; }
 .search-input.focused { border-color: #222; box-shadow: 0 0 0 1px #222; }
@@ -713,6 +728,14 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
   .step-bar p { font-size: 9px; }
   .search-page, .photos-page, .result-page { width: calc(100% - 28px); padding-top: 40px; padding-bottom: 80px; }
   .intro h1, .simple-heading h1 { font-size: 31px; }
+  .beta-notice { margin-top: 24px; border-radius: 12px; }
+  .beta-notice-head { padding: 18px 16px 15px; }
+  .beta-notice-head h2 { font-size: 16px; }
+  .beta-notice-points { grid-template-columns: 1fr; }
+  .beta-notice-points li { padding: 13px 16px; }
+  .beta-notice-points li:not(:last-child) { border-right: 0; border-bottom: 1px solid #e7e7e7; }
+  .beta-notice-purpose { padding: 16px; }
+  .beta-notice + .product-search { margin-top: 24px; }
   .product-search { margin-top: 30px; }
   .search-input { height: 56px; }
   .suggestions { top: 64px; }
