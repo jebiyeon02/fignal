@@ -1387,35 +1387,46 @@ function AiFindingsSection({ analysis, observations, previews, reviewed, onRevie
   reviewed: Partial<Record<EvidenceKey, boolean>>;
   onReview: (finding: AiFinding, value: Observation) => void;
 }) {
-  const reviewedCount = analysis.findings.filter((finding) => reviewed[finding.key]).length;
-  const statusLabel = (status: AiFinding["status"]) => status === "match" ? "일치" : status === "concern" ? "차이 의심" : "확인 불가";
+  const [isEditing, setIsEditing] = useState(false);
+  const statusLabel = (status: Observation) => status === "match" ? "일치" : status === "concern" ? "차이 의심" : "확인 불가";
 
   return (
     <section className="ai-section">
       <header>
         <div><ShieldCheck size={18} /><h2>AI가 찾은 근거</h2></div>
-        <span>직접 확인 {reviewedCount}/{analysis.findings.length}</span>
+        <button
+          type="button"
+          className="ai-review-toggle"
+          aria-expanded={isEditing}
+          aria-controls="ai-review-controls"
+          onClick={() => setIsEditing((current) => !current)}
+        >
+          {isEditing ? "수정 완료" : "이미지 비교 결과 수정하기"}
+        </button>
       </header>
-      <p className="ai-review-intro">사진에서 실제로 보이는 내용을 확인한 뒤 판정을 선택해 주세요.</p>
-      <div className="ai-finding-list">
+      <p className="ai-review-intro">{isEditing ? "사진에서 실제로 보이는 내용을 확인한 뒤 판정을 선택해 주세요." : "AI가 사진에서 확인한 비교 결과입니다."}</p>
+      <div className="ai-finding-list" id="ai-review-controls">
         {analysis.findings.map((finding) => {
           const current = observations[finding.key];
           const original = finding.status === "unclear" ? "unverified" : finding.status;
           const changed = reviewed[finding.key] && current !== original;
+          const displayedStatus = reviewed[finding.key] ? current : original;
           return (
-            <article className={`ai-finding ${finding.status}`} key={finding.key}>
+            <article className={`ai-finding ${displayedStatus}`} key={finding.key}>
               <div className="ai-finding-thumb">{previews[finding.key] ? <img src={previews[finding.key]} alt={`${finding.title} 분석 사진`} /> : <ImageIcon size={20} />}</div>
               <div className="ai-finding-copy">
-                <div className="ai-finding-title"><strong>{finding.title}</strong><span>{statusLabel(finding.status)}</span></div>
+                <div className="ai-finding-title"><strong>{finding.title}</strong><span>{statusLabel(displayedStatus)}</span></div>
                 <p>{finding.reason}</p>
                 <dl><dt>사진 근거</dt><dd>{finding.visibleEvidence}</dd></dl>
                 {finding.userAction && finding.status !== "match" && <dl><dt>다음 확인</dt><dd>{finding.userAction}</dd></dl>}
-                <div className="review-controls" aria-label={`${finding.title} 사용자 확인`}>
-                  <span>{reviewed[finding.key] ? (changed ? "수정됨" : "확인됨") : "내가 확인"}</span>
-                  <button className={reviewed[finding.key] && current === "match" ? "active match" : ""} onClick={() => onReview(finding, "match")}><Check size={12} /> 일치</button>
-                  <button className={reviewed[finding.key] && current === "concern" ? "active concern" : ""} onClick={() => onReview(finding, "concern")}><TriangleAlert size={12} /> 차이</button>
-                  <button className={reviewed[finding.key] && current === "unverified" ? "active" : ""} onClick={() => onReview(finding, "unverified")}>모름</button>
-                </div>
+                {isEditing && (
+                  <div className="review-controls" aria-label={`${finding.title} 사용자 확인`}>
+                    <span>{reviewed[finding.key] ? (changed ? "수정됨" : "확인됨") : "내가 확인"}</span>
+                    <button className={reviewed[finding.key] && current === "match" ? "active match" : ""} onClick={() => onReview(finding, "match")}><Check size={12} /> 일치</button>
+                    <button className={reviewed[finding.key] && current === "concern" ? "active concern" : ""} onClick={() => onReview(finding, "concern")}><TriangleAlert size={12} /> 차이</button>
+                    <button className={reviewed[finding.key] && current === "unverified" ? "active" : ""} onClick={() => onReview(finding, "unverified")}>모름</button>
+                  </div>
+                )}
               </div>
             </article>
           );
