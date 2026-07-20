@@ -140,7 +140,7 @@ const curatedCatalogProducts: CatalogProduct[] = [
     maker: "Good Smile Company",
     release: "2013.03",
     image: "",
-    officialUrl: "https://partner.goodsmile.info/support/eng/fake/en/3711/",
+    officialUrl: "https://mikatan.goodsmile.info/en/2012/10/16/nendoroid-iron-man-mark-7-heros-edition/",
     verified: true,
   },
   {
@@ -187,8 +187,8 @@ const curatedCatalogProducts: CatalogProduct[] = [
     number: "77",
     maker: "Good Smile Company",
     release: "구판 · 공식 가품 사례 확인",
-    image: "https://images.goodsmile.info/cgm/images/product/20100406/2842/9783/medium/34ed8d2302230e6163b012bca1274ccc.jpg",
-    officialUrl: "https://partner.goodsmile.info/support/eng/fake/en/2842/",
+    image: "",
+    officialUrl: "",
     verified: true,
   },
   {
@@ -199,8 +199,8 @@ const curatedCatalogProducts: CatalogProduct[] = [
     number: "97",
     maker: "Good Smile Company",
     release: "구판 · 공식 가품 사례 확인",
-    image: "https://images.goodsmile.info/cgm/images/product/20100630/2899/10593/medium/b339bc37e529e7ead14f71673ff48587.jpg",
-    officialUrl: "https://partner.goodsmile.info/support/eng/fake/en/2899/",
+    image: "",
+    officialUrl: "",
     verified: true,
   },
   {
@@ -211,8 +211,8 @@ const curatedCatalogProducts: CatalogProduct[] = [
     number: "150",
     maker: "Good Smile Company",
     release: "구판 확장판 · 공식 가품 사례 확인",
-    image: "https://images.goodsmile.info/cgm/images/product/20120125/3452/17050/medium/cf48eee0f23a9e95fa1e7c12b4be8f78.jpg",
-    officialUrl: "https://partner.goodsmile.info/support/eng/fake/en/3452/",
+    image: "",
+    officialUrl: "",
     verified: true,
   },
   {
@@ -223,8 +223,8 @@ const curatedCatalogProducts: CatalogProduct[] = [
     number: "106",
     maker: "Good Smile Company",
     release: "구판 · 공식 가품 사례 확인",
-    image: "https://images.goodsmile.info/cgm/images/product/20110106/3064/12542/medium/471cd79f1af768193dd0c831cb0a2d0b.jpg",
-    officialUrl: "https://partner.goodsmile.info/support/eng/fake/en/3064/",
+    image: "",
+    officialUrl: "",
     verified: true,
   },
   {
@@ -235,8 +235,8 @@ const curatedCatalogProducts: CatalogProduct[] = [
     number: "128",
     maker: "Good Smile Company",
     release: "구판 · 공식 가품 사례 확인",
-    image: "https://images.goodsmile.info/cgm/images/product/20110808/3249/14935/medium/a767794b19c588bec8b01db7dee14b00.jpg",
-    officialUrl: "https://partner.goodsmile.info/support/eng/fake/en/3249/",
+    image: "",
+    officialUrl: "",
     verified: true,
   },
   {
@@ -247,8 +247,8 @@ const curatedCatalogProducts: CatalogProduct[] = [
     number: "129",
     maker: "Good Smile Company",
     release: "구판 · 공식 가품 사례 확인",
-    image: "https://images.goodsmile.info/cgm/images/product/20110808/3251/14949/medium/b0af4d0e854ede4344000ef0fc483a47.jpg",
-    officialUrl: "https://partner.goodsmile.info/support/eng/fake/en/3251/",
+    image: "",
+    officialUrl: "",
     verified: true,
   },
   {
@@ -259,8 +259,8 @@ const curatedCatalogProducts: CatalogProduct[] = [
     number: "145",
     maker: "Good Smile Company",
     release: "구판 · 공식 가품 사례 확인",
-    image: "https://images.goodsmile.info/cgm/images/product/20110802/3241/14873/medium/0b41e35d33a2d8c8fd4f2ff83079ad57.jpg",
-    officialUrl: "https://partner.goodsmile.info/support/eng/fake/en/3241/",
+    image: "",
+    officialUrl: "",
     verified: true,
   },
   {
@@ -271,8 +271,8 @@ const curatedCatalogProducts: CatalogProduct[] = [
     number: "142",
     maker: "Good Smile Company",
     release: "구판 · 공식 가품 사례 확인",
-    image: "https://images.goodsmile.info/cgm/images/product/20120528/3561/18585/medium/5ee32bc57175ff1a5b62ca9a3cf420d8.jpg",
-    officialUrl: "https://partner.goodsmile.info/support/eng/fake/en/3561/",
+    image: "",
+    officialUrl: "",
     verified: true,
   },
   {
@@ -283,8 +283,8 @@ const curatedCatalogProducts: CatalogProduct[] = [
     number: "144",
     maker: "Good Smile Company",
     release: "구판 · 공식 가품 사례 확인",
-    image: "https://images.goodsmile.info/cgm/images/product/20120130/3453/17076/medium/6af29873541086aee77439206cb4ef50.jpg",
-    officialUrl: "https://partner.goodsmile.info/support/eng/fake/en/3453/",
+    image: "",
+    officialUrl: "",
     verified: true,
   },
   {
@@ -295,8 +295,8 @@ const curatedCatalogProducts: CatalogProduct[] = [
     number: "174",
     maker: "Good Smile Company",
     release: "구판 · 공식 가품 사례 확인",
-    image: "https://images.goodsmile.info/cgm/images/product/20110808/3250/14940/medium/5e1e4d3239c7ed69bfbcad189ca00d7d.jpg",
-    officialUrl: "https://partner.goodsmile.info/support/eng/fake/en/3250/",
+    image: "",
+    officialUrl: "",
     verified: true,
   },
   {
@@ -307,8 +307,8 @@ const curatedCatalogProducts: CatalogProduct[] = [
     number: "204",
     maker: "Good Smile Company",
     release: "구판 · 공식 가품 사례 확인",
-    image: "https://images.goodsmile.info/cgm/images/product/20120328/3516/17901/medium/8c7d72abcac4033535f4082b64dd517a.jpg",
-    officialUrl: "https://partner.goodsmile.info/support/eng/fake/en/3516/",
+    image: "",
+    officialUrl: "",
     verified: true,
   },
   {
@@ -319,8 +319,8 @@ const curatedCatalogProducts: CatalogProduct[] = [
     number: "207",
     maker: "Good Smile Company",
     release: "구판 · 공식 가품 사례 확인",
-    image: "https://images.goodsmile.info/cgm/images/product/20120116/3438/16906/medium/8192da72a120669851f53050ab879cb3.jpg",
-    officialUrl: "https://partner.goodsmile.info/support/eng/fake/en/3438/",
+    image: "",
+    officialUrl: "",
     verified: true,
   },
   {
@@ -331,8 +331,8 @@ const curatedCatalogProducts: CatalogProduct[] = [
     number: "303",
     maker: "Good Smile Company",
     release: "구판 · 공식 가품 사례 확인",
-    image: "https://images.goodsmile.info/cgm/images/product/20120905/3666/20276/medium/93bad2aa646aba958d55a2c052ff74a6.jpg",
-    officialUrl: "https://partner.goodsmile.info/support/eng/fake/en/3666/",
+    image: "",
+    officialUrl: "",
     verified: true,
   },
   {
@@ -343,8 +343,8 @@ const curatedCatalogProducts: CatalogProduct[] = [
     number: "380",
     maker: "Good Smile Company",
     release: "구판 · 공식 가품 사례 확인",
-    image: "https://images.goodsmile.info/cgm/images/product/20131125/4133/27202/medium/be02d5a554b606a7efe93ee8ba6f759b.jpg",
-    officialUrl: "https://partner.goodsmile.info/support/eng/fake/en/4133-1/",
+    image: "",
+    officialUrl: "",
     verified: true,
   },
   {
@@ -1745,31 +1745,47 @@ const curatedCatalogProducts: CatalogProduct[] = [
 const catalogSnapshotProducts = nendoroidCatalogSnapshot as CatalogProduct[];
 const catalogSnapshotProductsById = new Map(catalogSnapshotProducts.map((product) => [product.id, product]));
 const curatedProductIds = new Set(curatedCatalogProducts.map((product) => product.id));
+const officialOneToFiveHundredProducts = nendoroidsOneToFiveHundred as CatalogProduct[];
+const officialOneToFiveHundredProductsById = new Map(
+  officialOneToFiveHundredProducts.map((product) => [product.id, product]),
+);
+
+function isOfficialGoodSmileHost(hostname: string) {
+  return hostname === "goodsmile.com"
+    || hostname.endsWith(".goodsmile.com")
+    || hostname === "goodsmile.info"
+    || hostname.endsWith(".goodsmile.info");
+}
 
 export function isOfficialProductImage(image: string) {
   if (!image) return false;
   try {
     const hostname = new URL(image).hostname;
-    return hostname === "www.goodsmile.com"
-      || hostname === "images.goodsmile.info"
-      || hostname.endsWith(".goodsmile.info");
+    return isOfficialGoodSmileHost(hostname);
+  } catch {
+    return false;
+  }
+}
+
+export function isOfficialProductUrl(url: string) {
+  if (!url) return false;
+  try {
+    const parsedUrl = new URL(url);
+    return isOfficialGoodSmileHost(parsedUrl.hostname)
+      && !parsedUrl.pathname.includes("/support/eng/fake/")
+      && !parsedUrl.pathname.endsWith(".pdf");
   } catch {
     return false;
   }
 }
 
 const withOfficialImageOnly = (product: CatalogProduct): CatalogProduct => {
+  const canonicalProduct = officialOneToFiveHundredProductsById.get(product.id);
   const snapshotProduct = catalogSnapshotProductsById.get(product.id);
-  const image = isOfficialProductImage(product.image)
-    ? product.image
-    : isOfficialProductImage(snapshotProduct?.image ?? "")
-      ? snapshotProduct?.image ?? ""
-      : "";
-  const officialUrl = isOfficialProductImage(product.officialUrl)
-    ? product.officialUrl
-    : isOfficialProductImage(snapshotProduct?.officialUrl ?? "")
-      ? snapshotProduct?.officialUrl ?? ""
-      : "";
+  const image = [canonicalProduct?.image, snapshotProduct?.image, product.image]
+    .find((candidate) => isOfficialProductImage(candidate ?? "")) ?? "";
+  const officialUrl = [canonicalProduct?.officialUrl, snapshotProduct?.officialUrl, product.officialUrl]
+    .find((candidate) => isOfficialProductUrl(candidate ?? "")) ?? "";
   return {
     ...product,
     image,
@@ -1778,7 +1794,7 @@ const withOfficialImageOnly = (product: CatalogProduct): CatalogProduct => {
     officialUrl,
   };
 };
-const officialOneToFiveHundred = (nendoroidsOneToFiveHundred as CatalogProduct[]).filter(
+const officialOneToFiveHundred = officialOneToFiveHundredProducts.filter(
   (product) => !curatedProductIds.has(product.id),
 ).map(withOfficialImageOnly);
 const preferredProductIds = new Set([

@@ -19,8 +19,40 @@ test("full catalog keeps its product coverage without GSInfo image URLs", () => 
   }
 });
 
+test("legacy catalog uses product-detail hero images instead of listing thumbnails", () => {
+  const productsWithImages = officialOneToFiveHundred.filter((product) => product.image);
+  assert.equal(productsWithImages.length, 480);
+
+  for (const product of productsWithImages) {
+    assert.match(product.image, /\/large\//, `${product.id} should use a large product image`);
+    assert.doesNotMatch(product.image, /\/medium\//);
+  }
+
+  for (const product of officialOneToFiveHundred) {
+    if (!product.officialUrl) continue;
+    assert.match(product.officialUrl, /^https:\/\/www\.goodsmile\.info\/en\/product\//);
+    assert.doesNotMatch(product.officialUrl, /\/support\/eng\/fake\/|\.pdf$/i);
+  }
+});
+
+test("Bloody Regina and Kiriko keep distinct official images and pages", () => {
+  const bloodyRegina = catalog.find((product) => product.id === "nendoroid-1672-b");
+  const kiriko = catalog.find((product) => product.id === "nendoroid-2225");
+
+  assert.ok(bloodyRegina);
+  assert.ok(kiriko);
+  assert.notEqual(bloodyRegina.image, kiriko.image);
+  assert.notEqual(bloodyRegina.officialUrl, kiriko.officialUrl);
+  assert.match(bloodyRegina.image, /\/20220304\/12431\/96172\/large\//);
+  assert.match(bloodyRegina.officialUrl, /goodsmile\.info\/en\/product\/12431\/Nendoroid\+Vladilena/);
+});
+
 test("runtime catalog has no GSInfo network dependency or fallback image field", () => {
   assert.doesNotMatch(catalogSource, /gsinfoproject/i);
   assert.doesNotMatch(catalogSource, /fallbackImage/);
   assert.doesNotMatch(catalogSource, /catalog-fallback/);
+  assert.doesNotMatch(
+    catalogSource,
+    /officialUrl:\s*["'][^"']*(?:\/support\/eng\/fake\/|english_nenmore_clip-kyuban_taiou\.pdf)/i,
+  );
 });

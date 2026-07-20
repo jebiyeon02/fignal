@@ -6,7 +6,6 @@ const OUTPUT = resolve(ROOT, "app/data/nendoroids-1-500.generated.json");
 const RANGES = ["000-100", "101-200", "201-300", "301-400", "401-500"];
 const EXPECTED_PRODUCT_COUNT = 535;
 const isCheck = process.argv.includes("--check");
-const OFFICIAL_COMPATIBILITY_URL = "https://partner.goodsmile.info/support/more/english_nenmore_clip-kyuban_taiou.pdf";
 
 // The legacy range pages omit several early limited/licensed releases. Good Smile's
 // official compatibility list supplies those numbers; NendoGuide supplies the two
@@ -71,7 +70,7 @@ const SUPPLEMENTAL_PRODUCTS = [
     "https://www.nendo.guide/nendoroids/nendoroid/iron-patriot-hero-s-edition-392/",
   ],
   ["475", "Elsa", "2015.05 · 2020.07 재판", "https://www.nendo.guide/nendoroids/nendoroid/elsa-475/"],
-].map(([number, shortName, release = "공식 호환표 확인", sourceUrl = OFFICIAL_COMPATIBILITY_URL]) => ({
+].map(([number, shortName, release = "공식 호환표 확인"]) => ({
   id: `nendoroid-${numberId(number)}`,
   name: `넨도로이드 ${shortName}`,
   englishName: `Nendoroid ${shortName}`,
@@ -80,7 +79,10 @@ const SUPPLEMENTAL_PRODUCTS = [
   maker: "Good Smile Company",
   release,
   image: "",
-  officialUrl: sourceUrl,
+  // Compatibility sheets and third-party guides are references, not product
+  // detail pages. Leave this blank so the runtime can prefer a canonical
+  // Good Smile product page from the full catalog snapshot when one exists.
+  officialUrl: "",
   verified: true,
 }));
 
@@ -144,6 +146,17 @@ function detailField(html, label) {
   return textContent(match?.[1]);
 }
 
+function detailHeroImage(html) {
+  const largeImage = html.match(/<a[^>]+href="([^"]+\/large\/[^"]+)"[^>]*class="imagebox"/i)?.[1]
+    ?? html.match(/<img[^>]+class="itemImg"[^>]+src="([^"]+\/large\/[^"]+)"/i)?.[1];
+  const metadataImage = html.match(/<meta[^>]+property="og:image"[^>]+content="([^"]+)"/i)?.[1];
+  const image = decodeHtml(largeImage ?? metadataImage ?? "")
+    .replace(/^http:\/\//i, "https://")
+    .replace(/^\/\//, "https://")
+    .replace("/medium/", "/large/");
+  return image.startsWith("https://") && !image.toLowerCase().endsWith(".gif") ? image : "";
+}
+
 function formatRelease(value) {
   return value.replace(/(\d{4})\/(\d{2})/g, "$1.$2") || "공식 제품 페이지 확인";
 }
@@ -185,7 +198,7 @@ function validate(products) {
     if (numericPart < 1 || numericPart > 500) errors.push(`${product.id}: number is outside 1-500`);
     if (ids.has(product.id)) errors.push(`${product.id}: duplicate id`);
     ids.add(product.id);
-    if (!product.officialUrl.startsWith("https://")) errors.push(`${product.id}: invalid source URL`);
+    if (product.officialUrl && !product.officialUrl.startsWith("https://")) errors.push(`${product.id}: invalid source URL`);
     if (product.image && !product.image.startsWith("https://")) errors.push(`${product.id}: invalid image URL`);
     if (!product.englishName.startsWith("Nendoroid ")) errors.push(`${product.id}: invalid English name`);
   }
@@ -225,7 +238,7 @@ async function syncCatalog() {
       number: product.number,
       maker: detailField(details, "Manufacturer") || "Good Smile Company",
       release: formatRelease(detailField(details, "Release Date")),
-      image: product.image,
+      image: detailHeroImage(details),
       officialUrl: product.officialUrl,
       verified: true,
     };
