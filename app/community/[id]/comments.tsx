@@ -64,7 +64,6 @@ export function CommunityComments({ postId, initialComments }: {
     <section className="community-comments" id="community-comments" aria-labelledby="community-comments-title">
       <header>
         <span><MessageCircle size={20} /><h2 id="community-comments-title">댓글</h2></span>
-        <p>사진이나 판본 차이에 대한 근거를 남겨주세요. 댓글 수가 AI 판정을 바꾸지는 않습니다.</p>
       </header>
 
       <div className="community-comment-toolbar">

@@ -6,7 +6,7 @@ const pageSource = await readFile(new URL("../app/page.tsx", import.meta.url), "
 
 test("result footer keeps only share and community publish actions", () => {
   const start = pageSource.indexOf('<div className="result-actions">');
-  const end = pageSource.indexOf('<p className="disclaimer">', start);
+  const end = pageSource.indexOf("{criteriaOpen", start);
   const actions = start >= 0 && end > start ? pageSource.slice(start, end) : "";
   assert.match(actions, /> 공유<\/button>/);
   assert.match(actions, /> 커뮤니티에 게시<\/button>/);

@@ -8,7 +8,8 @@ test("AI 분석 중에는 전체 화면의 상호작용을 잠근다", () => {
   assert.match(pageSource, /inert=\{isAnalyzing \? true : undefined\}/);
   assert.match(pageSource, /className="analysis-interaction-lock"/);
   assert.match(pageSource, /aria-modal="true"/);
-  assert.match(pageSource, /사진 추가·삭제와 페이지 이동을 잠시 막아두었습니다/);
+  assert.match(pageSource, /사진을 분석하고 있어요/);
+  assert.doesNotMatch(pageSource, /사진 추가·삭제와 페이지 이동을 잠시 막아두었습니다/);
 });
 
 test("사진 변경 핸들러도 분석 중 요청을 거부한다", () => {

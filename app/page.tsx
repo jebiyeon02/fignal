@@ -17,7 +17,6 @@ import {
   ExternalLink,
   FileCheck2,
   Image as ImageIcon,
-  Info,
   LoaderCircle,
   MessageCircle,
   PackageCheck,
@@ -1220,11 +1219,10 @@ export default function Home() {
           </details>
 
           <div className={`upload-capacity ${uploadCapacityPercent >= 85 ? "near-limit" : ""}`} role="status" aria-live="polite">
-            <div><span><strong>사진 용량</strong><small>{isPreparingImages ? "자동 최적화 중" : "업로드 전 자동 압축 적용"}</small></span><p><strong>현재 {formatUploadMegabytes(uploadedImageBytes)}</strong><span> / 최대 {formatUploadMegabytes(CLIENT_UPLOAD_TARGET_BYTES)}</span></p></div>
+            <div><span><strong>사진 용량</strong>{isPreparingImages && <small>자동 최적화 중</small>}</span><p><strong>현재 {formatUploadMegabytes(uploadedImageBytes)}</strong><span> / 최대 {formatUploadMegabytes(CLIENT_UPLOAD_TARGET_BYTES)}</span></p></div>
             <div className="upload-capacity-track" role="progressbar" aria-label="사진 업로드 용량" aria-valuemin={0} aria-valuemax={CLIENT_UPLOAD_TARGET_BYTES} aria-valuenow={uploadedImageBytes}><span style={{ width: `${uploadCapacityPercent}%` }} /></div>
           </div>
 
-          <div className="photo-note"><Info size={16} /><span>라이선스 씰은 복제되거나 발매판마다 달라질 수 있어 단독으로 판단하지 않습니다.</span></div>
           <label className={`report-consent ${reportConsent ? "checked" : ""}`}>
             <input type="checkbox" checked={reportConsent} onChange={(event) => setReportConsent(event.target.checked)} />
             <span><strong>사진이 포함된 공개 검증 리포트 저장에 동의합니다.</strong>검증 사진과 판정 근거는 고유한 읽기 전용 리포트로 공개됩니다. 구매내역 사진은 저장하지 않으며, 사진 속 이름·주소 등 개인정보는 직접 가린 뒤 올려주세요.</span>
@@ -1305,7 +1303,6 @@ export default function Home() {
               {communityPublishToken && <button className="black-button" type="button" disabled={communityComposerOpen} onClick={openCommunityComposer}><MessageCircle size={17} /> 커뮤니티에 게시</button>}
             </div>
           )}
-          <p className="disclaimer">AI 시각 분석과 사용자 확인을 정리한 참고 의견이며 정품 보증서가 아닙니다.</p>
         </section>
       )}
 
@@ -1313,11 +1310,10 @@ export default function Home() {
       {toast && <div className="toast" role="status"><Check size={16} /> {toast}</div>}
     </main>
     {isAnalyzing && (
-      <div className="analysis-interaction-lock" role="dialog" aria-modal="true" aria-labelledby="analysis-lock-title" aria-describedby="analysis-lock-description">
+      <div className="analysis-interaction-lock" role="dialog" aria-modal="true" aria-labelledby="analysis-lock-title">
         <div className="analysis-interaction-lock-card">
           <span><LoaderCircle className="spin" size={24} /></span>
           <strong id="analysis-lock-title">사진을 분석하고 있어요</strong>
-          <p id="analysis-lock-description">결과가 나올 때까지 사진 추가·삭제와 페이지 이동을 잠시 막아두었습니다.</p>
         </div>
       </div>
     )}
@@ -1445,7 +1441,7 @@ function ReviewPathSection({
   if (path === "risk_detected") {
     return (
       <section className="review-path-panel risk-detected">
-        <div className="review-path-heading"><TriangleAlert size={21} /><span><strong>명확한 비정상 신호 {riskSignalCount}개를 감지했어요</strong><small>제품별 비교 사례가 없어도 이 신호는 최종 위험 판정에 반영됩니다.</small></span></div>
+        <div className="review-path-heading"><TriangleAlert size={21} /><span><strong>명확한 비정상 신호 {riskSignalCount}개를 감지했어요</strong></span></div>
         <p>아래 항목에서 사진에 실제로 보인 내용과 위험 판단 이유를 확인하세요. 이 결과는 가품 확정이 아니라 거래를 중단하고 판매자·제조사 확인을 우선하라는 높은 위험 경고입니다.</p>
       </section>
     );
@@ -1644,7 +1640,6 @@ function VerificationCriteriaDialog({ onClose }: { onClose: () => void }) {
           </section>
         </div>
 
-        <footer className="criteria-footer"><Info size={14} /><span>AI 시각 분석과 사용자 확인을 돕는 참고 기준이며 제조사의 정품 보증을 대신하지 않습니다.</span></footer>
       </aside>
     </div>
   );
@@ -1675,7 +1670,7 @@ function AiFindingsSection({ analysis, observations, previews, reviewed, onRevie
           {isEditing ? "수정 완료" : "이미지 비교 결과 수정하기"}
         </button>
       </header>
-      <p className="ai-review-intro">{isEditing ? "사진에서 실제로 보이는 내용을 확인한 뒤 판정을 선택해 주세요." : "AI가 사진에서 확인한 비교 결과입니다."}</p>
+      {isEditing && <p className="ai-review-intro">사진에서 실제로 보이는 내용을 확인한 뒤 판정을 선택해 주세요.</p>}
       <div className="ai-finding-list" id="ai-review-controls">
         {analysis.findings.map((finding) => {
           const current = observations[finding.key];
@@ -1712,7 +1707,6 @@ function AiFindingsSection({ analysis, observations, previews, reviewed, onRevie
           );
         })}
       </div>
-      <p className="ai-caveat">{analysis.caveat}</p>
     </section>
   );
 }
@@ -1845,9 +1839,6 @@ function CounterfeitCaseSection({ cases, observations, aiMatches }: {
                 </div>
                 <h3>{item.title}</h3>
                 <p>{item.summary}</p>
-                {item.sourceType === "community" && (
-                  <p className="case-community-note"><Info size={13} /> 커뮤니티 자료이며 제조사 공식 판정은 아닙니다. AI 판정과 점수에는 반영하지 않았습니다.</p>
-                )}
                 <ul>
                   {item.signals.map((signal) => {
                     const signalMatches = affectsVerdict && (observations[signal.evidenceKey] === "concern" || Boolean(aiMatch?.evidenceKeys.includes(signal.evidenceKey)));
@@ -1871,7 +1862,6 @@ function CounterfeitCaseSection({ cases, observations, aiMatches }: {
           );
         })}
 
-        <p className="case-note">사례는 판정 근거 중 하나입니다. 모양이 다르다고 정품이라는 뜻은 아니므로 사진과 실물을 함께 비교하세요.</p>
       </section>
 
       {preview && previewCase && previewImages.length > 0 && typeof document !== "undefined" && createPortal(
@@ -1975,7 +1965,6 @@ function CommunityMentionsSection({ mentions }: { mentions: CommunityMention[] }
         <ChevronDown className="community-chevron" size={17} />
       </summary>
       <div className="community-mentions-body">
-        <p className="community-caution"><Info size={15} /> 커뮤니티 작성자와 댓글의 주장·질문은 제조사 판정이 아닙니다. AI 판정과 점수에는 반영하지 않았으며, 제품명이나 번호를 확인한 원문만 참고용으로 연결했습니다.</p>
         <div className="community-mention-list">
           {sortedMentions.map((mention) => {
             const signalLabels = [...new Set(mention.signalTags.map((tag) => communitySignalLabels[tag]).filter(Boolean))];

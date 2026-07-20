@@ -23,10 +23,10 @@ test("anonymous comment writing has length and rate limits", () => {
   assert.match(commentRouteSource, /MAX_COMMENT_LENGTH = 500/);
 });
 
-test("post detail exposes a comment composer and explains verdict separation", () => {
+test("post detail exposes a concise comment composer", () => {
   assert.match(commentUiSource, /댓글 쓰기/);
-  assert.match(commentUiSource, /댓글 수가 AI 판정을 바꾸지는 않습니다/);
   assert.match(commentUiSource, /판매자 개인정보나 단정적인 비방/);
+  assert.doesNotMatch(commentUiSource, /댓글 수가 AI 판정을 바꾸지는 않습니다/);
 });
 
 test("comment composer follows the comment list like a community board", () => {

@@ -106,7 +106,7 @@ export default async function VerificationReportPage({
         </section>
 
         <section className="report-source">
-          <div><ShieldCheck size={18} /><span><strong>공식 제품 정보와 검수 사례를 기준으로 분석</strong><small>이 리포트는 사진 기반 참고 의견이며 정품 보증서나 제조사 판정이 아닙니다.</small></span></div>
+          <div><ShieldCheck size={18} /><span><strong>공식 제품 정보와 검수 사례를 기준으로 분석</strong></span></div>
           {report.productOfficialUrl && <a href={report.productOfficialUrl} target="_blank" rel="noreferrer">제품 정보 페이지 <ExternalLink size={14} /></a>}
         </section>
       </div>
