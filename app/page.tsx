@@ -1146,11 +1146,8 @@ function RecentVerificationSection({
                 <span className="recent-verification-copy">
                   <small><time dateTime={item.createdAt}>{formatVerificationDate(item.createdAt)}</time> · No.{item.productNumber}</small>
                   <strong>{item.productName}</strong>
-                  <em>{verdict.label}</em>
                 </span>
-                <span className="recent-verification-metrics">
-                  <small>사진 {item.photoCount}장 · 위험 신호 {item.riskSignalCount}개</small>
-                </span>
+                <span className="recent-verification-verdict">{verdict.label}</span>
                 <ArrowRight size={17} />
               </a>
             );
