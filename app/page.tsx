@@ -34,7 +34,6 @@ import {
   ZoomIn,
 } from "lucide-react";
 import { BrandMark } from "./brand-mark";
-import { FloatingUtilityRail } from "./floating-utility-rail";
 import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
@@ -48,6 +47,7 @@ import { displayableCaseImages } from "./case-image-rights";
 import { expandedProducts } from "./catalog";
 import { isCommunityPostStatus, type CommunityPostStatus } from "./community";
 import { communityMentions, type CommunityMention } from "./community-mentions";
+import { DEFAULT_PRODUCT_IMAGE, DEFAULT_PRODUCT_IMAGE_LABEL } from "./product-image-default";
 import {
   counterfeitCases,
   type CounterfeitCase,
@@ -1068,7 +1068,7 @@ export default function Home() {
 
   return (
     <>
-    <main className="site" aria-busy={isAnalyzing} inert={isAnalyzing ? true : undefined}>
+    <main className="site" data-feedback-context={stage} aria-busy={isAnalyzing} inert={isAnalyzing ? true : undefined}>
       <header className="top-header">
         <div className="top-inner">
           <button className="logo" onClick={resetAll} aria-label="FIGNAL BETA 홈"><BrandMark /></button>
@@ -1310,7 +1310,6 @@ export default function Home() {
       {criteriaOpen && <VerificationCriteriaDialog onClose={() => setCriteriaOpen(false)} />}
       {toast && <div className="toast" role="status"><Check size={16} /> {toast}</div>}
     </main>
-    <FloatingUtilityRail context={stage} />
     {isAnalyzing && (
       <div className="analysis-interaction-lock" role="dialog" aria-modal="true" aria-labelledby="analysis-lock-title">
         <div className="analysis-interaction-lock-card">
@@ -1516,7 +1515,7 @@ function StepBar({ stage }: { stage: Stage }) {
 }
 
 function ProductImage({ product, size }: { product: Product; size: "small" | "medium" | "large" }) {
-  const sources = [product.image].filter(Boolean);
+  const sources = [product.image, DEFAULT_PRODUCT_IMAGE].filter(Boolean);
   const [failures, setFailures] = useState<{ productId: string; sources: string[] }>({
     productId: product.id,
     sources: [],
@@ -1524,11 +1523,12 @@ function ProductImage({ product, size }: { product: Product; size: "small" | "me
   const failedSources = failures.productId === product.id ? failures.sources : [];
   const source = sources.find((candidate) => !failedSources.includes(candidate));
   if (!source) return <div className={`product-image placeholder ${size}`}><ImageIcon size={size === "large" ? 40 : 22} /></div>;
+  const isDefaultImage = source === DEFAULT_PRODUCT_IMAGE;
   return (
-    <div className={`product-image ${size}`}>
+    <div className={`product-image ${size} ${isDefaultImage ? "default" : ""}`}>
       <img
         src={source}
-        alt={`${product.name} 제품 이미지`}
+        alt={isDefaultImage ? `${product.name}의 공식 이미지가 없어 표시한 대체 이미지` : `${product.name} 제품 이미지`}
         onError={() => setFailures((current) => ({
           productId: product.id,
           sources: current.productId === product.id
@@ -1536,6 +1536,7 @@ function ProductImage({ product, size }: { product: Product; size: "small" | "me
             : [source],
         }))}
       />
+      {isDefaultImage && <span className="default-product-image-label">{DEFAULT_PRODUCT_IMAGE_LABEL}</span>}
     </div>
   );
 }

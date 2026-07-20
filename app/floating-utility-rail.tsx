@@ -1,11 +1,11 @@
 "use client";
 
-import { FileCheck2, Image as ImageIcon, Info, TriangleAlert, X } from "lucide-react";
+import { Cpu, FileCheck2, Image as ImageIcon, Info, TriangleAlert, X } from "lucide-react";
 import { useState } from "react";
 import { FeedbackWidget } from "./feedback-widget";
 import styles from "./floating-utility-rail.module.css";
 
-export function FloatingUtilityRail({ context }: { context: "search" | "photos" | "result" }) {
+export function FloatingUtilityRail() {
   const [betaOpen, setBetaOpen] = useState(false);
 
   return (
@@ -33,11 +33,12 @@ export function FloatingUtilityRail({ context }: { context: "search" | "photos" 
             <li><ImageIcon size={15} /><span>일부 제품은 확인 가능한 공식 대표 이미지가 없어요.</span></li>
             <li><FileCheck2 size={15} /><span>제품별 가품 비교 사례를 계속 보완하고 있어요.</span></li>
           </ul>
-          <footer><strong>더 신뢰할 수 있는 서비스를 향해</strong><span>검증 자료와 커뮤니티 피드백을 바탕으로 기준을 꾸준히 보완합니다.</span><small>분석 결과는 정품 보증이나 제조사 판정을 대신하지 않습니다.</small></footer>
+          <div className={styles.modelNote}><Cpu size={16} /><span><strong>현재 Gemini Flash 계열 모델 사용</strong><small>사용자와 검증 사례, 피드백이 충분히 쌓이면 더 정교한 모델로 단계적으로 고도화해 신뢰도를 높일 계획입니다.</small></span></div>
+          <footer><strong>더 신뢰할 수 있는 서비스를 향해</strong><span>검증 자료와 커뮤니티 피드백을 바탕으로 비교 기준과 평가 데이터를 꾸준히 보완합니다.</span><small>분석 결과는 정품 보증이나 제조사 판정을 대신하지 않습니다.</small></footer>
         </div>
       </section>
 
-      <FeedbackWidget context={context} />
+      <FeedbackWidget />
     </div>
   );
 }

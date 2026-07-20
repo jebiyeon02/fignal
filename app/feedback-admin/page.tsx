@@ -12,6 +12,10 @@ const contextLabels: Record<string, string> = {
   search: "제품 찾기",
   photos: "사진 확인",
   result: "판정 결과",
+  community: "커뮤니티",
+  report: "검증 리포트",
+  feedback_admin: "피드백 관리",
+  other: "기타 화면",
 };
 
 function formatFeedbackDate(value: string) {
@@ -57,7 +61,7 @@ export default async function FeedbackAdminPage() {
 
       <section className={styles.shell}>
         <header className={styles.heading}>
-          <div><span>USER FEEDBACK</span><h1>받은 피드백</h1><p>메인 화면의 빠른 입력창으로 접수된 익명 의견입니다.</p></div>
+          <div><span>USER FEEDBACK</span><h1>받은 피드백</h1><p>서비스 모든 화면의 빠른 입력창으로 접수된 익명 의견입니다.</p></div>
           <strong><MessageSquareText size={18} /> {feedback.length}건</strong>
         </header>
 

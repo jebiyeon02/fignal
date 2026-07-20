@@ -4,7 +4,7 @@ const MAX_FEEDBACK_LENGTH = 600;
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const RATE_LIMIT_SUBMISSIONS = 5;
 const feedbackRequestLog = new Map<string, number[]>();
-const VALID_CONTEXTS = new Set(["search", "photos", "result"]);
+const VALID_CONTEXTS = new Set(["search", "photos", "result", "community", "report", "feedback_admin", "other"]);
 
 function cleanText(value: unknown, maxLength: number) {
   return typeof value === "string"

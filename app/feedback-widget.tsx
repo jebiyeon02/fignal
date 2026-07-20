@@ -6,7 +6,16 @@ import styles from "./feedback-widget.module.css";
 
 const MAX_FEEDBACK_LENGTH = 600;
 
-export function FeedbackWidget({ context }: { context: "search" | "photos" | "result" }) {
+function currentFeedbackContext(pathname: string) {
+  const pageContext = document.querySelector<HTMLElement>("[data-feedback-context]")?.dataset.feedbackContext;
+  if (pageContext === "search" || pageContext === "photos" || pageContext === "result") return pageContext;
+  if (pathname.startsWith("/community")) return "community";
+  if (pathname.startsWith("/reports")) return "report";
+  if (pathname.startsWith("/feedback-admin")) return "feedback_admin";
+  return pathname === "/" ? "search" : "other";
+}
+
+export function FeedbackWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [message, setMessage] = useState("");
   const [status, setStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
@@ -38,7 +47,7 @@ export function FeedbackWidget({ context }: { context: "search" | "photos" | "re
         body: JSON.stringify({
           message: body,
           pagePath: `${window.location.pathname}${window.location.search}`,
-          pageContext: context,
+          pageContext: currentFeedbackContext(window.location.pathname),
           website: "",
         }),
       });
