@@ -82,7 +82,6 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .recent-verifications > header { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; margin-bottom: 18px; }
 .recent-verifications > header > div { min-width: 0; }
 .recent-verifications > header h2 { margin: 0; color: #222; font-size: 22px; letter-spacing: -.035em; }
-.recent-verifications > header p { margin: 7px 0 0; color: #888; font-size: 10px; line-height: 1.5; }
 .recent-verifications > header em { flex: 0 0 auto; color: #999; font-size: 9px; font-style: normal; }
 .recent-state { min-height: 112px; display: flex; align-items: center; justify-content: center; gap: 9px; padding: 22px; border: 1px dashed #ddd; border-radius: 12px; background: #fafafa; color: #888; font-size: 10px; }
 .recent-state.error { color: var(--red); }

@@ -1355,7 +1355,6 @@ function RecentVerificationSection({
       <header>
         <div>
           <h2 id="recent-verifications-title">최근 검증 사례</h2>
-          <p>실제 검증 사진과 판정 근거를 읽기 전용 리포트로 확인하세요.</p>
         </div>
         {items.length > 0 && <em>최근 {items.length}건</em>}
       </header>
