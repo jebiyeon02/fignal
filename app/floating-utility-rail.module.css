@@ -55,10 +55,11 @@
 
 .betaWidget::before { content: ""; position: absolute; right: 100%; top: -10px; width: 13px; height: 62px; }
 .betaWidget:hover .betaPanel, .pinned .betaPanel { opacity: 1; pointer-events: auto; transform: translate(0, -50%) scale(1); visibility: visible; }
-.betaPanel > header { display: flex; align-items: flex-start; }
+.betaPanel > header { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; }
 .betaPanel > header > span { display: grid; gap: 5px; }
 .betaPanel > header em { color: #438060; font-size: 7px; font-style: normal; font-weight: 800; letter-spacing: .12em; }
 .betaPanel > header strong { font-size: 13px; line-height: 1.4; letter-spacing: -.025em; }
+.betaPanel > header button { width: 26px; height: 26px; display: grid; place-items: center; flex: 0 0 auto; border: 0; border-radius: 50%; background: #f1f1f1; color: #777; cursor: pointer; }
 .betaPanel > p { margin: 9px 0 0; color: #888; font-size: 9px; line-height: 1.55; }
 .betaPanel ul { display: grid; gap: 1px; margin: 14px 0 0; padding: 0; overflow: hidden; border: 1px solid #e7e7e7; border-radius: 9px; background: #e7e7e7; }
 .betaPanel li { display: grid; grid-template-columns: 17px 1fr; align-items: start; gap: 7px; padding: 9px 10px; background: #fafafa; color: #555; font-size: 8px; line-height: 1.5; list-style: none; }
