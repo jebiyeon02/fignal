@@ -154,7 +154,7 @@ export async function saveVerificationHistory(input: {
   return historyItem;
 }
 
-export async function listRecentVerificationHistory(limit = 6): Promise<VerificationHistoryItem[]> {
+export async function listRecentVerificationHistory(limit = 10): Promise<VerificationHistoryItem[]> {
   await ensureVerificationHistorySchema();
   const safeLimit = Math.min(Math.max(Math.trunc(limit), 1), 12);
   const db = getDb();

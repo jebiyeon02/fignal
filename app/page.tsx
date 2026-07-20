@@ -472,7 +472,7 @@ function formatUploadMegabytes(bytes: number) {
 }
 
 async function fetchRecentVerifications() {
-  const response = await fetch("/api/verifications?limit=6", { cache: "no-store" });
+  const response = await fetch("/api/verifications?limit=10", { cache: "no-store" });
   const payload = await response.json().catch(() => null) as { verifications?: unknown } | null;
   if (!response.ok || !Array.isArray(payload?.verifications)) throw new Error("Invalid history response");
   return payload.verifications.flatMap((item) => {
@@ -1072,10 +1072,6 @@ export default function Home() {
           <div className="top-nav">
             <span>넨도로이드 검증</span>
             <Link href="/community"><MessageCircle size={16} /> 검증 사례</Link>
-            <button onClick={() => {
-              if (stage !== "search") resetAll();
-              window.setTimeout(() => document.getElementById("recent-verifications")?.scrollIntoView({ behavior: "smooth" }), 0);
-            }}><Clock3 size={16} /> 최근 사례</button>
             <button onClick={() => setCriteriaOpen(true)}><FileCheck2 size={16} /> 판정 기준</button>
             <button onClick={resetAll}><Plus size={16} /> 새 검증</button>
           </div>
@@ -1331,12 +1327,20 @@ function RelatedCommunityPosts({ posts, productName }: { posts: RelatedCommunity
 function formatVerificationDate(value: string) {
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "최근";
-  return new Intl.DateTimeFormat("ko-KR", {
-    month: "short",
-    day: "numeric",
-    hour: "2-digit",
-    minute: "2-digit",
-  }).format(date);
+
+  const elapsedMilliseconds = Math.max(0, Date.now() - date.getTime());
+  const elapsedMinutes = Math.floor(elapsedMilliseconds / 60_000);
+  if (elapsedMinutes < 1) return "방금 전";
+  if (elapsedMinutes < 60) return `${elapsedMinutes}분 전`;
+
+  const elapsedHours = Math.floor(elapsedMinutes / 60);
+  if (elapsedHours < 24) return `${elapsedHours}시간 전`;
+
+  const elapsedDays = Math.floor(elapsedHours / 24);
+  if (elapsedDays < 7) return `${elapsedDays}일 전`;
+  if (elapsedDays < 35) return `${Math.floor(elapsedDays / 7)}주 전`;
+  if (elapsedDays < 365) return `${Math.floor(elapsedDays / 30)}개월 전`;
+  return `${Math.floor(elapsedDays / 365)}년 전`;
 }
 
 function RecentVerificationSection({

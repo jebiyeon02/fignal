@@ -1,8 +1,8 @@
 import { listRecentVerificationHistory } from "../../../db/verification-history";
 
 export async function GET(request: Request) {
-  const requestedLimit = Number(new URL(request.url).searchParams.get("limit") ?? 6);
-  const limit = Number.isFinite(requestedLimit) ? requestedLimit : 6;
+  const requestedLimit = Number(new URL(request.url).searchParams.get("limit") ?? 10);
+  const limit = Number.isFinite(requestedLimit) ? requestedLimit : 10;
 
   try {
     const verifications = await listRecentVerificationHistory(limit);
