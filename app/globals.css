@@ -106,8 +106,11 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .recent-verification-card.danger .recent-verification-verdict { background: var(--red-bg); color: var(--red); }
 .recent-verification-card > svg { color: #aaa; }
 
-.product-image { overflow: hidden; background: #f4f4f4; }
+.product-image { position: relative; overflow: hidden; background: #f4f4f4; }
 .product-image img { width: 100%; height: 100%; display: block; object-fit: contain; mix-blend-mode: multiply; }
+.product-image.default img { mix-blend-mode: normal; }
+.default-product-image-label { position: absolute; top: 7px; right: 7px; z-index: 1; padding: 4px 6px; border: 1px solid rgba(255,255,255,.7); border-radius: 5px; background: rgba(34,34,34,.72); color: #fff; font-size: 7px; font-weight: 750; line-height: 1; backdrop-filter: blur(4px); }
+.product-image.small .default-product-image-label { top: 4px; right: 4px; padding: 3px 4px; font-size: 6px; }
 .product-image.small { width: 58px; height: 64px; border-radius: 7px; }
 .product-image.medium { width: 78px; height: 88px; border-radius: 9px; }
 .product-image.large { width: 100%; height: 100%; border-radius: 0; }
@@ -533,8 +536,9 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .community-inline-result.safe { border-left-color: var(--green); }
 .community-inline-result.caution { border-left-color: var(--amber); }
 .community-inline-result.danger { border-left-color: var(--red); }
-.community-inline-product-image { width: 76px; height: 76px; display: grid; place-items: center; overflow: hidden; border-radius: 8px; background: #f2f2f2; }
+.community-inline-product-image { position: relative; width: 76px; height: 76px; display: grid; place-items: center; overflow: hidden; border-radius: 8px; background: #f2f2f2; }
 .community-inline-product-image img { width: 100%; height: 100%; object-fit: contain; mix-blend-mode: multiply; }
+.community-inline-product-image img.default-product-image { mix-blend-mode: normal; }
 .community-inline-product-copy { min-width: 0; display: grid; gap: 4px; }
 .community-inline-product-copy > span { color: #999; font-size: 8px; }
 .community-inline-product-copy > strong { overflow: hidden; font-size: 13px; text-overflow: ellipsis; white-space: nowrap; }
@@ -674,8 +678,9 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .report-hero.safe { border-top-color: var(--green); }
 .report-hero.caution { border-top-color: var(--amber); }
 .report-hero.danger { border-top-color: var(--red); }
-.report-product-image { width: 150px; height: 160px; display: grid; place-items: center; overflow: hidden; border-radius: 11px; background: #f3f3f3; color: #bbb; }
+.report-product-image { position: relative; width: 150px; height: 160px; display: grid; place-items: center; overflow: hidden; border-radius: 11px; background: #f3f3f3; color: #bbb; }
 .report-product-image img { width: 100%; height: 100%; display: block; object-fit: contain; mix-blend-mode: multiply; }
+.report-product-image img.default-product-image { mix-blend-mode: normal; }
 .report-hero-copy { min-width: 0; }
 .report-hero-copy h1 { margin: 0; font-size: clamp(24px, 4vw, 34px); letter-spacing: -.045em; }
 .report-hero-copy > p { margin: 7px 0 0; color: #888; font-size: 10px; }
