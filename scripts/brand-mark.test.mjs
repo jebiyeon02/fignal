@@ -13,3 +13,8 @@ test("서비스명을 FIGNAL로 통일하고 BETA 상태를 표시한다", () =>
   assert.match(shareSource, /FIGNAL BETA 추가 검토 요청/);
   assert.doesNotMatch(`${brandMark}\n${metadata}\n${shareSource}`, /FIGSIGNAL/);
 });
+
+test("메인 검색 제목은 넨도로이드에 맞추고 중복 상단 문구를 숨긴다", () => {
+  assert.match(shareSource, /넨도로이드 이름을<br \/>검색해보세요/);
+  assert.doesNotMatch(shareSource, /<span>넨도로이드 검증<\/span>/);
+});

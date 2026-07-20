@@ -1073,7 +1073,6 @@ export default function Home() {
         <div className="top-inner">
           <button className="logo" onClick={resetAll} aria-label="FIGNAL BETA 홈"><BrandMark /></button>
           <div className="top-nav">
-            <span>넨도로이드 검증</span>
             <Link href="/community"><MessageCircle size={16} /> 커뮤니티</Link>
             <button onClick={() => setCriteriaOpen(true)}><FileCheck2 size={16} /> 판정 기준</button>
             <button onClick={resetAll}><Plus size={16} /> 새 검증</button>
@@ -1086,7 +1085,7 @@ export default function Home() {
       {stage === "search" && (
         <section className="search-page page-enter">
           <div className="intro">
-            <h1>피규어 이름을<br />검색해보세요</h1>
+            <h1>넨도로이드 이름을<br />검색해보세요</h1>
             <p>공식 제품 {products.length}개 · 제품을 고르면 제조사와 번호를 자동으로 찾습니다.</p>
           </div>
 
