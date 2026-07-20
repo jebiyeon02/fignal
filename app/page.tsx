@@ -34,6 +34,7 @@ import {
   ZoomIn,
 } from "lucide-react";
 import { BrandMark } from "./brand-mark";
+import { trackSiteEvent } from "./analytics";
 import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
@@ -541,6 +542,8 @@ export default function Home() {
   const [isPublishingCommunityPost, setIsPublishingCommunityPost] = useState(false);
   const [relatedCommunityPosts, setRelatedCommunityPosts] = useState<RelatedCommunityPost[]>([]);
   const [shareOptionsOpen, setShareOptionsOpen] = useState(false);
+  const lastTrackedSearchRef = useRef("");
+  const resultViewedRef = useRef("");
 
   const showToast = useCallback((message: string) => {
     setToast(message);
@@ -651,6 +654,27 @@ export default function Home() {
   }, [query]);
   const isOnePieceQuery = /원피스|one\s*piece/i.test(query);
 
+  const recordSearch = useCallback(() => {
+    const trimmedQuery = query.trim();
+    if (trimmedQuery.length < 2) return;
+    const signature = `${trimmedQuery}:${filteredProducts.length}`;
+    if (lastTrackedSearchRef.current === signature) return;
+    lastTrackedSearchRef.current = signature;
+    trackSiteEvent("search_performed", {
+      properties: {
+        query_length: trimmedQuery.length,
+        result_count: filteredProducts.length,
+        had_results: filteredProducts.length > 0,
+      },
+    });
+  }, [filteredProducts.length, query]);
+
+  useEffect(() => {
+    if (selectedProduct || query.trim().length < 2) return;
+    const timer = window.setTimeout(recordSearch, 800);
+    return () => window.clearTimeout(timer);
+  }, [query, recordSearch, selectedProduct]);
+
   const manualMakerValue = manualMaker === "기타" ? manualMakerOther.trim() : manualMaker;
   const manualReady = manualName.trim().length > 1 && manualNumber.trim().length > 0 && manualMakerValue.length > 1;
   const currentProduct: Product | null = selectedProduct ?? (manualReady ? {
@@ -742,8 +766,34 @@ export default function Home() {
     tone: "neutral",
     summary: "현재 지원 범위에 필요한 공식 제품 정보와 기준 자료가 없습니다.",
   } : result;
+  const resultProductId = currentProduct?.id;
+
+  useEffect(() => {
+    if (stage !== "result" || !resultProductId) return;
+    const signature = `${resultProductId}:${savedReportId ?? "unsaved"}:${aiAnalysis?.verdict ?? reviewPath}`;
+    if (resultViewedRef.current === signature) return;
+    resultViewedRef.current = signature;
+    trackSiteEvent("result_viewed", {
+      productId: resultProductId,
+      verificationId: savedReportId,
+      properties: {
+        verdict: aiAnalysis?.verdict ?? verdictCardResult.tone,
+        review_path: reviewPath,
+        has_ai_analysis: Boolean(aiAnalysis),
+        photo_count: completedCount,
+      },
+    });
+  }, [aiAnalysis, completedCount, resultProductId, reviewPath, savedReportId, stage, verdictCardResult.tone]);
 
   const selectProduct = (product: Product) => {
+    recordSearch();
+    trackSiteEvent("product_selected", {
+      productId: product.id,
+      properties: {
+        selection_position: Math.max(0, filteredProducts.findIndex((item) => item.id === product.id)) + 1,
+        verified: product.verified,
+      },
+    });
     if (selectedProduct?.id && selectedProduct.id !== product.id) {
       Object.values(filePreviews).forEach((preview) => preview && URL.revokeObjectURL(preview));
       setFiles({});
@@ -797,7 +847,15 @@ export default function Home() {
     }
     const file = event.target.files?.[0];
     if (!file) return;
-    void storeEvidenceFile(key, file);
+    const wasFirstUpload = Object.keys(sourceFilesRef.current).length === 0;
+    void storeEvidenceFile(key, file).then((stored) => {
+      if (stored && wasFirstUpload) {
+        trackSiteEvent("photo_upload_started", {
+          productId: currentProduct?.id,
+          properties: { upload_method: "file", evidence_key: key },
+        });
+      }
+    });
     event.target.value = "";
   };
 
@@ -805,7 +863,16 @@ export default function Home() {
     if (isAnalyzing) return;
     try {
       const file = await readClipboardImage();
-      if (file) await storeEvidenceFile(key, file, true);
+      if (file) {
+        const wasFirstUpload = Object.keys(sourceFilesRef.current).length === 0;
+        const stored = await storeEvidenceFile(key, file, true);
+        if (stored && wasFirstUpload) {
+          trackSiteEvent("photo_upload_started", {
+            productId: currentProduct?.id,
+            properties: { upload_method: "clipboard", evidence_key: key },
+          });
+        }
+      }
     } catch {
       return;
     }
@@ -869,6 +936,15 @@ export default function Home() {
       showToast("사진이 포함된 공개 리포트 저장에 동의해 주세요.");
       return;
     }
+    const analysisStartedAt = Date.now();
+    let failureCode = "unknown";
+    trackSiteEvent("analysis_started", {
+      productId: currentProduct.id,
+      properties: {
+        photo_count: Object.keys(files).length,
+        evidence_ready: evidenceReady,
+      },
+    });
     setIsAnalyzing(true);
     setAnalysisError("");
     const formData = new FormData();
@@ -888,6 +964,7 @@ export default function Home() {
         code?: string;
       } | null;
       if (!response.ok || !isAiAnalysis(payload?.analysis)) {
+        failureCode = typeof payload?.code === "string" ? payload.code : `http_${response.status}`;
         throw new Error(payload?.error || "AI 분석 결과를 받지 못했습니다.");
       }
 
@@ -910,6 +987,18 @@ export default function Home() {
       } else {
         showToast("분석은 완료됐지만 공개 리포트를 저장하지 못했습니다.");
       }
+      trackSiteEvent("analysis_completed", {
+        productId: currentProduct.id,
+        verificationId: savedVerification?.id,
+        properties: {
+          duration_ms: Date.now() - analysisStartedAt,
+          verdict: analysis.verdict,
+          photo_count: Object.keys(files).length,
+          risk_signal_count: analysis.findings.filter((finding) => finding.status === "concern").length,
+          case_match_count: analysis.caseMatches.length,
+          report_saved: Boolean(savedVerification),
+        },
+      });
       setReviewedEvidence({});
       setUserOverrides({});
       setReviewRequestShared(false);
@@ -917,6 +1006,14 @@ export default function Home() {
       setStage("result");
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (error) {
+      trackSiteEvent("analysis_failed", {
+        productId: currentProduct.id,
+        properties: {
+          duration_ms: Date.now() - analysisStartedAt,
+          failure_code: failureCode,
+          photo_count: Object.keys(files).length,
+        },
+      });
       setIsAnalyzing(false);
       setAnalysisError(error instanceof Error ? error.message : "AI 분석을 시작하지 못했습니다.");
     }
@@ -997,6 +1094,13 @@ export default function Home() {
 
   const resetAll = () => {
     if (isAnalyzing) return;
+    if (stage !== "search") {
+      trackSiteEvent("recheck_started", {
+        productId: currentProduct?.id,
+        verificationId: savedReportId,
+        properties: { from_stage: stage, had_result: stage === "result" },
+      });
+    }
     Object.values(filePreviews).forEach((preview) => {
       if (preview) URL.revokeObjectURL(preview);
     });
@@ -1177,7 +1281,13 @@ export default function Home() {
             </div>
           )}
 
-          <button className="black-button full" disabled={!currentProduct} onClick={() => { setStage(currentProduct?.verified ? "photos" : "result"); window.scrollTo({ top: 0, behavior: "smooth" }); }}>이 제품 확인하기 <ArrowRight size={18} /></button>
+          <button className="black-button full" disabled={!currentProduct} onClick={() => {
+            if (currentProduct?.id === "manual") {
+              trackSiteEvent("product_selected", { productId: currentProduct.id, properties: { selection_position: 0, verified: false } });
+            }
+            setStage(currentProduct?.verified ? "photos" : "result");
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }}>이 제품 확인하기 <ArrowRight size={18} /></button>
 
           <RecentVerificationSection
             items={recentVerifications}
@@ -1268,11 +1378,11 @@ export default function Home() {
           )}
 
           {productCases.length > 0 && (
-            <CounterfeitCaseSection cases={productCases} observations={observations} aiMatches={aiAnalysis?.caseMatches ?? []} />
+            <CounterfeitCaseSection cases={productCases} observations={observations} aiMatches={aiAnalysis?.caseMatches ?? []} productId={currentProduct.id} verificationId={savedReportId} />
           )}
 
           {productCommunityMentions.length > 0 && (
-            <CommunityMentionsSection key={currentProduct?.id} mentions={productCommunityMentions} />
+            <CommunityMentionsSection key={currentProduct?.id} mentions={productCommunityMentions} productId={currentProduct.id} verificationId={savedReportId} />
           )}
 
           {reviewPath !== "more_photos_needed" && reviewPath !== "unsupported" && pendingItems.some((item) => observations[item.key] === "missing") && <div className="pending-line"><CircleHelp size={16} /><span><strong>올리지 않은 사진</strong>{pendingItems.filter((item) => observations[item.key] === "missing").map((item) => item.title).join(" · ")}</span></div>}
@@ -1713,10 +1823,12 @@ function AiFindingsSection({ analysis, observations, previews, reviewed, onRevie
   );
 }
 
-function CounterfeitCaseSection({ cases, observations, aiMatches }: {
+function CounterfeitCaseSection({ cases, observations, aiMatches, productId, verificationId }: {
   cases: CounterfeitCase[];
   observations: Record<EvidenceKey, Observation>;
   aiMatches: AiAnalysis["caseMatches"];
+  productId: string;
+  verificationId: string | null;
 }) {
   const [preview, setPreview] = useState<{ caseId: string; imageIndex: number } | null>(null);
   const verdictCases = cases.filter((item) => item.verdictImpact !== "none");
@@ -1725,6 +1837,13 @@ function CounterfeitCaseSection({ cases, observations, aiMatches }: {
   const aiMatchCount = aiMatches.filter((match) => match.similarity !== "low" && verdictCases.some((item) => item.id === match.caseId)).length;
   const previewCase = preview ? cases.find((item) => item.id === preview.caseId) : null;
   const previewImages = previewCase ? displayableCaseImages(previewCase) : [];
+  const recordSourceClick = (caseId: string, sourceKind: string, sourceName: string) => {
+    trackSiteEvent("case_source_clicked", {
+      productId,
+      verificationId,
+      properties: { case_id: caseId, source_kind: sourceKind, source_name: sourceName },
+    });
+  };
 
   const movePreview = useCallback((direction: -1 | 1) => {
     setPreview((current) => {
@@ -1808,13 +1927,13 @@ function CounterfeitCaseSection({ cases, observations, aiMatches }: {
                     ))}
                   </div>
                   {usesExternalSourceImages && (
-                    <a className="case-external-image-note" href={item.sourceUrl} target="_blank" rel="noreferrer">
+                    <a className="case-external-image-note" href={item.sourceUrl} target="_blank" rel="noreferrer" onClick={() => recordSourceClick(item.id, "case_image_source", item.sourceName)}>
                       <ExternalLink size={12} /> 외부 출처에서 불러온 참고 이미지 · AI 판정 미반영
                     </a>
                   )}
                 </div>
               ) : (
-                <a className="case-reference-only" href={item.sourceUrl} target="_blank" rel="noreferrer">
+                <a className="case-reference-only" href={item.sourceUrl} target="_blank" rel="noreferrer" onClick={() => recordSourceClick(item.id, "case_reference", item.sourceName)}>
                   <FileCheck2 size={25} />
                   <span><strong>원문에서 실물 확인</strong><small>이미지는 복제하지 않았습니다.</small></span>
                   <ExternalLink size={16} />
@@ -1829,11 +1948,11 @@ function CounterfeitCaseSection({ cases, observations, aiMatches }: {
                     {caseKindLabel[caseKind]}
                   </span>
                   <span className="case-source-links">
-                    <a className="case-source-link" href={item.sourceUrl} target="_blank" rel="noreferrer">
+                    <a className="case-source-link" href={item.sourceUrl} target="_blank" rel="noreferrer" onClick={() => recordSourceClick(item.id, "primary", item.sourceName)}>
                       {item.sourceName} 원문 <ExternalLink size={11} />
                     </a>
                     {item.secondarySources?.map((source) => (
-                      <a className="case-source-link" href={source.url} target="_blank" rel="noreferrer" key={source.url}>
+                      <a className="case-source-link" href={source.url} target="_blank" rel="noreferrer" key={source.url} onClick={() => recordSourceClick(item.id, "secondary", source.name)}>
                         {source.name} <ExternalLink size={11} />
                       </a>
                     ))}
@@ -1879,7 +1998,7 @@ function CounterfeitCaseSection({ cases, observations, aiMatches }: {
               <div>
                 <span>비교 사진 {preview.imageIndex + 1} / {previewImages.length}</span>
                 <h2 id="case-lightbox-title">{previewCase.title}</h2>
-                <a className="case-lightbox-source" href={previewCase.sourceUrl} target="_blank" rel="noreferrer">
+                <a className="case-lightbox-source" href={previewCase.sourceUrl} target="_blank" rel="noreferrer" onClick={() => recordSourceClick(previewCase.id, "lightbox", previewCase.sourceName)}>
                   출처 원문 <ExternalLink size={11} />
                 </a>
               </div>
@@ -1941,7 +2060,7 @@ const communitySignalLabels: Record<string, string> = {
   blister: "내부 포장",
 };
 
-function CommunityMentionsSection({ mentions }: { mentions: CommunityMention[] }) {
+function CommunityMentionsSection({ mentions, productId, verificationId }: { mentions: CommunityMention[]; productId: string; verificationId: string | null }) {
   const domesticCount = mentions.filter((mention) => mention.sourceLocale === "domestic").length;
   const internationalCount = mentions.length - domesticCount;
   const [isOpen, setIsOpen] = useState(mentions.length > 0);
@@ -1987,7 +2106,21 @@ function CommunityMentionsSection({ mentions }: { mentions: CommunityMention[] }
                 )}
                 <div className="community-mention-source">
                   <span>{publishedDate ?? "게시일 미확인"}</span>
-                  <a href={mention.sourceUrl} target="_blank" rel="noreferrer">{mention.sourceName ?? "외부 커뮤니티"} 원문 <ExternalLink size={12} /></a>
+                  <a
+                    href={mention.sourceUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    onClick={() => trackSiteEvent("case_source_clicked", {
+                      productId,
+                      verificationId,
+                      properties: {
+                        case_id: mention.mentionId,
+                        source_kind: "community_mention",
+                        source_locale: mention.sourceLocale ?? "unknown",
+                        source_name: mention.sourceName ?? "외부 커뮤니티",
+                      },
+                    })}
+                  >{mention.sourceName ?? "외부 커뮤니티"} 원문 <ExternalLink size={12} /></a>
                 </div>
               </article>
             );

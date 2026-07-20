@@ -9,6 +9,7 @@ import { expandedProducts, isOfficialProductImage } from "../../catalog";
 import { verificationVerdictCopy } from "../../verification-history";
 import { getVerificationHistoryById } from "../../../db/verification-history";
 import { ReportProductImage } from "./report-product-image";
+import { AnalyticsPageEvent } from "../../analytics-page-event";
 
 const findingStatusCopy: Record<AnalysisFinding["status"], { label: string; tone: string }> = {
   match: { label: "일치", tone: "match" },
@@ -47,6 +48,12 @@ export default async function VerificationReportPage({
 
   return (
     <main className="readonly-report">
+      <AnalyticsPageEvent
+        eventName="report_opened"
+        productId={report.productId}
+        verificationId={report.id}
+        properties={{ verdict: report.verdict, photo_count: report.photoCount }}
+      />
       <header className="report-topbar">
         <Link href="/" className="report-brand" aria-label="FIGNAL BETA 홈"><BrandMark /></Link>
       </header>

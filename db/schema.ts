@@ -83,3 +83,24 @@ export const siteFeedback = sqliteTable(
   },
   (table) => [index("site_feedback_created_at_idx").on(table.createdAt)],
 );
+
+export const siteEvents = sqliteTable(
+  "site_events",
+  {
+    id: text("id").primaryKey(),
+    sessionHash: text("session_hash").notNull(),
+    eventName: text("event_name").notNull(),
+    pagePath: text("page_path").notNull().default("/"),
+    pageContext: text("page_context").notNull().default("other"),
+    productId: text("product_id"),
+    verificationId: text("verification_id"),
+    propertiesJson: text("properties_json").notNull().default("{}"),
+    createdAt: text("created_at").notNull(),
+  },
+  (table) => [
+    index("site_events_created_at_idx").on(table.createdAt),
+    index("site_events_event_created_at_idx").on(table.eventName, table.createdAt),
+    index("site_events_session_created_at_idx").on(table.sessionHash, table.createdAt),
+    index("site_events_product_created_at_idx").on(table.productId, table.createdAt),
+  ],
+);

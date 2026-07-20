@@ -4,6 +4,49 @@
 .topbar > span { color: #777; font-size: 10px; font-weight: 700; }
 .topbar > a:last-child { display: inline-flex; align-items: center; gap: 5px; justify-self: end; color: #777; font-size: 9px; text-decoration: none; }
 .shell { width: min(920px, calc(100% - 40px)); margin: 0 auto; padding: 58px 0 100px; }
+.analytics { display: grid; gap: 16px; margin-bottom: 72px; }
+.analyticsHeading { display: flex; align-items: flex-end; justify-content: space-between; gap: 28px; padding-bottom: 22px; border-bottom: 2px solid #222; }
+.analyticsHeading > div > span { color: #38805a; font-size: 9px; font-weight: 800; letter-spacing: .12em; }
+.analyticsHeading h1 { margin: 9px 0 0; font-size: 34px; letter-spacing: -.05em; }
+.analyticsHeading p { margin: 9px 0 0; color: #888; font-size: 10px; }
+.analyticsHeading > strong { display: inline-flex; align-items: center; gap: 7px; padding: 8px 10px; border-radius: 7px; background: #eaf5ee; color: #286944; font-size: 10px; white-space: nowrap; }
+.metricGrid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 9px; }
+.metricGrid article { display: grid; min-width: 0; padding: 17px; border: 1px solid #ddd; border-radius: 11px; background: #fff; }
+.metricGrid article > span { display: flex; align-items: center; gap: 6px; color: #777; font-size: 9px; font-weight: 700; }
+.metricGrid article > strong { margin-top: 15px; font-size: 27px; line-height: 1; letter-spacing: -.04em; }
+.metricGrid article > small { margin-top: 7px; color: #999; font-size: 8px; line-height: 1.45; }
+.analyticsGrid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+.funnelCard, .dailyCard, .productCard { overflow: hidden; border: 1px solid #ddd; border-radius: 11px; background: #fff; }
+.funnelCard > header, .dailyCard > header, .productCard > header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; padding: 17px 18px; border-bottom: 1px solid #eee; }
+.funnelCard > header div, .dailyCard > header div, .productCard > header div { display: grid; gap: 4px; }
+.funnelCard > header strong, .dailyCard > header strong, .productCard > header strong { font-size: 11px; }
+.funnelCard > header small, .dailyCard > header small, .productCard > header small { color: #999; font-size: 8px; font-weight: 400; }
+.funnelCard > header > span, .dailyCard > header > span, .productCard > header > span { color: #aaa; font-size: 7px; font-weight: 800; letter-spacing: .1em; }
+.funnelCard ol { display: grid; gap: 11px; margin: 0; padding: 18px; }
+.funnelCard li { display: grid; gap: 5px; list-style: none; }
+.funnelCard li > div { display: flex; align-items: center; justify-content: space-between; gap: 10px; color: #666; font-size: 8px; }
+.funnelCard li > div strong { color: #333; font-size: 9px; }
+.funnelTrack { height: 5px; overflow: hidden; border-radius: 999px; background: #eee; }
+.funnelTrack i { display: block; height: 100%; border-radius: inherit; background: #3d7d58; }
+.dailyCard { display: grid; grid-template-rows: auto 1fr auto; }
+.dailyChart { height: 238px; display: flex; align-items: stretch; gap: 5px; padding: 24px 18px 12px; }
+.dailyChart > div { min-width: 0; flex: 1; display: grid; grid-template-rows: 1fr auto; gap: 7px; }
+.dailyChart > div > span { display: flex; align-items: flex-end; justify-content: center; gap: 2px; min-height: 0; border-bottom: 1px solid #eee; }
+.dailyChart i, .dailyChart em { width: min(8px, 42%); min-height: 0; border-radius: 3px 3px 0 0; background: #d4d4d4; }
+.dailyChart em { background: #4b8b64; }
+.dailyChart small { overflow: hidden; color: #aaa; font-size: 6px; text-align: center; white-space: nowrap; }
+.dailyCard > footer { display: flex; justify-content: flex-end; gap: 12px; padding: 0 18px 16px; color: #888; font-size: 7px; }
+.dailyCard > footer span { display: flex; align-items: center; gap: 4px; }
+.dailyCard > footer i { width: 7px; height: 7px; border-radius: 2px; background: #d4d4d4; }
+.dailyCard > footer span:last-child i { background: #4b8b64; }
+.analyticsEmpty { min-height: 140px; display: grid; place-items: center; padding: 20px; color: #aaa; font-size: 8px; text-align: center; }
+.productTable { display: grid; }
+.productTable > div { display: grid; grid-template-columns: minmax(0, 1.8fr) repeat(4, minmax(64px, .5fr)); align-items: center; min-height: 44px; padding: 0 18px; border-top: 1px solid #f0f0f0; }
+.productTable > div:first-child { min-height: 34px; border-top: 0; background: #fafafa; color: #999; font-size: 7px; font-weight: 700; }
+.productTable > div > span { font-size: 9px; text-align: center; }
+.productTable > div > span:first-child { text-align: left; }
+.productTable > div > strong { display: grid; min-width: 0; gap: 2px; overflow: hidden; font-size: 9px; text-overflow: ellipsis; white-space: nowrap; }
+.productTable > div > strong small { color: #aaa; font-size: 7px; font-weight: 400; }
 .heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 28px; padding-bottom: 22px; border-bottom: 2px solid #222; }
 .heading > div > span { color: #999; font-size: 9px; font-weight: 800; letter-spacing: .13em; }
 .heading h1 { margin: 9px 0 0; font-size: 34px; letter-spacing: -.05em; }
@@ -36,6 +79,14 @@
   .topbar { height: 60px; grid-template-columns: 1fr auto; padding: 0 16px; }
   .topbar > span { display: none; }
   .shell { width: calc(100% - 28px); padding-top: 38px; }
+  .analytics { margin-bottom: 54px; }
+  .analyticsHeading { align-items: flex-start; flex-direction: column; gap: 18px; }
+  .analyticsHeading h1 { font-size: 29px; }
+  .metricGrid { grid-template-columns: 1fr 1fr; }
+  .metricGrid article { padding: 14px; }
+  .analyticsGrid { grid-template-columns: 1fr; }
+  .productTable { overflow-x: auto; }
+  .productTable > div { width: 660px; }
   .heading { align-items: flex-start; flex-direction: column; gap: 18px; }
   .heading h1 { font-size: 29px; }
   .list article { grid-template-columns: 1fr; gap: 10px; padding: 15px; }
