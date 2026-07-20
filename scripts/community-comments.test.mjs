@@ -30,6 +30,7 @@ test("comment passwords are salted and hashed instead of stored as plain text", 
   assert.match(schemaSource, /passwordHash: text\("password_hash"\)/);
   assert.match(schemaSource, /passwordSalt: text\("password_salt"\)/);
   assert.match(passwordSource, /PBKDF2/);
+  assert.match(passwordSource, /PASSWORD_HASH_ITERATIONS = 100_000/);
   assert.match(passwordSource, /crypto\.getRandomValues/);
   assert.match(commentStoreSource, /hashCommentPassword\(input\.password\)/);
   assert.doesNotMatch(commentStoreSource, /password: input\.password/);

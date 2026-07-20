@@ -1,4 +1,4 @@
-const PASSWORD_HASH_ITERATIONS = 120_000;
+const PASSWORD_HASH_ITERATIONS = 100_000;
 const PASSWORD_SALT_BYTES = 16;
 
 function encodeBase64Url(bytes: Uint8Array) {
