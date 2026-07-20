@@ -1297,7 +1297,6 @@ function EvidenceCard({ item, observation, fileName, preview, onFile, onRemove, 
         {preview ? <img src={preview} alt={`${item.title} 업로드 사진`} /> : <div><Icon size={26} /><span>사진 추가</span></div>}
       </label>
       <div className="photo-card-copy"><div><strong>{item.title}</strong>{fileName && <button onClick={() => onRemove(item.key)} aria-label={`${item.title} 삭제`}><X size={14} /></button>}</div><p>{item.description}</p></div>
-      {observation !== "missing" && <div className="photo-ready"><ShieldCheck size={13} /> AI 분석 대기</div>}
       <button
         type="button"
         className="paste-target-button"

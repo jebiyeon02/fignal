@@ -190,7 +190,6 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .photo-card-copy strong { font-size: 12px; }
 .photo-card-copy button { width: 24px; height: 24px; display: grid; place-items: center; border: 0; background: transparent; color: #999; cursor: pointer; }
 .photo-card-copy p { margin: 5px 0 0; color: #999; font-size: 9px; }
-.photo-ready { min-height: 38px; display: flex; align-items: center; gap: 6px; padding: 0 14px; border-top: 1px solid #eee; background: #fafafa; color: var(--green); font-size: 8px; font-weight: 700; }
 .paste-target-button { width: 100%; min-height: 38px; display: flex; align-items: center; justify-content: center; gap: 6px; padding: 0 12px; border: 0; border-top: 1px solid #eee; background: #fff; color: #777; font-size: 9px; font-weight: 650; cursor: pointer; }
 .paste-target-button:hover { background: #f7f7f7; color: #222; }
 .compare-buttons { display: flex; align-items: center; gap: 5px; padding: 9px 10px; border-top: 1px solid #eee; background: #fafafa; }
