@@ -310,6 +310,9 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .review-controls button.active { border-color: #aaa; background: #f4f4f4; color: #444; }
 .review-controls button.active.match { border-color: #b7d8c7; background: var(--green-bg); color: var(--green); }
 .review-controls button.active.concern { border-color: #efc1ba; background: var(--red-bg); color: var(--red); }
+.review-controls button.review-reset { margin-left: 3px; }
+.review-controls button:disabled { border-color: #eee; background: #fafafa; color: #ccc; cursor: not-allowed; }
+.review-controls button:disabled:hover { border-color: #eee; color: #ccc; }
 .ai-caveat { padding: 11px 13px; margin: 14px 0 0; background: #f7f7f7; color: #888; font-size: 8px; line-height: 1.55; }
 
 .case-section { margin-top: 46px; }

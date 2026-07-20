@@ -853,6 +853,21 @@ export default function Home() {
     });
   };
 
+  const resetFindingReview = (finding: AiFinding) => {
+    const original = finding.status === "unclear" ? "unverified" : finding.status;
+    setObservations((current) => ({ ...current, [finding.key]: original }));
+    setReviewedEvidence((current) => {
+      const next = { ...current };
+      delete next[finding.key];
+      return next;
+    });
+    setUserOverrides((current) => {
+      const next = { ...current };
+      delete next[finding.key];
+      return next;
+    });
+  };
+
   const shareResult = async () => {
     if (!currentProduct) return;
     const reportUrl = savedReportId ? `${window.location.origin}/reports/${savedReportId}` : "";
@@ -1145,6 +1160,7 @@ export default function Home() {
               previews={filePreviews}
               reviewed={reviewedEvidence}
               onReview={reviewFinding}
+              onResetReview={resetFindingReview}
             />
           )}
 
@@ -1464,12 +1480,13 @@ function VerificationCriteriaDialog({ onClose }: { onClose: () => void }) {
   );
 }
 
-function AiFindingsSection({ analysis, observations, previews, reviewed, onReview }: {
+function AiFindingsSection({ analysis, observations, previews, reviewed, onReview, onResetReview }: {
   analysis: AiAnalysis;
   observations: Record<EvidenceKey, Observation>;
   previews: Partial<Record<EvidenceKey, string>>;
   reviewed: Partial<Record<EvidenceKey, boolean>>;
   onReview: (finding: AiFinding, value: Observation) => void;
+  onResetReview: (finding: AiFinding) => void;
 }) {
   const [isEditing, setIsEditing] = useState(false);
   const statusLabel = (status: Observation) => status === "match" ? "일치" : status === "concern" ? "차이 의심" : "확인 불가";
@@ -1509,6 +1526,15 @@ function AiFindingsSection({ analysis, observations, previews, reviewed, onRevie
                     <button className={reviewed[finding.key] && current === "match" ? "active match" : ""} onClick={() => onReview(finding, "match")}><Check size={12} /> 일치</button>
                     <button className={reviewed[finding.key] && current === "concern" ? "active concern" : ""} onClick={() => onReview(finding, "concern")}><TriangleAlert size={12} /> 차이</button>
                     <button className={reviewed[finding.key] && current === "unverified" ? "active" : ""} onClick={() => onReview(finding, "unverified")}>모름</button>
+                    <button
+                      type="button"
+                      className="review-reset"
+                      disabled={!reviewed[finding.key]}
+                      onClick={() => onResetReview(finding)}
+                      aria-label={`${finding.title}을 AI 판단으로 초기화`}
+                    >
+                      <RotateCcw size={12} /> 초기화
+                    </button>
                   </div>
                 )}
               </div>
