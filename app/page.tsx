@@ -1158,10 +1158,6 @@ export default function Home() {
 
           {reviewPath !== "more_photos_needed" && reviewPath !== "unsupported" && pendingItems.some((item) => observations[item.key] === "missing") && <div className="pending-line"><CircleHelp size={16} /><span><strong>올리지 않은 사진</strong>{pendingItems.filter((item) => observations[item.key] === "missing").map((item) => item.title).join(" · ")}</span></div>}
 
-          <section className="lookup-source">
-            <div><ShieldCheck size={19} /><span><strong>{currentProduct.verified ? "공식 제품 정보 확인됨" : "직접 입력한 제품"}</strong><small>{currentProduct.verified ? [seriesLabel(currentProduct), currentProduct.maker, `No.${currentProduct.number}`].filter(Boolean).join(" · ") : "공식 제품 페이지를 추가로 확인하세요."}</small></span></div>
-          </section>
-
           <div className="result-actions">{savedReportId && <a className="line-button" href={`/reports/${savedReportId}`}><FileCheck2 size={17} /> 읽기 전용 리포트</a>}<button className="line-button" onClick={shareResult}><Share2 size={17} /> 공유</button><button className="black-button" onClick={resetAll}><RotateCcw size={16} /> 새 검증</button></div>
           <p className="disclaimer">AI 시각 분석과 사용자 확인을 정리한 참고 의견이며 정품 보증서가 아닙니다.</p>
         </section>

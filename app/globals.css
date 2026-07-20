@@ -441,13 +441,6 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .pending-line span { font-size: 9px; line-height: 1.55; }
 .pending-line strong { display: block; margin-bottom: 3px; color: #555; font-size: 10px; }
 
-.lookup-source { min-height: 74px; display: flex; align-items: center; justify-content: space-between; gap: 18px; padding: 15px 17px; margin-top: 30px; border: 1px solid #e2e2e2; border-radius: 10px; }
-.lookup-source > div { display: flex; align-items: center; gap: 11px; }
-.lookup-source > div > svg { color: var(--green); }
-.lookup-source span { display: grid; gap: 4px; }
-.lookup-source strong { font-size: 11px; }
-.lookup-source small { color: #999; font-size: 9px; }
-.lookup-source a { display: inline-flex; align-items: center; gap: 5px; color: #666; font-size: 9px; text-decoration: none; }
 .result-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 26px; }
 .disclaimer { margin: 16px 0 0; color: #aaa; font-size: 8px; text-align: right; }
 
@@ -611,7 +604,6 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
   .community-mentions-body { padding: 0 14px 14px; }
   .community-impact { display: none; }
   .community-mention-source { align-items: flex-start; }
-  .lookup-source { align-items: flex-start; }
   .criteria-header { padding: 26px 22px 22px; }
   .criteria-header h2 { font-size: 25px; }
   .criteria-body { padding: 0 22px 34px; }
