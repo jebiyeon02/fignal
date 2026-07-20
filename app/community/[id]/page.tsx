@@ -50,11 +50,10 @@ export default async function CommunityPostPage({
     <main className="readonly-report community-detail-page">
       <header className="report-topbar">
         <Link href="/" className="report-brand" aria-label="FIGNAL BETA 홈"><BrandMark /></Link>
-        <span><MessageCircle size={14} /> 검증 사례</span>
       </header>
 
       <div className="report-shell">
-        <Link href="/community" className="report-back"><ArrowLeft size={16} /> 검증 사례 목록</Link>
+        <Link href="/community" className="report-back"><ArrowLeft size={16} /> 커뮤니티</Link>
 
         <article className="community-post-article">
           <header>
@@ -74,7 +73,7 @@ export default async function CommunityPostPage({
           </section>
           <footer>
             <a href="#community-comments"><MessageCircle size={15} /> 의견 {comments.length}</a>
-            <span>검증 사례 #{post.id.slice(0, 8)}</span>
+            <span>게시글 #{post.id.slice(0, 8)}</span>
           </footer>
         </article>
 

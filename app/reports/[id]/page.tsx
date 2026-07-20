@@ -1,6 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 
-import { ArrowLeft, ExternalLink, FileCheck2, ImageOff, LockKeyhole, ShieldCheck } from "lucide-react";
+import { ArrowLeft, ExternalLink, FileCheck2, ImageOff, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BrandMark } from "../../brand-mark";
@@ -49,7 +49,6 @@ export default async function VerificationReportPage({
     <main className="readonly-report">
       <header className="report-topbar">
         <Link href="/" className="report-brand" aria-label="FIGNAL BETA 홈"><BrandMark /></Link>
-        <span><LockKeyhole size={14} /> 읽기 전용 리포트</span>
       </header>
 
       <div className="report-shell">

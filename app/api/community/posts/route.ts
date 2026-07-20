@@ -26,7 +26,7 @@ export async function GET(request: Request) {
     return Response.json({ posts }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     console.error("Failed to load related community posts", error);
-    return Response.json({ error: "같은 제품의 검증 사례를 불러오지 못했습니다." }, { status: 500 });
+    return Response.json({ error: "같은 제품의 커뮤니티 글을 불러오지 못했습니다." }, { status: 500 });
   }
 }
 
@@ -59,6 +59,6 @@ export async function POST(request: Request) {
     return Response.json({ post: result.post }, { status: 201, headers: { "Cache-Control": "no-store" } });
   } catch (error) {
     console.error("Failed to create community post", error);
-    return Response.json({ error: "검증 사례를 게시하지 못했습니다." }, { status: 500 });
+    return Response.json({ error: "커뮤니티 글을 게시하지 못했습니다." }, { status: 500 });
   }
 }

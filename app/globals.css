@@ -664,9 +664,8 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .analysis-interaction-lock-card > p { max-width: 270px; margin: 8px 0 0; color: #777; font-size: 10px; line-height: 1.6; }
 
 .readonly-report { min-height: 100vh; background: #f7f7f7; }
-.report-topbar { height: 70px; display: flex; align-items: center; justify-content: space-between; padding: 0 max(24px, calc((100% - 1040px) / 2)); border-bottom: 1px solid #e5e5e5; background: rgba(255,255,255,.96); }
+.report-topbar { height: 70px; display: flex; align-items: center; padding: 0 max(24px, calc((100% - 1040px) / 2)); border-bottom: 1px solid #e5e5e5; background: rgba(255,255,255,.96); }
 .report-brand { display: inline-flex; align-items: flex-start; gap: 6px; color: #111; font-size: 17px; font-weight: 850; letter-spacing: .055em; text-decoration: none; }
-.report-topbar > span { display: inline-flex; align-items: center; gap: 6px; color: #777; font-size: 10px; font-weight: 650; }
 .report-shell { width: min(1040px, calc(100% - 40px)); margin: 0 auto; padding: 34px 0 90px; }
 .report-back { display: inline-flex; align-items: center; gap: 6px; margin-bottom: 22px; color: #777; font-size: 10px; text-decoration: none; }
 .report-back:hover { color: #222; }

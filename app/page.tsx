@@ -1057,11 +1057,11 @@ export default function Home() {
       });
       const payload = await response.json().catch(() => null) as { error?: string; post?: { id?: string } } | null;
       if ((!response.ok && response.status !== 409) || !payload?.post?.id) {
-        throw new Error(payload?.error || "검증 사례를 게시하지 못했습니다.");
+        throw new Error(payload?.error || "커뮤니티 글을 게시하지 못했습니다.");
       }
       window.location.href = `/community/${payload.post.id}`;
     } catch (error) {
-      setCommunityPublishError(error instanceof Error ? error.message : "검증 사례를 게시하지 못했습니다.");
+      setCommunityPublishError(error instanceof Error ? error.message : "커뮤니티 글을 게시하지 못했습니다.");
       setIsPublishingCommunityPost(false);
     }
   };
@@ -1074,7 +1074,7 @@ export default function Home() {
           <button className="logo" onClick={resetAll} aria-label="FIGNAL BETA 홈"><BrandMark /></button>
           <div className="top-nav">
             <span>넨도로이드 검증</span>
-            <Link href="/community"><MessageCircle size={16} /> 검증 사례</Link>
+            <Link href="/community"><MessageCircle size={16} /> 커뮤니티</Link>
             <button onClick={() => setCriteriaOpen(true)}><FileCheck2 size={16} /> 판정 기준</button>
             <button onClick={resetAll}><Plus size={16} /> 새 검증</button>
           </div>
@@ -1329,8 +1329,8 @@ function RelatedCommunityPosts({ posts, productName }: { posts: RelatedCommunity
   return (
     <aside className="related-community-posts" aria-labelledby="related-community-title">
       <header>
-        <span><MessageCircle size={18} /><span><strong id="related-community-title">같은 제품의 검증 사례가 있어요</strong><small>{productName}을 검증한 다른 결과와 비교해 보세요.</small></span></span>
-        <Link href="/community">전체 사례 <ArrowRight size={14} /></Link>
+        <span><MessageCircle size={18} /><span><strong id="related-community-title">같은 제품에 대한 글이 있어요</strong><small>{productName}을 검증한 다른 사람의 결과와 비교해 보세요.</small></span></span>
+        <Link href="/community">커뮤니티 <ArrowRight size={14} /></Link>
       </header>
       <div>
         {posts.map((post) => {
