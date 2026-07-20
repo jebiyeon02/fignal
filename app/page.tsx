@@ -35,6 +35,7 @@ import {
 } from "lucide-react";
 import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import Link from "next/link";
 import {
   isAnalysisResult,
   type AnalysisFinding,
@@ -43,6 +44,7 @@ import {
 } from "./api/analyze/analysis-contract";
 import { displayableCaseImages } from "./case-image-rights";
 import { expandedProducts } from "./catalog";
+import { communityPostStatusCopy, type CommunityPostStatus } from "./community";
 import { communityMentions, type CommunityMention } from "./community-mentions";
 import {
   counterfeitCases,
@@ -95,6 +97,13 @@ type EvidenceItem = {
 
 type AiFinding = AnalysisFinding;
 type AiAnalysis = AnalysisResult;
+type RelatedCommunityPost = {
+  id: string;
+  title: string;
+  status: CommunityPostStatus;
+  createdAt: string;
+  verification: Pick<VerificationHistoryItem, "verdict" | "summary" | "photoCount" | "riskSignalCount">;
+};
 
 const curatedProducts: Product[] = [
   {
@@ -472,6 +481,27 @@ async function fetchRecentVerifications() {
   });
 }
 
+function parseRelatedCommunityPost(value: unknown): RelatedCommunityPost | null {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const post = value as Record<string, unknown>;
+  const verification = post.verification;
+  if (!verification || typeof verification !== "object" || Array.isArray(verification)) return null;
+  const result = verification as Record<string, unknown>;
+  if (
+    typeof post.id !== "string"
+    || typeof post.title !== "string"
+    || typeof post.createdAt !== "string"
+    || typeof post.status !== "string"
+    || !(post.status in communityPostStatusCopy)
+    || typeof result.verdict !== "string"
+    || !(result.verdict in verificationVerdictCopy)
+    || typeof result.summary !== "string"
+    || !Number.isInteger(result.photoCount)
+    || !Number.isInteger(result.riskSignalCount)
+  ) return null;
+  return post as unknown as RelatedCommunityPost;
+}
+
 export default function Home() {
   const [stage, setStage] = useState<Stage>("search");
   const [query, setQuery] = useState("");
@@ -502,6 +532,13 @@ export default function Home() {
   const [historyStatus, setHistoryStatus] = useState<"loading" | "ready" | "error">("loading");
   const [reportConsent, setReportConsent] = useState(false);
   const [savedReportId, setSavedReportId] = useState<string | null>(null);
+  const [communityPublishToken, setCommunityPublishToken] = useState("");
+  const [communityComposerOpen, setCommunityComposerOpen] = useState(false);
+  const [communityTitle, setCommunityTitle] = useState("");
+  const [communityBody, setCommunityBody] = useState("");
+  const [communityPublishError, setCommunityPublishError] = useState("");
+  const [isPublishingCommunityPost, setIsPublishingCommunityPost] = useState(false);
+  const [relatedCommunityPosts, setRelatedCommunityPosts] = useState<RelatedCommunityPost[]>([]);
 
   const showToast = useCallback((message: string) => {
     setToast(message);
@@ -575,6 +612,8 @@ export default function Home() {
       setReviewRequestShared(false);
       setReportConsent(false);
       setSavedReportId(null);
+      setCommunityPublishToken("");
+      setCommunityComposerOpen(false);
       setIsPreparingImages(false);
       if (prepared.recompressed) showToast("사진 용량을 분석에 맞게 자동으로 줄였습니다.");
       return true;
@@ -615,6 +654,27 @@ export default function Home() {
     officialUrl: "",
     verified: false,
   } : null);
+
+  useEffect(() => {
+    if (stage !== "result" || !currentProduct?.verified) return;
+    const controller = new AbortController();
+    const searchParams = new URLSearchParams({ productId: currentProduct.id });
+    if (savedReportId) searchParams.set("excludeVerificationId", savedReportId);
+    void fetch(`/api/community/posts?${searchParams.toString()}`, { cache: "no-store", signal: controller.signal })
+      .then(async (response) => {
+        const payload = await response.json().catch(() => null) as { posts?: unknown } | null;
+        if (!response.ok || !Array.isArray(payload?.posts)) throw new Error("Invalid community response");
+        setRelatedCommunityPosts(payload.posts.flatMap((post) => {
+          const parsed = parseRelatedCommunityPost(post);
+          return parsed ? [parsed] : [];
+        }));
+      })
+      .catch((error) => {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+        setRelatedCommunityPosts([]);
+      });
+    return () => controller.abort();
+  }, [stage, currentProduct?.id, currentProduct?.verified, savedReportId]);
 
   const completedCount = Object.values(observations).filter((value) => value !== "missing").length;
   const uploadedImageBytes = totalImageBytes(Object.values(files).map((file) => file?.size ?? 0));
@@ -762,6 +822,9 @@ export default function Home() {
     setReviewedEvidence({});
     setUserOverrides({});
     setReviewRequestShared(false);
+    setSavedReportId(null);
+    setCommunityPublishToken("");
+    setCommunityComposerOpen(false);
   };
 
   const sellerMessage = `안녕하세요. 구매 전에 제품 확인용 사진을 부탁드립니다.\n① 박스 정면 ② 박스 뒷면 ③ 바코드 ④ 받침대 밑면 각인 ⑤ 얼굴 근접\n같은 배경에서 오늘 날짜 메모가 보이게 촬영해 주세요.`;
@@ -804,6 +867,7 @@ export default function Home() {
       const payload = await response.json().catch(() => null) as {
         analysis?: unknown;
         verification?: unknown;
+        communityPublishToken?: unknown;
         error?: string;
         code?: string;
       } | null;
@@ -826,6 +890,7 @@ export default function Home() {
         ].slice(0, 6));
         setHistoryStatus("ready");
         setSavedReportId(savedVerification.id);
+        setCommunityPublishToken(typeof payload?.communityPublishToken === "string" ? payload.communityPublishToken : "");
       } else {
         showToast("분석은 완료됐지만 공개 리포트를 저장하지 못했습니다.");
       }
@@ -957,7 +1022,46 @@ export default function Home() {
     setReviewRequestShared(false);
     setReportConsent(false);
     setSavedReportId(null);
+    setCommunityPublishToken("");
+    setCommunityComposerOpen(false);
+    setCommunityTitle("");
+    setCommunityBody("");
+    setCommunityPublishError("");
     window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  const openCommunityComposer = () => {
+    if (!currentProduct || !savedReportId || !communityPublishToken) return;
+    setCommunityTitle(`${currentProduct.name} 검증 결과를 공유합니다`);
+    setCommunityBody("");
+    setCommunityPublishError("");
+    setCommunityComposerOpen(true);
+  };
+
+  const publishCommunityPost = async () => {
+    if (!savedReportId || !communityPublishToken || communityTitle.trim().length < 5) return;
+    setIsPublishingCommunityPost(true);
+    setCommunityPublishError("");
+    try {
+      const response = await fetch("/api/community/posts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          verificationId: savedReportId,
+          publishToken: communityPublishToken,
+          title: communityTitle,
+          body: communityBody,
+        }),
+      });
+      const payload = await response.json().catch(() => null) as { error?: string; post?: { id?: string } } | null;
+      if ((!response.ok && response.status !== 409) || !payload?.post?.id) {
+        throw new Error(payload?.error || "검증 사례를 게시하지 못했습니다.");
+      }
+      window.location.href = `/community/${payload.post.id}`;
+    } catch (error) {
+      setCommunityPublishError(error instanceof Error ? error.message : "검증 사례를 게시하지 못했습니다.");
+      setIsPublishingCommunityPost(false);
+    }
   };
 
   return (
@@ -967,6 +1071,7 @@ export default function Home() {
           <button className="logo" onClick={resetAll}>FIGSIGNAL</button>
           <div className="top-nav">
             <span>넨도로이드 검증</span>
+            <Link href="/community"><MessageCircle size={16} /> 검증 사례</Link>
             <button onClick={() => {
               if (stage !== "search") resetAll();
               window.setTimeout(() => document.getElementById("recent-verifications")?.scrollIntoView({ behavior: "smooth" }), 0);
@@ -1140,6 +1245,8 @@ export default function Home() {
             <div className="verdict-numbers"><div><strong>{completedCount}</strong><span>분석 사진</span></div><div><strong>{reviewedCount}/{aiAnalysis?.findings.length ?? assessedCount}</strong><span>사용자 확인</span></div></div>
           </article>
 
+          {relatedCommunityPosts.length > 0 && <RelatedCommunityPosts posts={relatedCommunityPosts} productName={currentProduct.name} />}
+
           <ReviewPathSection
             path={reviewPath}
             product={currentProduct}
@@ -1174,7 +1281,19 @@ export default function Home() {
 
           {reviewPath !== "more_photos_needed" && reviewPath !== "unsupported" && pendingItems.some((item) => observations[item.key] === "missing") && <div className="pending-line"><CircleHelp size={16} /><span><strong>올리지 않은 사진</strong>{pendingItems.filter((item) => observations[item.key] === "missing").map((item) => item.title).join(" · ")}</span></div>}
 
-          <div className="result-actions">{savedReportId && <a className="line-button" href={`/reports/${savedReportId}`}><FileCheck2 size={17} /> 읽기 전용 리포트</a>}<button className="line-button" onClick={shareResult}><Share2 size={17} /> 공유</button><button className="black-button" onClick={resetAll}><RotateCcw size={16} /> 새 검증</button></div>
+          {communityComposerOpen && (
+            <section className="community-composer" aria-labelledby="community-composer-title">
+              <header><span><MessageCircle size={18} /><strong id="community-composer-title">검증 사례로 게시하기</strong></span><button type="button" onClick={() => setCommunityComposerOpen(false)} aria-label="게시 작성 닫기"><X size={17} /></button></header>
+              <p>현재 완료한 검증 결과와 공개 사진이 게시글에 연결됩니다. 판매자 정보나 개인정보는 적지 마세요.</p>
+              <label><span>제목</span><input value={communityTitle} maxLength={80} onChange={(event) => setCommunityTitle(event.target.value)} /></label>
+              <label><span>확인받고 싶은 내용 <small>선택</small></span><textarea value={communityBody} maxLength={600} onChange={(event) => setCommunityBody(event.target.value)} placeholder="예: 재판 제품인지, 얼굴 도색 차이가 정상 범위인지 의견을 듣고 싶어요." /></label>
+              <div className="community-composer-meta"><span>검증 결과가 없는 일반 글은 작성할 수 없습니다.</span><em>{communityBody.length}/600</em></div>
+              {communityPublishError && <div className="analysis-error" role="alert"><TriangleAlert size={16} /><span>{communityPublishError}</span></div>}
+              <div className="community-composer-actions"><button className="line-button" type="button" onClick={() => setCommunityComposerOpen(false)}>취소</button><button className="black-button" type="button" disabled={isPublishingCommunityPost || communityTitle.trim().length < 5} onClick={() => void publishCommunityPost()}>{isPublishingCommunityPost ? <><LoaderCircle className="spin" size={17} /> 게시 중</> : <><MessageCircle size={17} /> 사례 게시</>}</button></div>
+            </section>
+          )}
+
+          <div className="result-actions">{savedReportId && <a className="line-button" href={`/reports/${savedReportId}`}><FileCheck2 size={17} /> 읽기 전용 리포트</a>}{savedReportId && communityPublishToken && !communityComposerOpen && <button className="line-button" onClick={openCommunityComposer}><MessageCircle size={17} /> 검증 사례로 게시</button>}<button className="line-button" onClick={shareResult}><Share2 size={17} /> 공유</button><button className="black-button" onClick={resetAll}><RotateCcw size={16} /> 새 검증</button></div>
           <p className="disclaimer">AI 시각 분석과 사용자 확인을 정리한 참고 의견이며 정품 보증서가 아닙니다.</p>
         </section>
       )}
@@ -1182,6 +1301,30 @@ export default function Home() {
       {criteriaOpen && <VerificationCriteriaDialog onClose={() => setCriteriaOpen(false)} />}
       {toast && <div className="toast" role="status"><Check size={16} /> {toast}</div>}
     </main>
+  );
+}
+
+function RelatedCommunityPosts({ posts, productName }: { posts: RelatedCommunityPost[]; productName: string }) {
+  return (
+    <aside className="related-community-posts" aria-labelledby="related-community-title">
+      <header>
+        <span><MessageCircle size={18} /><span><strong id="related-community-title">같은 제품의 검증 사례가 있어요</strong><small>{productName}을 검증한 다른 결과와 비교해 보세요.</small></span></span>
+        <Link href="/community">전체 사례 <ArrowRight size={14} /></Link>
+      </header>
+      <div>
+        {posts.map((post) => {
+          const verdict = verificationVerdictCopy[post.verification.verdict];
+          return (
+            <Link href={`/community/${post.id}`} className={`related-community-card ${verdict.tone}`} key={post.id}>
+              <span><em>{communityPostStatusCopy[post.status]}</em><time dateTime={post.createdAt}>{formatVerificationDate(post.createdAt)}</time></span>
+              <strong>{post.title}</strong>
+              <small>{verdict.label} · 사진 {post.verification.photoCount}장</small>
+              <ArrowRight size={16} />
+            </Link>
+          );
+        })}
+      </div>
+    </aside>
   );
 }
 

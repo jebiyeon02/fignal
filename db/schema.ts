@@ -18,9 +18,27 @@ export const verificationHistory = sqliteTable(
     matchedCaseCount: integer("matched_case_count").notNull(),
     analysisJson: text("analysis_json").notNull(),
     promptVersion: text("prompt_version").notNull(),
+    communityPublishTokenHash: text("community_publish_token_hash").notNull().default(""),
     createdAt: text("created_at").notNull(),
   },
   (table) => [index("verification_history_created_at_idx").on(table.createdAt)],
+);
+
+export const communityPosts = sqliteTable(
+  "community_posts",
+  {
+    id: text("id").primaryKey(),
+    verificationId: text("verification_id").notNull(),
+    title: text("title").notNull(),
+    body: text("body").notNull().default(""),
+    status: text("status").notNull().default("collecting"),
+    helpfulCount: integer("helpful_count").notNull().default(0),
+    createdAt: text("created_at").notNull(),
+  },
+  (table) => [
+    uniqueIndex("community_posts_verification_idx").on(table.verificationId),
+    index("community_posts_created_at_idx").on(table.createdAt),
+  ],
 );
 
 export const verificationReportImages = sqliteTable(

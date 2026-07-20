@@ -30,6 +30,7 @@ async function ensureVerificationHistorySchema() {
       matched_case_count integer NOT NULL,
       analysis_json text NOT NULL,
       prompt_version text NOT NULL,
+      community_publish_token_hash text DEFAULT '' NOT NULL,
       created_at text NOT NULL
     )`),
     env.DB.prepare("CREATE INDEX IF NOT EXISTS verification_history_created_at_idx ON verification_history (created_at)"),
@@ -105,6 +106,7 @@ export async function saveVerificationHistory(input: {
   product: VerificationProduct;
   analysis: AnalysisResult;
   promptVersion: string;
+  communityPublishTokenHash: string;
   images: StoredReportImage[];
 }): Promise<VerificationHistoryItem> {
   await ensureVerificationHistorySchema();
@@ -126,6 +128,7 @@ export async function saveVerificationHistory(input: {
     matchedCaseCount: analysis.caseMatches.length,
     analysisJson: JSON.stringify(analysis),
     promptVersion: input.promptVersion,
+    communityPublishTokenHash: input.communityPublishTokenHash,
     createdAt,
   };
 

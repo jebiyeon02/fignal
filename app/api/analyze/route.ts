@@ -1,5 +1,6 @@
 import { env } from "cloudflare:workers";
 import { saveVerificationHistory } from "../../../db/verification-history";
+import { hashCommunityPublishToken } from "../../../db/community-posts";
 import {
   deleteVerificationReportImages,
   storeVerificationReportImages,
@@ -279,9 +280,11 @@ export async function POST(request: Request) {
     if (!analysis) throw new Error("Invalid analysis contract");
 
     let verification = null;
+    let communityPublishToken = "";
     let storedImages: StoredReportImage[] = [];
     try {
       const verificationId = crypto.randomUUID();
+      communityPublishToken = crypto.randomUUID();
       storedImages = await storeVerificationReportImages(
         verificationId,
         uploaded.filter((item) => item.key !== "purchaseProof").map((item) => ({
@@ -294,6 +297,7 @@ export async function POST(request: Request) {
         product,
         analysis,
         promptVersion: analysisPromptVersion,
+        communityPublishTokenHash: await hashCommunityPublishToken(communityPublishToken),
         images: storedImages,
       });
     } catch (error) {
@@ -309,6 +313,7 @@ export async function POST(request: Request) {
       {
         analysis,
         verification,
+        communityPublishToken: verification ? communityPublishToken : null,
         meta: {
           promptVersion: analysisPromptVersion,
           historySaved: Boolean(verification),
