@@ -73,11 +73,6 @@ export default async function VerificationReportPage({
           </div>
         </section>
 
-        <aside className="readonly-notice">
-          <LockKeyhole size={18} />
-          <span><strong>검증 완료 시점 그대로 보존된 리포트예요.</strong>열람자는 사진이나 판정 항목을 수정할 수 없습니다. 구매내역 사진과 개인정보가 포함될 수 있는 내용은 공개 저장하지 않습니다.</span>
-        </aside>
-
         <section className="report-findings" aria-labelledby="report-findings-title">
           <header>
             <div><FileCheck2 size={20} /><h2 id="report-findings-title">사진별 판정 근거</h2></div>
