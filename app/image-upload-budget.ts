@@ -1,4 +1,4 @@
-export const CLIENT_UPLOAD_TARGET_BYTES = 7 * 1024 * 1024;
+export const CLIENT_UPLOAD_TARGET_BYTES = 8 * 1024 * 1024;
 
 export function totalImageBytes(sizes: number[]) {
   return sizes.reduce((total, size) => total + Math.max(0, size), 0);
