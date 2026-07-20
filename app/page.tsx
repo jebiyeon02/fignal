@@ -49,7 +49,6 @@ import {
   type CounterfeitCase,
   type CounterfeitCaseKind,
 } from "./counterfeit-cases";
-import { getProductVerificationNotes } from "./product-verification";
 import { resolveReviewPath, reviewPathCopy, type ReviewPath } from "./review-path";
 import {
   parseVerificationHistoryItem,
@@ -1001,13 +1000,6 @@ export default function Home() {
               <small>{aiProductCases.length > 0 ? "사진 분석 후 등록 사례와 공통점과 차이점을 보여드립니다." : "제품별 사례가 없어도 공식·검수 사례에서 정리한 범용 위험 패턴으로 결론을 냅니다."}</small>
             </span>
           </div>
-
-          {getProductVerificationNotes(currentProduct).length > 0 && (
-            <details className="series-verification-guide">
-              <summary><span><ShieldCheck size={16} /> 히로아카 확인 포인트</span><ChevronDown size={17} /></summary>
-              <ul>{getProductVerificationNotes(currentProduct).map((note) => <li key={note}>{note}</li>)}</ul>
-            </details>
-          )}
 
           <div className="photo-topline"><div><strong>필수 사진</strong><span>{essentialCompleted}/5</span></div><button onClick={copySellerMessage}><Clipboard size={14} /> 판매자에게 요청</button></div>
           <div className="photo-grid">

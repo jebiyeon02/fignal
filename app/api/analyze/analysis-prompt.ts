@@ -134,7 +134,6 @@ export function buildNendoroidAnalysisPrompt(domainKnowledge: string, outputSche
     "status=match는 정품 일치가 아니라, 제공된 메타데이터와 알려진 사례 특징에 뚜렷하게 충돌하지 않는다는 뜻입니다.",
     "서버가 제공한 가품 사례의 텍스트 특징과 사용자 사진의 관찰이 구체적으로 겹칠 때만 caseMatches에 넣으세요.",
     "official_confirmed는 제조사 확인 자료이고 side_by_side_author_asserted는 비교 작성자의 판단입니다. 두 출처 강도를 구분하세요.",
-    "제품별 확인 메모가 제공되면 단일 로고·스티커 유무로 단정하지 말고 발매판과 유통사 차이를 먼저 고려하세요.",
     "caseMatches.reason에는 사용자 사진에서 관찰된 부분과 등록 사례의 어떤 특징이 겹치는지 구체적으로 적으세요.",
     "보이지 않거나 해상도가 부족한 글자, 로고, JAN, 각인은 status=unclear로 처리하고 재촬영 방법을 userAction에 적으세요.",
     "사진마다 해당 evidence_key로 findings를 정확히 하나씩 만들고, 업로드되지 않은 key는 만들지 마세요.",

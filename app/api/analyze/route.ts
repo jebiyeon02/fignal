@@ -8,7 +8,6 @@ import {
 
 import { expandedProducts } from "../../catalog";
 import { counterfeitCases } from "../../counterfeit-cases";
-import { getProductVerificationNotes } from "../../product-verification";
 import {
   essentialEvidenceKeys,
   evidenceKeys,
@@ -187,9 +186,6 @@ export async function POST(request: Request) {
         `작품: ${[product.seriesName, product.englishSeriesName].filter(Boolean).join(" / ") || "미확인"}`,
         `제조사: ${product.maker}`,
         "공식 카탈로그 등록 여부: 등록됨",
-        ...(getProductVerificationNotes(product).length
-          ? [`제품별 확인 메모:\n- ${getProductVerificationNotes(product).join("\n- ")}`]
-          : []),
         "아래에는 서버에서 선택한 알려진 가품 특징과 사용자가 올린 증거 사진이 제공됩니다.",
         "외부 참고 이미지는 권리 확인 전이므로 이 분석에 제공되지 않습니다.",
       ].join("\n"),
