@@ -13,6 +13,7 @@ import {
   CircleHelp,
   Clipboard,
   Clock3,
+  Copy,
   ExternalLink,
   FileCheck2,
   Image as ImageIcon,
@@ -51,7 +52,7 @@ import {
   type CounterfeitCase,
   type CounterfeitCaseKind,
 } from "./counterfeit-cases";
-import { resolveReviewPath, reviewPathCopy, type ReviewPath } from "./review-path";
+import { resolveReviewPath, type ReviewPath } from "./review-path";
 import {
   CLIENT_UPLOAD_TARGET_BYTES,
   allocateImageByteBudgets,
@@ -539,6 +540,7 @@ export default function Home() {
   const [communityPublishError, setCommunityPublishError] = useState("");
   const [isPublishingCommunityPost, setIsPublishingCommunityPost] = useState(false);
   const [relatedCommunityPosts, setRelatedCommunityPosts] = useState<RelatedCommunityPost[]>([]);
+  const [shareOptionsOpen, setShareOptionsOpen] = useState(false);
 
   const showToast = useCallback((message: string) => {
     setToast(message);
@@ -700,7 +702,6 @@ export default function Home() {
     hasRiskSignals: concernItems.length > 0,
     hasComparisonCases: aiProductCases.length > 0,
   });
-  const reviewPathResult = reviewPathCopy[reviewPath];
   const photoActions = evidenceItems.flatMap((item) => {
     if (!item.essential) return [];
     if (observations[item.key] === "missing") {
@@ -933,32 +934,15 @@ export default function Home() {
     });
   };
 
-  const shareResult = async () => {
-    if (!currentProduct) return;
-    const reportUrl = savedReportId ? `${window.location.origin}/reports/${savedReportId}` : "";
-    const text = [
-      `[FIGSIGNAL] ${currentProduct.name}`,
-      `${reviewPathResult.label}${aiAnalysis ? ` · AI 위험 신호: ${result.label}` : ""}`,
-      `No.${currentProduct.number} · 확인한 사진 ${completedCount}장`,
-      reportUrl,
-    ].filter(Boolean).join("\n");
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: "FIGSIGNAL 판정 결과",
-          text,
-          ...(reportUrl ? { url: reportUrl } : {}),
-        });
-        return;
-      } catch {
-        return;
-      }
-    }
+  const copyReportLink = async () => {
+    if (!savedReportId) return;
+    const reportUrl = `${window.location.origin}/reports/${savedReportId}`;
     try {
-      await navigator.clipboard.writeText(text);
-      showToast("결과를 복사했습니다.");
+      await navigator.clipboard.writeText(reportUrl);
+      setShareOptionsOpen(false);
+      showToast("리포트 링크를 복사했습니다.");
     } catch {
-      showToast("복사하지 못했습니다.");
+      showToast("링크를 복사하지 못했습니다.");
     }
   };
 
@@ -1027,6 +1011,7 @@ export default function Home() {
     setCommunityTitle("");
     setCommunityBody("");
     setCommunityPublishError("");
+    setShareOptionsOpen(false);
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
@@ -1035,6 +1020,7 @@ export default function Home() {
     setCommunityTitle(`${currentProduct.name} 검증 결과를 공유합니다`);
     setCommunityBody("");
     setCommunityPublishError("");
+    setShareOptionsOpen(false);
     setCommunityComposerOpen(true);
   };
 
@@ -1279,17 +1265,30 @@ export default function Home() {
 
           {communityComposerOpen && (
             <section className="community-composer" aria-labelledby="community-composer-title">
-              <header><span><MessageCircle size={18} /><strong id="community-composer-title">검증 사례로 게시하기</strong></span><button type="button" onClick={() => setCommunityComposerOpen(false)} aria-label="게시 작성 닫기"><X size={17} /></button></header>
+              <header><span><MessageCircle size={18} /><strong id="community-composer-title">커뮤니티에 게시하기</strong></span><button type="button" onClick={() => setCommunityComposerOpen(false)} aria-label="게시 작성 닫기"><X size={17} /></button></header>
               <p>현재 완료한 검증 결과와 공개 사진이 게시글에 연결됩니다. 판매자 정보나 개인정보는 적지 마세요.</p>
               <label><span>제목</span><input value={communityTitle} maxLength={80} onChange={(event) => setCommunityTitle(event.target.value)} /></label>
               <label><span>확인받고 싶은 내용 <small>선택</small></span><textarea value={communityBody} maxLength={600} onChange={(event) => setCommunityBody(event.target.value)} placeholder="예: 재판 제품인지, 얼굴 도색 차이가 정상 범위인지 의견을 듣고 싶어요." /></label>
               <div className="community-composer-meta"><span>검증 결과가 없는 일반 글은 작성할 수 없습니다.</span><em>{communityBody.length}/600</em></div>
               {communityPublishError && <div className="analysis-error" role="alert"><TriangleAlert size={16} /><span>{communityPublishError}</span></div>}
-              <div className="community-composer-actions"><button className="line-button" type="button" onClick={() => setCommunityComposerOpen(false)}>취소</button><button className="black-button" type="button" disabled={isPublishingCommunityPost || communityTitle.trim().length < 5} onClick={() => void publishCommunityPost()}>{isPublishingCommunityPost ? <><LoaderCircle className="spin" size={17} /> 게시 중</> : <><MessageCircle size={17} /> 사례 게시</>}</button></div>
+              <div className="community-composer-actions"><button className="line-button" type="button" onClick={() => setCommunityComposerOpen(false)}>취소</button><button className="black-button" type="button" disabled={isPublishingCommunityPost || communityTitle.trim().length < 5} onClick={() => void publishCommunityPost()}>{isPublishingCommunityPost ? <><LoaderCircle className="spin" size={17} /> 게시 중</> : <><MessageCircle size={17} /> 게시하기</>}</button></div>
             </section>
           )}
 
-          <div className="result-actions">{savedReportId && <a className="line-button" href={`/reports/${savedReportId}`}><FileCheck2 size={17} /> 읽기 전용 리포트</a>}{savedReportId && communityPublishToken && !communityComposerOpen && <button className="line-button" onClick={openCommunityComposer}><MessageCircle size={17} /> 검증 사례로 게시</button>}<button className="line-button" onClick={shareResult}><Share2 size={17} /> 공유</button><button className="black-button" onClick={resetAll}><RotateCcw size={16} /> 새 검증</button></div>
+          {savedReportId && (
+            <div className="result-actions">
+              <div className="result-share-action">
+                <button className="line-button" type="button" aria-expanded={shareOptionsOpen} aria-controls="result-share-options" onClick={() => setShareOptionsOpen((current) => !current)}><Share2 size={17} /> 공유</button>
+                {shareOptionsOpen && (
+                  <div className="result-share-options" id="result-share-options">
+                    <button type="button" onClick={() => void copyReportLink()}><Copy size={16} /><span><strong>링크 복사</strong><small>리포트 주소를 클립보드에 복사</small></span></button>
+                    <Link href={`/reports/${savedReportId}`} target="_blank" rel="noreferrer" onClick={() => setShareOptionsOpen(false)}><FileCheck2 size={16} /><span><strong>리포트 열기</strong><small>읽기 전용 결과를 새 창에서 확인</small></span></Link>
+                  </div>
+                )}
+              </div>
+              {communityPublishToken && <button className="black-button" type="button" disabled={communityComposerOpen} onClick={openCommunityComposer}><MessageCircle size={17} /> 커뮤니티에 게시</button>}
+            </div>
+          )}
           <p className="disclaimer">AI 시각 분석과 사용자 확인을 정리한 참고 의견이며 정품 보증서가 아닙니다.</p>
         </section>
       )}
