@@ -556,11 +556,6 @@ export default function Home() {
   const matchedCaseSignals = aiProductCases.flatMap((item) => item.signals)
     .filter((signal) => observations[signal.evidenceKey] === "concern");
   const hasKnownCaseOverlap = matchedCaseSignals.length > 0;
-  const localEvidencePoints = Object.values(observations).reduce(
-    (sum, observation) => sum + (observation === "match" || observation === "concern" ? 1 : observation === "unverified" ? 0.5 : 0),
-    0,
-  );
-  const evidenceCompleteness = aiAnalysis?.evidenceCompleteness ?? Math.round((localEvidencePoints / evidenceItems.length) * 100);
   const reviewedCount = Object.values(reviewedEvidence).filter(Boolean).length;
   const hasUserOverride = Object.keys(userOverrides).length > 0;
   const evidenceReady = essentialCompleted >= 4;
@@ -785,7 +780,7 @@ export default function Home() {
     const text = [
       `[FIGSIGNAL] ${currentProduct.name}`,
       `${reviewPathResult.label}${aiAnalysis ? ` · AI 위험 신호: ${result.label}` : ""}`,
-      `자료 충족도 ${evidenceCompleteness}% · No.${currentProduct.number} · 확인한 사진 ${completedCount}장`,
+      `No.${currentProduct.number} · 확인한 사진 ${completedCount}장`,
       reportUrl,
     ].filter(Boolean).join("\n");
     if (navigator.share) {
@@ -818,7 +813,7 @@ export default function Home() {
       "[FIGSIGNAL 추가 검토 요청]",
       `${currentProduct.name} · No.${currentProduct.number}`,
       `제조사: ${currentProduct.maker}`,
-      `AI 위험 신호: ${result.label} · 자료 충족도 ${evidenceCompleteness}%`,
+      `AI 위험 신호: ${result.label} · 확인한 사진 ${completedCount}장`,
       "명확한 비정상 신호는 없지만 판본 또는 서로 충돌하는 근거가 남아 추가 검토를 요청합니다.",
       reviewFindings ? `\n확인이 필요한 항목\n${reviewFindings}` : "",
       "\n이 요청은 사진 기반 참고 의견이며 정품 보증서가 아닙니다.",
@@ -1047,7 +1042,7 @@ export default function Home() {
           <article className={`verdict-card ${verdictCardResult.tone}`}>
             <div className="verdict-product"><ProductImage product={currentProduct} size="medium" /><span><small>No.{currentProduct.number}</small><strong>{currentProduct.name}</strong><em>{currentProduct.maker}</em></span></div>
             <div className="verdict-copy"><span>{hasUserOverride ? "사용자 확인 반영" : aiAnalysis ? "AI 판정" : "검토 결과"}</span><h1>{verdictCardResult.label}</h1><p>{verdictCardResult.summary}</p></div>
-            <div className="verdict-numbers"><div><strong>{reviewPath === "unsupported" ? "—" : `${evidenceCompleteness}%`}</strong><span>{reviewPath === "unsupported" ? "자료 미확인" : "자료 충족도"}</span></div><div><strong>{completedCount}</strong><span>분석 사진</span></div><div><strong>{reviewedCount}/{aiAnalysis?.findings.length ?? assessedCount}</strong><span>사용자 확인</span></div></div>
+            <div className="verdict-numbers"><div><strong>{completedCount}</strong><span>분석 사진</span></div><div><strong>{reviewedCount}/{aiAnalysis?.findings.length ?? assessedCount}</strong><span>사용자 확인</span></div></div>
           </article>
 
           <ReviewPathSection
@@ -1154,7 +1149,6 @@ function RecentVerificationSection({
                   <em>{verdict.label}</em>
                 </span>
                 <span className="recent-verification-metrics">
-                  <strong>{item.evidenceCompleteness}%</strong>
                   <small>사진 {item.photoCount}장 · 위험 신호 {item.riskSignalCount}개</small>
                 </span>
                 <ArrowRight size={17} />

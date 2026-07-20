@@ -67,7 +67,6 @@ export default async function VerificationReportPage({
             <em>{report.summary}</em>
           </div>
           <div className="report-metrics">
-            <div><strong>{report.evidenceCompleteness}%</strong><span>자료 충족도</span></div>
             <div><strong>{report.photoCount}</strong><span>분석 사진</span></div>
             <div><strong>{report.riskSignalCount}</strong><span>위험 신호</span></div>
           </div>
