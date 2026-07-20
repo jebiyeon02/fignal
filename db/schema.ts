@@ -48,6 +48,8 @@ export const communityComments = sqliteTable(
     postId: text("post_id").notNull(),
     nickname: text("nickname").notNull(),
     body: text("body").notNull(),
+    passwordHash: text("password_hash"),
+    passwordSalt: text("password_salt"),
     createdAt: text("created_at").notNull(),
   },
   (table) => [index("community_comments_post_created_at_idx").on(table.postId, table.createdAt)],

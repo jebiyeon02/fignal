@@ -18,6 +18,7 @@ export type CommunityComment = {
   postId: string;
   nickname: string;
   body: string;
+  canManage: boolean;
   createdAt: string;
 };
 
