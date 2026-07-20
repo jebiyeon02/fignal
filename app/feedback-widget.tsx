@@ -66,7 +66,7 @@ export function FeedbackWidget() {
       {!isOpen ? (
         <button className={styles.trigger} type="button" onClick={() => setIsOpen(true)} aria-expanded="false">
           <MessageSquarePlus size={17} />
-          <span>피드백</span>
+          <span>빠른 피드백</span>
         </button>
       ) : (
         <div className={styles.panel}>
