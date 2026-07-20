@@ -4,7 +4,7 @@ import { ArrowLeft, ExternalLink, FileCheck2, ImageOff, LockKeyhole, ShieldCheck
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { AnalysisFinding } from "../../api/analyze/analysis-contract";
-import { expandedProducts } from "../../catalog";
+import { expandedProducts, isOfficialProductImage } from "../../catalog";
 import { verificationVerdictCopy } from "../../verification-history";
 import { getVerificationHistoryById } from "../../../db/verification-history";
 import { ReportProductImage } from "./report-product-image";
@@ -42,8 +42,7 @@ export default async function VerificationReportPage({
   const productImageSources = [
     report.productImage,
     currentCatalogProduct?.image ?? "",
-    currentCatalogProduct?.fallbackImage ?? "",
-  ];
+  ].filter(isOfficialProductImage);
 
   return (
     <main className="readonly-report">

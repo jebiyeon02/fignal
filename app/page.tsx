@@ -69,8 +69,7 @@ type Product = {
   maker: string;
   release: string;
   image: string;
-  fallbackImage?: string;
-  imageSource?: "official" | "catalog-fallback" | "none";
+  imageSource?: "official" | "none";
   imageSourceUrl?: string;
   officialUrl: string;
   verified: boolean;
@@ -954,7 +953,7 @@ export default function Home() {
                   {seriesLabel(selectedProduct) && <div><dt>작품</dt><dd>{seriesLabel(selectedProduct)}</dd></div>}
                   <div><dt>제조사</dt><dd>{selectedProduct.maker}</dd></div>
                   <div><dt>발매</dt><dd>{selectedProduct.release}</dd></div>
-                  <div><dt>대표 이미지</dt><dd>{selectedProduct.imageSource === "official" ? "제조사 원본" : selectedProduct.image ? "카탈로그 보존 이미지" : "확인 가능한 이미지 없음"}</dd></div>
+                  <div><dt>대표 이미지</dt><dd>{selectedProduct.imageSource === "official" ? "제조사 원본" : "확인 가능한 공식 이미지 없음"}</dd></div>
                 </dl>
                 <div className="selected-links"><a href={selectedProduct.officialUrl} target="_blank" rel="noreferrer">제품 정보 페이지 <ExternalLink size={14} /></a><button onClick={() => { setSelectedProduct(null); setQuery(""); }}>다른 제품 찾기</button></div>
               </div>
@@ -1257,9 +1256,7 @@ function StepBar({ stage }: { stage: Stage }) {
 }
 
 function ProductImage({ product, size }: { product: Product; size: "small" | "medium" | "large" }) {
-  const sources = [product.image, product.fallbackImage].filter((source, index, values): source is string => (
-    Boolean(source) && values.indexOf(source) === index
-  ));
+  const sources = [product.image].filter(Boolean);
   const [failures, setFailures] = useState<{ productId: string; sources: string[] }>({
     productId: product.id,
     sources: [],

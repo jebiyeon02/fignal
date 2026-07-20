@@ -79,9 +79,7 @@ const SUPPLEMENTAL_PRODUCTS = [
   number,
   maker: "Good Smile Company",
   release,
-  image: new Set(["100", "232", "260", "284", "349", "359", "392", "475"]).has(number)
-    ? `https://www.nendo.guide/get/image/${number}/0`
-    : "",
+  image: "",
   officialUrl: sourceUrl,
   verified: true,
 }));

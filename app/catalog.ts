@@ -1,8 +1,6 @@
 import nendoroidsOneToFiveHundred from "./data/nendoroids-1-500.generated.json";
-import allGsInfoNendoroids from "./data/nendoroids-all.generated.json";
-import officialImageCatalog from "./data/nendoroid-official-images.generated.json";
 
-export type CatalogImageSource = "official" | "catalog-fallback" | "none";
+export type CatalogImageSource = "official" | "none";
 
 export type CatalogProduct = {
   id: string;
@@ -13,24 +11,14 @@ export type CatalogProduct = {
   maker: string;
   release: string;
   image: string;
-  fallbackImage?: string;
   imageSource?: CatalogImageSource;
   imageSourceUrl?: string;
   officialUrl: string;
   officialProductId?: string;
-  catalogSourceUrl?: string;
   verified: boolean;
   series?: string;
   seriesName?: string;
   englishSeriesName?: string;
-};
-
-type OfficialImageRecord = {
-  id: string;
-  officialProductId: string;
-  officialUrl: string;
-  image: string;
-  status: "available" | "unavailable";
 };
 
 const curatedCatalogProducts: CatalogProduct[] = [
@@ -150,7 +138,7 @@ const curatedCatalogProducts: CatalogProduct[] = [
     number: "284",
     maker: "Good Smile Company",
     release: "2013.03",
-    image: "https://www.nendo.guide/get/image/284/0",
+    image: "",
     officialUrl: "https://partner.goodsmile.info/support/eng/fake/en/3711/",
     verified: true,
   },
@@ -389,7 +377,7 @@ const curatedCatalogProducts: CatalogProduct[] = [
     number: "1151",
     maker: "Good Smile Company",
     release: "2020.02",
-    image: "https://storage.googleapis.com/gsc-webrevo-sdk-storage-prd/product/image/product/20190703/8513/61839/large/c97e3af94173ba2e9decf91ea62400e2.jpg",
+    image: "",
     officialUrl: "https://www.goodsmile.com/en/product/6221/Nendoroid%2BHatsune%2BMiku%2BMagical%2BMirai%2B2018%2BVer",
     verified: true,
   },
@@ -1754,12 +1742,8 @@ const curatedCatalogProducts: CatalogProduct[] = [
 ];
 
 const curatedProductIds = new Set(curatedCatalogProducts.map((product) => product.id));
-const gsInfoProductsById = new Map((allGsInfoNendoroids as CatalogProduct[]).map((product) => [product.id, product]));
-const officialImagesById = new Map(
-  (officialImageCatalog.records as OfficialImageRecord[]).map((record) => [record.id, record]),
-);
 
-function isOfficialImage(image: string) {
+export function isOfficialProductImage(image: string) {
   if (!image) return false;
   try {
     const hostname = new URL(image).hostname;
@@ -1771,67 +1755,20 @@ function isOfficialImage(image: string) {
   }
 }
 
-const enrichWithSources = (product: CatalogProduct): CatalogProduct => {
-  const gsInfoProduct = gsInfoProductsById.get(product.id);
-  const officialImage = officialImagesById.get(product.id);
-  const productImageIsOfficial = isOfficialImage(product.image);
-  const image = productImageIsOfficial
-    ? product.image
-    : officialImage?.image || product.image || gsInfoProduct?.image || "";
-  const fallbackImage = gsInfoProduct?.image && gsInfoProduct.image !== image
-    ? gsInfoProduct.image
-    : undefined;
-  const imageSource: CatalogImageSource = isOfficialImage(image)
-    ? "official"
-    : image
-      ? "catalog-fallback"
-      : "none";
-  const productInformationUrl = officialImage?.status === "available"
-    ? officialImage.officialUrl
-    : product.catalogSourceUrl
-      ? product.catalogSourceUrl
-      : product.officialUrl;
-
-  if (!gsInfoProduct) {
-    return {
-      ...product,
-      image,
-      fallbackImage,
-      imageSource,
-      imageSourceUrl: imageSource === "official" ? productInformationUrl : product.imageSourceUrl,
-      officialUrl: productInformationUrl,
-    };
-  }
-
+const withOfficialImageOnly = (product: CatalogProduct): CatalogProduct => {
+  const image = isOfficialProductImage(product.image) ? product.image : "";
   return {
     ...product,
-    aliases: [...new Set([...product.aliases, ...gsInfoProduct.aliases])],
     image,
-    fallbackImage,
-    imageSource,
-    imageSourceUrl: imageSource === "official"
-      ? productInformationUrl
-      : gsInfoProduct.catalogSourceUrl ?? gsInfoProduct.officialUrl,
-    officialUrl: productInformationUrl || gsInfoProduct.officialUrl,
-    officialProductId: product.officialProductId ?? gsInfoProduct.officialProductId,
-    catalogSourceUrl: gsInfoProduct.catalogSourceUrl,
-    series: product.series ?? gsInfoProduct.series,
-    seriesName: product.seriesName ?? gsInfoProduct.seriesName,
-    englishSeriesName: product.englishSeriesName ?? gsInfoProduct.englishSeriesName,
+    imageSource: image ? "official" : "none",
+    imageSourceUrl: image ? product.officialUrl : undefined,
   };
 };
 const officialOneToFiveHundred = (nendoroidsOneToFiveHundred as CatalogProduct[]).filter(
   (product) => !curatedProductIds.has(product.id),
-).map(enrichWithSources);
-const preferredProductIds = new Set([
-  ...curatedProductIds,
-  ...officialOneToFiveHundred.map((product) => product.id),
-]);
+).map(withOfficialImageOnly);
 
 export const expandedProducts: CatalogProduct[] = [
-  ...curatedCatalogProducts.map(enrichWithSources),
+  ...curatedCatalogProducts.map(withOfficialImageOnly),
   ...officialOneToFiveHundred,
-  ...(allGsInfoNendoroids as CatalogProduct[])
-    .filter((product) => !preferredProductIds.has(product.id))
-    .map(enrichWithSources),
 ];
