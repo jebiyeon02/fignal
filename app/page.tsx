@@ -1023,7 +1023,7 @@ export default function Home() {
             <span><strong>사진이 포함된 공개 검증 리포트 저장에 동의합니다.</strong>검증 사진과 판정 근거는 고유한 읽기 전용 리포트로 공개됩니다. 구매내역 사진은 저장하지 않으며, 사진 속 이름·주소 등 개인정보는 직접 가린 뒤 올려주세요.</span>
           </label>
           {analysisError && <div className="analysis-error" role="alert"><TriangleAlert size={17} /><span><strong>분석을 시작하지 못했어요</strong>{analysisError}</span></div>}
-          <button className="black-button full" disabled={completedCount === 0 || isAnalyzing || (evidenceReady && !reportConsent)} onClick={analyze}>{isAnalyzing ? <><LoaderCircle className="spin" size={18} /> 사진 분석 중</> : evidenceReady && !reportConsent ? <><FileCheck2 size={18} /> 공개 리포트 동의 필요</> : evidenceReady ? <><ShieldCheck size={18} /> AI로 분석하고 리포트 만들기</> : <><CircleHelp size={18} /> 부족한 사진 확인</>}</button>
+          <button className="black-button full" disabled={completedCount === 0 || isAnalyzing || (evidenceReady && !reportConsent)} onClick={analyze}>{isAnalyzing ? <><LoaderCircle className="spin" size={18} /> 사진 분석 중</> : evidenceReady && !reportConsent ? <><FileCheck2 size={18} /> 공개 리포트 동의 필요</> : evidenceReady ? <><ShieldCheck size={18} /> AI로 분석하기</> : <><CircleHelp size={18} /> 부족한 사진 확인</>}</button>
         </section>
       )}
 
