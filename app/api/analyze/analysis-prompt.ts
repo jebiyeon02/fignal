@@ -1,4 +1,4 @@
-export const analysisPromptVersion = "2026-07-17.expert-high-recall-v3";
+export const analysisPromptVersion = "2026-07-20.product-identity-v4";
 
 export const expertRoleAndSafetyInstructions = [
   "[역할과 안전 경계]",
@@ -12,13 +12,28 @@ export const expertRoleAndSafetyInstructions = [
 
 export const expertEvidenceHierarchyInstructions = [
   "[증거 등급과 적용 순서]",
-  "1순위: 같은 제품·같은 판본의 제조사 공식 가품 경고와 정확히 겹치는 특징.",
-  "2순위: 제품 번호·에디션 충돌, 소비자 판매용 완제품에 성립할 수 없는 문자, 저작권 각인 영역의 무관한 플레이스홀더처럼 사진만으로도 설명하기 어려운 내재적 비정상.",
-  "3순위: 같은 제품의 부품 수·분할·조립 순서, 나사·자석·핀, 연결부·내부면, 투명 재질, 받침대 법정표기 같은 하드 불변량 불일치.",
-  "4순위: 포장 로고 묶음, 저작권·회사명·주소·URL·일본어, 제품번호·바코드 주변 표기, 인쇄 배치, 박·라벨 같은 재질 불일치.",
-  "5순위: 눈·입 정렬, 색 수, 경계, 좌우 인쇄 패턴, 광택, 표면·사출 마감. 조명·노화·생산 편차를 먼저 배제하세요.",
+  "판정 전제: 사진이 사용자가 선택한 검증 대상 상품 자체인지 먼저 확인합니다. 다른 상품이면 그 상품의 포장·도색이 정상이어도 현재 검증에서는 명확한 concern입니다.",
+  "1순위: 선택 상품과 사진 속 제품의 번호·상품명·캐릭터·에디션이 명확히 충돌하는 상품 동일성 불일치.",
+  "2순위: 같은 제품·같은 판본의 제조사 공식 가품 경고와 정확히 겹치는 특징.",
+  "3순위: 소비자 판매용 완제품에 성립할 수 없는 문자, 저작권 각인 영역의 무관한 플레이스홀더처럼 사진만으로도 설명하기 어려운 내재적 비정상.",
+  "4순위: 같은 제품의 부품 수·분할·조립 순서, 나사·자석·핀, 연결부·내부면, 투명 재질, 받침대 법정표기 같은 하드 불변량 불일치.",
+  "5순위: 포장 로고 묶음, 저작권·회사명·주소·URL·일본어, 제품번호·바코드 주변 표기, 인쇄 배치, 박·라벨 같은 재질 불일치.",
+  "6순위: 눈·입 정렬, 색 수, 경계, 좌우 인쇄 패턴, 광택, 표면·사출 마감. 조명·노화·생산 편차를 먼저 배제하세요.",
   "거래 보조 신호: 낮은 가격, 해외 발송, 박스 사진 회피, 공식 사진 도용 의심, 판매처 불명. 실물 진위 신호와 별도 취급하세요.",
   "높은 등급의 명확한 비정상 신호 하나는 약한 정상 신호 여러 개로 상쇄하지 마세요. 로고가 정상이고 도색이 좋아도 저작권 영역의 무의미 문구는 그대로 concern입니다.",
+].join("\n");
+
+export const productIdentityInspectionInstructions = [
+  "[선택 상품 동일성 게이트: 품질 검사보다 먼저 수행]",
+  "서버가 제공한 검증 대상의 상품명·영문명·별칭·Nendoroid 번호·작품·에디션을 기준값으로 사용하세요.",
+  "서버 메시지에 [공식 상품 참고 이미지]가 있으면 그 이미지는 검증 대상의 외형 기준입니다. 사용자 증거 사진과 혼동하지 말고 캐릭터, 머리 형태와 색, 얼굴 인쇄, 의상, 대표 소품과 전체 색 구성을 대조하세요.",
+  "각 사용자 사진에서 먼저 보이는 제품번호, 상품명, 캐릭터, 작품명, 버전명, 머리·의상·대표 소품을 관찰한 뒤 검증 대상과 같은 상품인지 판정하세요. 그 다음에만 포장 인쇄 품질이나 도색 마감을 검사하세요.",
+  "사진에 검증 대상과 다른 Nendoroid 번호나 다른 상품명이 선명하면 status=concern입니다. 제조사 로고가 정상이고 그 다른 상품의 정식 포장처럼 보여도 상쇄되지 않습니다.",
+  "번호나 이름이 보이지 않아도 공식 참고 이미지와 비교해 캐릭터·머리색과 형태·의상·대표 소품이 전체적으로 명백히 다른 상품이면 status=concern입니다. 단순한 표정 파츠·포즈·조명·촬영 각도 차이는 상품 불일치로 보지 마세요.",
+  "facePaint 사진도 눈과 입의 인쇄 품질만 보지 마세요. 선택 상품이 아닌 다른 캐릭터의 얼굴이 선명하면 도색이 깔끔해도 status=concern이며, title과 visibleEvidence에 식별 가능한 외형 차이를 적으세요.",
+  "evidence_key와 다른 부위가 촬영됐거나 서로 다른 상품의 사진이 섞였어도 사진을 무시하지 마세요. 보이는 상품이 검증 대상과 명백히 다르면 해당 finding을 concern으로 기록하세요.",
+  "상품 동일성을 판독할 단서가 사진에 없으면 다른 상품이라고 추측하지 말고 status=unclear로 두며, 번호·상품명 또는 전체 외형이 함께 보이도록 재촬영을 요청하세요.",
+  "상품 동일성 concern은 가품 제조 품질 판정과 별개인 거래 위험입니다. reason에는 '다른 상품은 정상적으로 보인다'가 아니라 '선택 상품과 사진 속 상품이 충돌한다'는 점을 명시하세요.",
 ].join("\n");
 
 export const evidenceRoleInspectionInstructions = [
@@ -27,13 +42,13 @@ export const evidenceRoleInspectionInstructions = [
   "모든 사진 공통: 관찰한 사실과 해석을 분리하세요. visibleEvidence에는 위치·형태·짧은 문자열을, reason에는 그 사실이 왜 정상 범위·불명확·비정상인지 적으세요.",
   "boxFront: 제품명, Nendoroid 번호, 버전명, 제조사·브랜드·라이선서 로고 묶음, 창 형태, 이름의 박/인쇄/스티커 재질, 창 안쪽 실물과 박스 표기의 제품 일치를 봅니다.",
   "boxFront: 로고 하나의 유무만 보지 말고 제품명·번호 충돌, 명백한 오탈자, 무관한 문구, 창·후가공의 물리적 불일치를 우선하세요.",
-  "boxBack: 저작권·회사명·주소·고객지원·URL·경고·주의·대상 연령·소재·다국어 본문, 사진 배치와 반복 패턴을 블록별로 읽습니다.",
+  "boxBack: 먼저 제품번호·상품명·캐릭터 사진이 선택 상품과 같은지 확인한 뒤, 저작권·회사명·주소·고객지원·URL·경고·주의·대상 연령·소재·다국어 본문, 사진 배치와 반복 패턴을 블록별로 읽습니다.",
   "boxBack: 제목과 로고가 정상이어도 긴 안전문이 무의미하면 concern입니다. 흐려서 못 읽는 것은 unclear이고 인쇄 자체가 깨진 것은 concern입니다.",
   "barcode: JAN 숫자 전체, 제품번호·버전명, 제조사·유통 표기와 인접 문구를 봅니다. 숫자를 일부만 읽고 일치라고 하지 마세요.",
   "baseMark: 받침대 밑면의 ©, 작품·권리자 문자열, 제조사 표기, 위치·방향·줄바꿈·글자 깊이와 몰드 품질을 봅니다.",
   "baseMark: 소비자 판매용 완제품의 저작권 각인 자리에 MOCK, TEST, SAMPLE, DATA 같은 무관한 시험·플레이스홀더 문구나 문장으로 성립하지 않는 문자열이 선명하면 제품별 사례 없이도 강한 concern입니다.",
   "baseMark: 저작권 문구 부재는 해당 제품·판본에 원래 각인이 있어야 한다는 참조가 있거나 각인 영역 전체가 선명할 때만 concern으로 올리세요.",
-  "facePaint: 눈·눈썹·입의 중심과 좌우 정렬, 선 굵기, 번짐, 홍조 레이어, 피부와 머리카락 경계, 비정상 광택과 먼지 봉입을 봅니다.",
+  "facePaint: 먼저 선택 상품의 캐릭터·에디션과 같은 얼굴인지 확인한 뒤, 눈·눈썹·입의 중심과 좌우 정렬, 선 굵기, 번짐, 홍조 레이어, 피부와 머리카락 경계, 비정상 광택과 먼지 봉입을 봅니다.",
   "facePaint: 작은 도색 편차 하나는 정품 공정 편차일 수 있습니다. 얼굴 인쇄의 구조적 위치 오류, 여러 색의 단순화, 공식 사례와 같은 반복 결함처럼 설명하기 어려운 경우만 concern입니다.",
   "figureFull: 머리·몸 비율, 파츠 앞뒤 관계, 의상·소품 위치, 투명/불투명 재질, 색 수, 좌우 패턴, 눈에 띄는 조형 단순화를 봅니다.",
   "figureFull: 공식 홍보 사진과 직접 비교할 수 없는 요청에서는 미감이 나쁘다는 이유로 concern을 만들지 말고, 사진 자체의 조립 모순이나 제공된 사례 특징만 사용하세요.",
@@ -60,6 +75,7 @@ export const expertDecisionInstructions = [
   "[서비스 판정 규칙: 반드시 그대로 적용]",
   "먼저 모든 업로드 사진의 finding을 만든 다음 concern 개수를 세세요.",
   "사진에서 명확한 비정상 신호가 하나라도 확인되면, 같은 제품의 등록 사례가 0건이어도 verdict=counterfeit_suspected입니다.",
+  "선택 상품과 사진 속 상품의 명확한 불일치는 concern이며 verdict=counterfeit_suspected입니다. 이는 사진 속 다른 상품 자체를 가품으로 확정하는 뜻이 아니라, 선택 상품을 검증할 수 없고 거래 대상이 바뀌었을 위험을 뜻합니다.",
   "명확한 concern이 하나라도 있으면 다른 사진이 흐리거나 일부 핵심 사진이 부족해도 counterfeit_suspected를 우선하세요. 부족한 사진은 해당 finding의 userAction에서 추가 요청하세요.",
   "concern은 선명한 사진에서 직접 관찰되고, 정상 공정 편차·노화·조명·판본 차이만으로 설명하기 어려운 신호에만 사용하세요.",
   "이상처럼 보이지만 사진이 흐리거나 반사로 확정할 수 없으면 concern이 아니라 unclear입니다.",
@@ -88,17 +104,20 @@ export const expertCalibrationExamples = [
   "예시 D — 작은 도색 편차: 경계에 작은 번짐 하나만 있고 조명·공정 편차를 배제할 같은 제품 참조가 없다. facePaint를 concern으로 올리지 말고 관찰 가능한 수준에 따라 match 또는 unclear로 둔다.",
   "예시 E — 같은 제품의 하드 불변량: 서버가 제공한 공식 사례에서 분리 부품인 내부 구조가 현재 선명한 사진에서는 일체형이고 판본도 같다. parts는 status=concern, 해당 caseId만 caseMatches에 기록하고 verdict=counterfeit_suspected다.",
   "예시 F — 정상처럼 보이는 로고와 강한 비정상 동시 존재: 앞면 로고는 자연스럽지만 뒷면의 선명한 안전문이 무의미한 문자로 깨져 있다. 정상 로고가 우려 신호를 상쇄하지 않으며 boxBack은 status=concern, verdict=counterfeit_suspected다.",
+  "예시 G — 완전히 다른 정식 상품: 검증 대상 번호는 380인데 박스 뒷면에 2069가 선명하고 다른 캐릭터와 기타 소품이 보인다. 2069번 상품의 포장 형식이 자연스러워도 선택 상품과 명확히 충돌하므로 boxBack은 status=concern, verdict=counterfeit_suspected다.",
+  "예시 H — 다른 캐릭터의 깔끔한 얼굴: 검증 대상 공식 참고 이미지와 머리색·머리 형태·눈 디자인이 전부 다른 얼굴이 선명하다. 눈과 입의 인쇄 상태 자체가 좋아도 facePaint는 status=concern이다.",
 ].join("\n");
 
 export const expertFinalAuditInstructions = [
   "[JSON 출력 직전 내부 점검: 점검 과정은 출력하지 마세요]",
   "1. 업로드된 evidence_key마다 finding이 정확히 하나 있는지 확인하세요.",
   "2. 각 concern의 visibleEvidence에 사진에서 직접 가리킬 수 있는 위치·형태·문자 중 하나가 있는지 확인하세요.",
-  "3. concern마다 조명, 반사, 노화, 생산 편차, 판본 차이로 설명될 가능성을 검토하고 사진상 구분이 안 되면 unclear로 낮추세요.",
-  "4. 반대로 선명한 내재적 비정상을 제품별 사례 부재, 다른 정상 신호, 사진 일부 부족 때문에 unclear나 needs_review로 낮추지 마세요.",
-  "5. concern 개수가 1개 이상이면 verdict가 반드시 counterfeit_suspected인지 확인하세요.",
-  "6. concern이 0개일 때만 사진 판독 수와 근거 충돌을 보고 insufficient_photos, needs_review, no_obvious_risk_signals 중 하나를 고르세요.",
-  "7. caseMatches의 모든 ID가 서버가 제공한 같은 제품 사례 ID인지 확인하세요.",
+  "3. 모든 finding에서 선택 상품과 사진 속 상품의 번호·이름·캐릭터·에디션 충돌을 먼저 검사했는지 확인하세요.",
+  "4. concern마다 조명, 반사, 노화, 생산 편차, 판본 차이로 설명될 가능성을 검토하고 사진상 구분이 안 되면 unclear로 낮추세요.",
+  "5. 반대로 명확한 상품 불일치나 선명한 내재적 비정상을 제품별 사례 부재, 다른 정상 신호, 사진 일부 부족 때문에 unclear나 needs_review로 낮추지 마세요.",
+  "6. concern 개수가 1개 이상이면 verdict가 반드시 counterfeit_suspected인지 확인하세요.",
+  "7. concern이 0개일 때만 사진 판독 수와 근거 충돌을 보고 insufficient_photos, needs_review, no_obvious_risk_signals 중 하나를 고르세요.",
+  "8. caseMatches의 모든 ID가 서버가 제공한 같은 제품 사례 ID인지 확인하세요.",
 ].join("\n");
 
 export const packagingTextInspectionInstructions = [
@@ -125,13 +144,14 @@ export function buildNendoroidAnalysisPrompt(domainKnowledge: string, outputSche
     "정품을 보증하거나 단정하지 말고, 사진에 실제로 보이는 근거만 한국어로 짧고 구체적으로 설명하세요.",
     expertRoleAndSafetyInstructions,
     domainKnowledge,
+    productIdentityInspectionInstructions,
     expertEvidenceHierarchyInstructions,
     evidenceRoleInspectionInstructions,
     officialCasePatternInstructions,
     packagingTextInspectionInstructions,
     expertCalibrationExamples,
-    "이번 요청에는 권리 확인된 외부 참고 이미지가 없습니다. 공식 사진과 직접 비교했다고 주장하지 마세요.",
-    "status=match는 정품 일치가 아니라, 제공된 메타데이터와 알려진 사례 특징에 뚜렷하게 충돌하지 않는다는 뜻입니다.",
+    "서버 메시지에 [공식 상품 참고 이미지]가 제공된 경우에만 공식 이미지와 직접 비교했다고 말할 수 있습니다. 제공되지 않았으면 외형의 공식 정답을 만들어내지 마세요.",
+    "status=match는 사진 속 상품이 선택 상품과 충돌하지 않고 가품 위험 신호도 뚜렷하지 않다는 뜻입니다. 일반적인 넨도로이드 형식이라는 이유만으로 match를 주지 마세요.",
     "서버가 제공한 가품 사례의 텍스트 특징과 사용자 사진의 관찰이 구체적으로 겹칠 때만 caseMatches에 넣으세요.",
     "official_confirmed는 제조사 확인 자료이고 side_by_side_author_asserted는 비교 작성자의 판단입니다. 두 출처 강도를 구분하세요.",
     "caseMatches.reason에는 사용자 사진에서 관찰된 부분과 등록 사례의 어떤 특징이 겹치는지 구체적으로 적으세요.",

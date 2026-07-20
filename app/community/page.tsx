@@ -2,6 +2,7 @@
 
 import { ArrowLeft, ArrowRight, Image as ImageIcon, MessageCircle, ShieldCheck } from "lucide-react";
 import Link from "next/link";
+import { BrandMark } from "../brand-mark";
 import { listCommunityPosts } from "../../db/community-posts";
 import { expandedProducts, isOfficialProductImage } from "../catalog";
 import { communityPostStatusCopy } from "../community";
@@ -21,7 +22,7 @@ export default async function CommunityPage() {
   return (
     <main className="community-page">
       <header className="report-topbar">
-        <Link href="/" className="report-brand">FIGSIGNAL</Link>
+        <Link href="/" className="report-brand" aria-label="FIGNAL BETA 홈"><BrandMark /></Link>
         <span><ShieldCheck size={14} /> 검증 결과 기반 커뮤니티</span>
       </header>
 

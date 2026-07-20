@@ -34,6 +34,7 @@ import {
   X,
   ZoomIn,
 } from "lucide-react";
+import { BrandMark } from "./brand-mark";
 import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
@@ -968,7 +969,7 @@ export default function Home() {
       .map((finding) => `- ${finding.title}: ${finding.reason}`)
       .join("\n");
     const text = [
-      "[FIGSIGNAL 추가 검토 요청]",
+      "[FIGNAL BETA 추가 검토 요청]",
       `${currentProduct.name} · No.${currentProduct.number}`,
       `제조사: ${currentProduct.maker}`,
       `AI 위험 신호: ${result.label} · 확인한 사진 ${completedCount}장`,
@@ -979,7 +980,7 @@ export default function Home() {
 
     if (navigator.share) {
       try {
-        await navigator.share({ title: "FIGSIGNAL 추가 검토 요청", text });
+        await navigator.share({ title: "FIGNAL BETA 추가 검토 요청", text });
         setReviewRequestShared(true);
         return;
       } catch {
@@ -1071,7 +1072,7 @@ export default function Home() {
     <main className="site" aria-busy={isAnalyzing} inert={isAnalyzing ? true : undefined}>
       <header className="top-header">
         <div className="top-inner">
-          <button className="logo" onClick={resetAll}>FIGSIGNAL</button>
+          <button className="logo" onClick={resetAll} aria-label="FIGNAL BETA 홈"><BrandMark /></button>
           <div className="top-nav">
             <span>넨도로이드 검증</span>
             <Link href="/community"><MessageCircle size={16} /> 검증 사례</Link>

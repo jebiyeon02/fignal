@@ -3,6 +3,7 @@
 import { ArrowLeft, ExternalLink, FileCheck2, ImageOff, LockKeyhole, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { BrandMark } from "../../brand-mark";
 import type { AnalysisFinding } from "../../api/analyze/analysis-contract";
 import { expandedProducts, isOfficialProductImage } from "../../catalog";
 import { verificationVerdictCopy } from "../../verification-history";
@@ -47,7 +48,7 @@ export default async function VerificationReportPage({
   return (
     <main className="readonly-report">
       <header className="report-topbar">
-        <Link href="/" className="report-brand">FIGSIGNAL</Link>
+        <Link href="/" className="report-brand" aria-label="FIGNAL BETA 홈"><BrandMark /></Link>
         <span><LockKeyhole size={14} /> 읽기 전용 리포트</span>
       </header>
 

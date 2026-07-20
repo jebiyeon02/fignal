@@ -18,7 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const host = requestHeaders.get("x-forwarded-host") ?? requestHeaders.get("host");
   const protocol = requestHeaders.get("x-forwarded-proto") ?? "https";
   const socialImage = host ? `${protocol}://${host}/og.png` : undefined;
-  const title = "FIGSIGNAL — 피규어 검증";
+  const title = "FIGNAL BETA — 피규어 검증";
   const description = "사례 비교, 추가 검토, 사진 보완과 지원 범위를 구분해 피규어 검증의 다음 행동을 안내합니다.";
 
   return {
@@ -32,7 +32,7 @@ export async function generateMetadata(): Promise<Metadata> {
       title,
       description,
       type: "website",
-      images: socialImage ? [{ url: socialImage, width: 1672, height: 941, alt: "FIGSIGNAL 피규어 검증 서비스" }] : [],
+      images: socialImage ? [{ url: socialImage, width: 1672, height: 941, alt: "FIGNAL BETA 피규어 검증 서비스" }] : [],
     },
     twitter: {
       card: "summary_large_image",

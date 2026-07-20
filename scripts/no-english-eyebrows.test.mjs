@@ -27,5 +27,6 @@ test("화면 위계용 영문 소제목을 노출하지 않는다", async () => 
     assert.equal(source.includes(heading), false, `${heading} 문구가 남아 있습니다.`);
   }
 
-  assert.equal(source.includes("FIGSIGNAL"), true, "서비스 로고는 유지해야 합니다.");
+  assert.equal(source.includes("FIGSIGNAL"), false, "이전 서비스명이 남아 있습니다.");
+  assert.equal(source.includes("FIGNAL"), true, "서비스 로고는 유지해야 합니다.");
 });

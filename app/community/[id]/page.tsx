@@ -3,6 +3,7 @@
 import { ArrowLeft, ExternalLink, FileCheck2, ImageOff, MessageCircle, ShieldCheck, UserRound } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { BrandMark } from "../../brand-mark";
 import { getCommunityPostById } from "../../../db/community-posts";
 import { listCommunityComments } from "../../../db/community-comments";
 import type { AnalysisFinding } from "../../api/analyze/analysis-contract";
@@ -49,7 +50,7 @@ export default async function CommunityPostPage({
   return (
     <main className="readonly-report community-detail-page">
       <header className="report-topbar">
-        <Link href="/" className="report-brand">FIGSIGNAL</Link>
+        <Link href="/" className="report-brand" aria-label="FIGNAL BETA 홈"><BrandMark /></Link>
         <span><MessageCircle size={14} /> 검증 사례</span>
       </header>
 

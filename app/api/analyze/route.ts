@@ -7,7 +7,7 @@ import {
   type StoredReportImage,
 } from "../../../db/verification-report-images";
 
-import { expandedProducts } from "../../catalog";
+import { expandedProducts, isOfficialProductImage } from "../../catalog";
 import { counterfeitCases } from "../../counterfeit-cases";
 import {
   essentialEvidenceKeys,
@@ -26,6 +26,7 @@ import { nendoroidAnalysisDomainKnowledge } from "./domain-knowledge";
 const MAX_FILES = 8;
 const MAX_FILE_BYTES = 6 * 1024 * 1024;
 const MAX_TOTAL_BYTES = 9 * 1024 * 1024;
+const MAX_REFERENCE_IMAGE_BYTES = 3 * 1024 * 1024;
 const RATE_LIMIT_WINDOW_MS = 10 * 60 * 1000;
 const RATE_LIMIT_REQUESTS = 6;
 
@@ -106,6 +107,25 @@ async function fileToGeminiPart(file: File): Promise<GeminiPart> {
   };
 }
 
+async function officialReferenceToGeminiPart(imageUrl: string): Promise<GeminiPart | null> {
+  if (!isOfficialProductImage(imageUrl)) return null;
+
+  try {
+    const response = await fetch(imageUrl, { signal: AbortSignal.timeout(5_000) });
+    if (!response.ok) return null;
+
+    const mimeType = response.headers.get("content-type")?.split(";")[0]?.trim().toLowerCase() ?? "";
+    const contentLength = Number(response.headers.get("content-length") ?? 0);
+    if (!supportedImageTypes.has(mimeType) || contentLength > MAX_REFERENCE_IMAGE_BYTES) return null;
+
+    const bytes = new Uint8Array(await response.arrayBuffer());
+    if (bytes.length === 0 || bytes.length > MAX_REFERENCE_IMAGE_BYTES) return null;
+    return { inlineData: { mimeType, data: bytesToBase64(bytes) } };
+  } catch {
+    return null;
+  }
+}
+
 function parseGeminiJson(text: string) {
   const unfenced = text
     .trim()
@@ -179,19 +199,29 @@ export async function POST(request: Request) {
     return jsonError("박스, 바코드, 각인, 얼굴 중 핵심 사진을 4장 이상 올려주세요.", 400, "INSUFFICIENT_EVIDENCE");
   }
 
+  const officialReference = await officialReferenceToGeminiPart(product.image);
   const content: GeminiPart[] = [
     {
       text: [
         `검증 대상: ${product.name} (${product.englishName || product.name})`,
+        `별칭: ${product.aliases.join(", ") || "없음"}`,
         `제품번호: ${product.number}`,
         `작품: ${[product.seriesName, product.englishSeriesName].filter(Boolean).join(" / ") || "미확인"}`,
+        `발매 정보: ${product.release || "미확인"}`,
         `제조사: ${product.maker}`,
         "공식 카탈로그 등록 여부: 등록됨",
         "아래에는 서버에서 선택한 알려진 가품 특징과 사용자가 올린 증거 사진이 제공됩니다.",
-        "외부 참고 이미지는 권리 확인 전이므로 이 분석에 제공되지 않습니다.",
+        `공식 상품 참고 이미지: ${officialReference ? "제공됨" : "제공되지 않음"}`,
       ].join("\n"),
     },
   ];
+
+  if (officialReference) {
+    content.push({
+      text: `[공식 상품 참고 이미지] 검증 대상 ${product.name}, Nendoroid ${product.number}. 사용자 증거 사진이 아닙니다.`,
+    });
+    content.push(officialReference);
+  }
 
   for (const counterfeitCase of cases) {
     content.push({
