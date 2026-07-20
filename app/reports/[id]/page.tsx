@@ -83,6 +83,10 @@ export default async function VerificationReportPage({
             {report.analysis.findings.map((finding) => {
               const status = findingStatusCopy[finding.status];
               const imageUrl = imagesByEvidenceKey.get(finding.key);
+              const internalAction = finding.userAction.toLowerCase().replace(/[\s-]+/g, "_");
+              const userAction = finding.status !== "match" && internalAction !== "not_applicable" && internalAction !== "n/a"
+                ? finding.userAction
+                : null;
               return (
                 <article className={`report-finding ${status.tone}`} key={finding.key}>
                   <div className="report-finding-media">
@@ -95,7 +99,7 @@ export default async function VerificationReportPage({
                     <p>{finding.reason}</p>
                     <dl>
                       <div><dt>사진 근거</dt><dd>{finding.visibleEvidence}</dd></div>
-                      <div><dt>다음 확인</dt><dd>{finding.userAction}</dd></div>
+                      {userAction && <div><dt>다음 확인</dt><dd>{userAction}</dd></div>}
                     </dl>
                   </div>
                 </article>

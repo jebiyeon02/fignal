@@ -88,6 +88,18 @@ function boundedString(value: unknown, maxLength = 800) {
   return normalized;
 }
 
+function normalizeUserAction(value: unknown, status: AnalysisFinding["status"]) {
+  const action = boundedString(value);
+  if (!action) return null;
+
+  const internalValue = action.toLowerCase().replace(/[\s-]+/g, "_");
+  if (internalValue !== "not_applicable" && internalValue !== "n/a") return action;
+
+  return status === "match"
+    ? "추가 확인이 필요하지 않습니다."
+    : "사진에서 확인하기 어려운 부분을 다시 촬영해 주세요.";
+}
+
 function normalizeFinding(value: unknown, uploadedKeySet: Set<string>): AnalysisFinding | null {
   if (!isRecord(value)) return null;
   const key = typeof value.key === "string" ? value.key : "";
@@ -104,7 +116,7 @@ function normalizeFinding(value: unknown, uploadedKeySet: Set<string>): Analysis
   const title = boundedString(value.title, 120);
   const reason = boundedString(value.reason);
   const visibleEvidence = boundedString(value.visibleEvidence);
-  const userAction = boundedString(value.userAction);
+  const userAction = normalizeUserAction(value.userAction, status);
   if (!title || !reason || !visibleEvidence || !userAction) return null;
 
   return {

@@ -38,6 +38,19 @@ test("server calculates evidence completeness and replaces model claims", () => 
   assert.match(result?.caveat ?? "", /정품 보증이나 제조사 판정이 아닙니다/);
 });
 
+test("internal not-applicable user actions are replaced with Korean copy", () => {
+  const findings = uploadedKeys.map((key) => ({
+    ...finding(key),
+    ...(key === "baseMark" ? { userAction: "not_applicable" } : {}),
+  }));
+  const result = normalizeAnalysisOutput(output({ findings }), context);
+
+  assert.equal(
+    result?.findings.find((item) => item.key === "baseMark")?.userAction,
+    "추가 확인이 필요하지 않습니다.",
+  );
+});
+
 test("one concern forces counterfeit suspicion", () => {
   const findings = uploadedKeys.map((key) => finding(key, key === "barcode" ? "concern" : "match"));
   const result = normalizeAnalysisOutput(output({ findings }), context);
