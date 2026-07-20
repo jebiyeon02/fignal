@@ -34,7 +34,7 @@ import {
   ZoomIn,
 } from "lucide-react";
 import { BrandMark } from "./brand-mark";
-import { FeedbackWidget } from "./feedback-widget";
+import { FloatingUtilityRail } from "./floating-utility-rail";
 import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
@@ -1090,35 +1090,6 @@ export default function Home() {
             <p>공식 제품 {products.length}개 · 제품을 고르면 제조사와 번호를 자동으로 찾습니다.</p>
           </div>
 
-          <aside className="beta-notice" aria-labelledby="beta-notice-title">
-            <div className="beta-notice-head">
-              <span className="beta-notice-badge">BETA 안내</span>
-              <h2 id="beta-notice-title">함께 정확해지는 피규어 검증을 만들고 있어요</h2>
-              <p>FIGNAL은 아직 초기 단계의 사진 기반 검증 보조 서비스입니다.</p>
-            </div>
-
-            <ul className="beta-notice-points">
-              <li>
-                <TriangleAlert size={18} aria-hidden="true" />
-                <span>AI 분석은 사진 품질과 촬영 환경에 따라 부정확할 수 있습니다.</span>
-              </li>
-              <li>
-                <ImageIcon size={18} aria-hidden="true" />
-                <span>일부 제품은 확인 가능한 공식 대표 이미지가 없습니다.</span>
-              </li>
-              <li>
-                <FileCheck2 size={18} aria-hidden="true" />
-                <span>일부 제품은 비교할 수 있는 가품 사례가 아직 부족합니다.</span>
-              </li>
-            </ul>
-
-            <div className="beta-notice-purpose">
-              <strong>더 신뢰할 수 있는 서비스를 향해</strong>
-              <p>권리와 활용 동의가 확인된 검증 자료와 커뮤니티 피드백을 바탕으로 비교 기준과 평가 데이터를 꾸준히 보완해, 사용할수록 더 신뢰할 수 있는 서비스를 만드는 것이 목표입니다. 초기 단계부터 이용하고 의견을 나눠주시는 모든 분께 진심으로 감사드립니다.</p>
-              <small>분석 결과는 정품 보증이나 제조사 판정을 대신하지 않습니다.</small>
-            </div>
-          </aside>
-
           <div className="product-search">
             <div className={`search-input ${searchOpen ? "focused" : ""}`}>
               <Search size={22} />
@@ -1339,7 +1310,7 @@ export default function Home() {
       {criteriaOpen && <VerificationCriteriaDialog onClose={() => setCriteriaOpen(false)} />}
       {toast && <div className="toast" role="status"><Check size={16} /> {toast}</div>}
     </main>
-    <FeedbackWidget context={stage} />
+    <FloatingUtilityRail context={stage} />
     {isAnalyzing && (
       <div className="analysis-interaction-lock" role="dialog" aria-modal="true" aria-labelledby="analysis-lock-title">
         <div className="analysis-interaction-lock-card">

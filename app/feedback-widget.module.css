@@ -1,19 +1,17 @@
 .widget {
-  position: fixed;
-  right: 20px;
-  top: 50%;
-  z-index: 60;
-  transform: translateY(-50%);
+  position: relative;
 }
 
 .trigger {
+  width: 112px;
   min-height: 42px;
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  padding: 0 12px;
+  justify-content: center;
+  padding: 0 11px;
   border: 1px solid #d8d8d8;
-  border-radius: 10px 0 0 10px;
+  border-radius: 10px;
   background: #222;
   color: #fff;
   font-size: 10px;
@@ -75,12 +73,11 @@
 @keyframes spin { to { transform: rotate(360deg); } }
 
 @media (max-width: 1080px) {
-  .widget { right: 12px; top: auto; bottom: 18px; transform: none; }
+  .widget { display: flex; justify-content: flex-end; }
 }
 
 @media (max-width: 680px) {
-  .widget { right: 10px; bottom: 12px; }
-  .trigger { border-radius: 999px; box-shadow: 0 8px 24px rgba(0,0,0,.18); }
+  .trigger { width: auto; min-width: 92px; border-radius: 999px; box-shadow: 0 8px 24px rgba(0,0,0,.18); }
   .panel { width: min(312px, calc(100vw - 20px)); }
 }
 
