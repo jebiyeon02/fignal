@@ -1,4 +1,4 @@
-export const analysisPromptVersion = "2026-07-20.product-identity-v4";
+export const analysisPromptVersion = "2026-07-21.manufacturer-distributor-v5";
 
 export const expertRoleAndSafetyInstructions = [
   "[역할과 안전 경계]",
@@ -56,6 +56,15 @@ export const evidenceRoleInspectionInstructions = [
   "parts: 다른 제품에서 본 스마일 마크, 흰 핀, 특정 나사 수를 보편 정답으로 사용하지 마세요. 같은 제품 참조가 있을 때 하드 불변량으로 사용합니다.",
   "purchaseProof: 판매처, 주문 상품명·번호·버전, 주문 시점과 발매 시점의 충돌을 봅니다. 개인정보는 반복 출력하지 마세요.",
   "purchaseProof: 영수증과 공식 판매처는 거래 신뢰를 높일 수 있지만 실물이 바뀔 수 있으므로 정품 증명으로 사용하지 않습니다.",
+].join("\n");
+
+export const manufacturerInspectionInstructions = [
+  "[제조사·유통사·협력사 표기 구분]",
+  "넨도로이드 브랜드의 모든 제품을 Good Smile Company 제조로 가정하지 마세요. 제품에 따라 Max Factory, ORANGE ROUGE, Good Smile Arts Shanghai 등 다른 공식 제조사가 존재합니다.",
+  "서버가 제공한 '제조사'는 선택한 제품별 공식 기준값입니다. 박스의 회사 표기를 볼 때 제조사(Manufacturer), 유통사·판매원(Distributed by), 기획·제작, 제작협력, 원형 제작사를 서로 다른 역할로 구분하세요.",
+  "Max Factory 제조 제품에 Good Smile Company 유통 표기가 함께 있는 것처럼 여러 공식 회사명과 로고가 공존할 수 있습니다. Good Smile Company 로고가 없거나 Max Factory 로고가 있다는 이유만으로 concern을 만들지 마세요.",
+  "특히 Nendoroid 2167 치이카와, 2168 하치와레, 2169 우사기는 공식 제조사가 Max Factory이고 유통사가 Good Smile Company이므로, 박스의 Max Factory 로고는 예상 가능한 정상 표기입니다.",
+  "제조사·유통사 표기의 불일치는 같은 제품·같은 판본의 공식 정보 또는 서버 기준값과 회사 역할까지 대조해 명확히 충돌할 때만 concern으로 올리세요. 로고가 흐리거나 역할 문구를 읽을 수 없으면 unclear로 두세요.",
 ].join("\n");
 
 export const officialCasePatternInstructions = [
@@ -147,6 +156,7 @@ export function buildNendoroidAnalysisPrompt(domainKnowledge: string, outputSche
     productIdentityInspectionInstructions,
     expertEvidenceHierarchyInstructions,
     evidenceRoleInspectionInstructions,
+    manufacturerInspectionInstructions,
     officialCasePatternInstructions,
     packagingTextInspectionInstructions,
     expertCalibrationExamples,

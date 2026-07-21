@@ -10,6 +10,7 @@ import {
   expertDecisionInstructions,
   expertEvidenceHierarchyInstructions,
   expertFinalAuditInstructions,
+  manufacturerInspectionInstructions,
   officialCasePatternInstructions,
   packagingTextInspectionInstructions,
   productIdentityInspectionInstructions,
@@ -60,6 +61,26 @@ test("product identity is checked before packaging and paint quality", () => {
   assert.match(productIdentityInspectionInstructions, /다른 Nendoroid 번호나 다른 상품명.*status=concern/);
   assert.match(productIdentityInspectionInstructions, /다른 캐릭터의 얼굴.*도색이 깔끔해도 status=concern/);
   assert.match(prompt, /일반적인 넨도로이드 형식이라는 이유만으로 match를 주지 마세요/);
+});
+
+test("manufacturer prompt accepts Max Factory packaging for Chiikawa Nendoroids", () => {
+  const prompt = buildNendoroidAnalysisPrompt("도메인 지식", { required: ["verdict"] });
+
+  assert.ok(prompt.includes(manufacturerInspectionInstructions));
+  assert.match(manufacturerInspectionInstructions, /모든 제품을 Good Smile Company 제조로 가정하지 마세요/);
+  assert.match(manufacturerInspectionInstructions, /2167 치이카와, 2168 하치와레, 2169 우사기/);
+  assert.match(manufacturerInspectionInstructions, /공식 제조사가 Max Factory이고 유통사가 Good Smile Company/);
+  assert.match(manufacturerInspectionInstructions, /Max Factory 로고는 예상 가능한 정상 표기/);
+});
+
+test("Chiikawa catalog products use the official Max Factory manufacturer", () => {
+  const catalog = JSON.parse(
+    readFileSync(new URL("../app/data/nendoroids-catalog.generated.json", import.meta.url), "utf8"),
+  );
+
+  for (const id of ["nendoroid-2167", "nendoroid-2168", "nendoroid-2169"]) {
+    assert.equal(catalog.find((product) => product.id === id)?.maker, "Max Factory");
+  }
 });
 
 test("analysis sends the catalog's official product image as a separate reference", () => {
