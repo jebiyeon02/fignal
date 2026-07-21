@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { FloatingUtilityRail } from "./floating-utility-rail";
 import { DEFAULT_PRODUCT_IMAGE } from "./product-image-default";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL } from "./site-config";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -14,31 +15,42 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
-const siteUrl = "https://figsignal-korea.jeong2hyun02.chatgpt.site";
-const socialImage = `${siteUrl}${DEFAULT_PRODUCT_IMAGE}`;
-const title = "FIGNAL BETA — 피규어 검증";
-const description = "사례 비교, 추가 검토, 사진 보완과 지원 범위를 구분해 피규어 검증의 다음 행동을 안내합니다.";
+const socialImage = `${SITE_URL}${DEFAULT_PRODUCT_IMAGE}`;
 
 export const metadata: Metadata = {
-  metadataBase: new URL(siteUrl),
-  title,
-  description,
+  metadataBase: new URL(SITE_URL),
+  applicationName: SITE_NAME,
+  title: SITE_TITLE,
+  description: SITE_DESCRIPTION,
   icons: {
     icon: [{ url: "/images/brand-character-icon.png", type: "image/png", sizes: "512x512" }],
     shortcut: "/images/brand-character-icon.png",
     apple: "/images/brand-character-icon.png",
   },
   openGraph: {
-    title,
-    description,
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
+    url: SITE_URL,
+    siteName: SITE_NAME,
+    locale: "ko_KR",
     type: "website",
     images: [{ url: socialImage, width: 900, height: 900, alt: "FIGNAL BETA 대표 캐릭터 피규어" }],
   },
   twitter: {
     card: "summary",
-    title,
-    description,
+    title: SITE_TITLE,
+    description: SITE_DESCRIPTION,
     images: [socialImage],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
   },
 };
 

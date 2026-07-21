@@ -1,13 +1,34 @@
 /* eslint-disable @next/next/no-img-element */
 
+import type { Metadata } from "next";
 import { ArrowLeft, ArrowRight, Image as ImageIcon, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import { BrandMark } from "../brand-mark";
 import { listCommunityPosts } from "../../db/community-posts";
 import { expandedProducts, isOfficialProductImage } from "../catalog";
+import { SITE_NAME } from "../site-config";
 import { verificationVerdictCopy } from "../verification-history";
 
 export const dynamic = "force-dynamic";
+
+const communityTitle = "넨도로이드 검증 사례 커뮤니티 | 피그널(FIGNAL)";
+const communityDescription = "피그널 이용자가 공개한 넨도로이드 사진 검증 사례와 판정 근거를 확인해보세요.";
+
+export const metadata: Metadata = {
+  title: communityTitle,
+  description: communityDescription,
+  alternates: {
+    canonical: "/community",
+  },
+  openGraph: {
+    title: communityTitle,
+    description: communityDescription,
+    url: "/community",
+    siteName: SITE_NAME,
+    locale: "ko_KR",
+    type: "website",
+  },
+};
 
 function formatPostDate(value: string) {
   const date = new Date(value);
