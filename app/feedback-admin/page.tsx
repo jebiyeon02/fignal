@@ -1,4 +1,4 @@
-import { Activity, ArrowLeft, BarChart3, Inbox, LockKeyhole, LogOut, MessageSquareText, MousePointerClick, Users } from "lucide-react";
+import { Activity, ArrowLeft, BarChart3, Database, Inbox, LockKeyhole, LogOut, MessageSquareText, MousePointerClick, Users } from "lucide-react";
 import Link from "next/link";
 import { siteEventLabels, type SiteEventName } from "../analytics-contract";
 import { BrandMark } from "../brand-mark";
@@ -99,7 +99,7 @@ export default async function FeedbackAdminPage() {
     <main className={styles.page}>
       <header className={styles.topbar}>
         <Link href="/" aria-label="FIGSIGNAL 메인"><BrandMark /></Link>
-        <span>서비스 인사이트</span>
+        <span>서비스 인사이트 · <Link href="/feedback-admin/database"><Database size={11} /> 데이터베이스</Link></span>
         <a href={chatGPTSignOutPath("/")}><LogOut size={15} /> 로그아웃</a>
       </header>
 
