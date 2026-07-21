@@ -53,8 +53,7 @@
   transition: opacity .16s ease, transform .18s ease, visibility .16s ease;
 }
 
-.betaWidget::before { content: ""; position: absolute; right: 100%; top: -10px; width: 13px; height: 62px; }
-.betaWidget:hover .betaPanel, .pinned .betaPanel { opacity: 1; pointer-events: auto; transform: translate(0, -50%) scale(1); visibility: visible; }
+.pinned .betaPanel { opacity: 1; pointer-events: auto; transform: translate(0, -50%) scale(1); visibility: visible; }
 .betaPanel > header { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; }
 .betaPanel > header > span { display: grid; gap: 5px; }
 .betaPanel > header em { color: #438060; font-size: 7px; font-style: normal; font-weight: 800; letter-spacing: .12em; }
@@ -77,8 +76,7 @@
 @media (max-width: 1080px) {
   .rail { right: 12px; top: auto; bottom: 18px; transform: none; }
   .betaPanel { top: auto; right: 0; bottom: calc(100% + 9px); transform: translateY(8px) scale(.97); transform-origin: right bottom; }
-  .betaWidget:hover .betaPanel, .pinned .betaPanel { transform: none; }
-  .betaWidget::before { right: 0; top: auto; bottom: 100%; width: 120px; height: 13px; }
+  .pinned .betaPanel { transform: none; }
 }
 
 @media (max-width: 680px) {

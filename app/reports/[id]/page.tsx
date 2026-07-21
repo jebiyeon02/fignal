@@ -1,5 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
-
 import { ArrowLeft, ExternalLink, FileCheck2, ImageOff, ShieldCheck } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -9,6 +7,7 @@ import type { AnalysisFinding } from "../../api/analyze/analysis-contract";
 import { expandedProducts, isOfficialProductImage } from "../../catalog";
 import { verificationVerdictCopy } from "../../verification-history";
 import { getVerificationHistoryById } from "../../../db/verification-history";
+import { ReportFindingImage } from "./report-finding-image";
 import { ReportProductImage } from "./report-product-image";
 import { AnalyticsPageEvent } from "../../analytics-page-event";
 
@@ -97,7 +96,7 @@ export default async function VerificationReportPage({
                 <article className={`report-finding ${status.tone}`} key={finding.key}>
                   <div className="report-finding-media">
                     {imageUrl
-                      ? <img src={imageUrl} alt={`${finding.title} 검증에 사용된 사진`} />
+                      ? <ReportFindingImage src={imageUrl} title={finding.title} />
                       : <span><ImageOff size={26} /><small>{finding.key === "purchaseProof" ? "구매내역 사진 비공개" : "공개 사진 없음"}</small></span>}
                   </div>
                   <div className="report-finding-copy">

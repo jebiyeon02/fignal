@@ -1,5 +1,3 @@
-/* eslint-disable @next/next/no-img-element */
-
 import { ArrowLeft, ExternalLink, FileCheck2, ImageOff, MessageCircle, ShieldCheck, UserRound } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -9,6 +7,7 @@ import { listCommunityComments } from "../../../db/community-comments";
 import type { AnalysisFinding } from "../../api/analyze/analysis-contract";
 import { expandedProducts, isOfficialProductImage } from "../../catalog";
 import { verificationVerdictCopy } from "../../verification-history";
+import { ReportFindingImage } from "../../reports/[id]/report-finding-image";
 import { ReportProductImage } from "../../reports/[id]/report-product-image";
 import { CommunityComments } from "./comments";
 
@@ -106,7 +105,7 @@ export default async function CommunityPostPage({
                   const imageUrl = imagesByEvidenceKey.get(finding.key);
                   return (
                     <article className={`report-finding ${status.tone}`} key={finding.key}>
-                      <div className="report-finding-media">{imageUrl ? <img src={imageUrl} alt={`${finding.title} 검증 사진`} /> : <span><ImageOff size={26} /><small>{finding.key === "purchaseProof" ? "구매내역 사진 비공개" : "공개 사진 없음"}</small></span>}</div>
+                      <div className="report-finding-media">{imageUrl ? <ReportFindingImage src={imageUrl} title={finding.title} /> : <span><ImageOff size={26} /><small>{finding.key === "purchaseProof" ? "구매내역 사진 비공개" : "공개 사진 없음"}</small></span>}</div>
                       <div className="report-finding-copy">
                         <div><h3>{finding.title}</h3><span>{status.label}</span></div>
                         <p>{finding.reason}</p>
