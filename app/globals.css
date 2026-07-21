@@ -253,6 +253,10 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .verdict-numbers > div:first-child { padding-left: 0; border-left: 0; }
 .verdict-numbers strong { display: block; font-size: 19px; }
 .verdict-numbers span { display: block; margin-top: 4px; color: #999; font-size: 8px; }
+.decision-disclaimer { display: flex; align-items: flex-start; gap: 10px; margin-top: 14px; padding: 14px 16px; border: 1px solid #e1e1e1; border-radius: 10px; background: #fafafa; color: #777; }
+.decision-disclaimer svg { flex: 0 0 auto; margin-top: 1px; color: #777; }
+.decision-disclaimer span { font-size: 10px; line-height: 1.6; }
+.decision-disclaimer strong { display: block; margin-bottom: 2px; color: #444; font-size: 11px; }
 
 .related-community-posts { margin-top: 18px; padding: 18px; border: 1px solid #d7e5df; border-radius: 12px; background: #f7fbf9; }
 .related-community-posts > header { display: flex; align-items: center; justify-content: space-between; gap: 20px; }

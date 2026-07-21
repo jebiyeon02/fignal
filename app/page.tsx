@@ -34,6 +34,7 @@ import {
   ZoomIn,
 } from "lucide-react";
 import { BrandMark } from "./brand-mark";
+import { DecisionDisclaimer } from "./decision-disclaimer";
 import { trackSiteEvent } from "./analytics";
 import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -1388,6 +1389,7 @@ export default function Home() {
             <div className="verdict-copy"><span>{hasUserOverride ? "사용자 확인 반영" : aiAnalysis ? "AI 판정" : "검토 결과"}</span><h1>{verdictCardResult.label}</h1><p>{verdictCardResult.summary}</p></div>
             <div className="verdict-numbers"><div><strong>{completedCount}</strong><span>분석 사진</span></div><div><strong>{reviewedCount}/{aiAnalysis?.findings.length ?? assessedCount}</strong><span>사용자 확인</span></div></div>
           </article>
+          <DecisionDisclaimer />
 
           {relatedCommunityPosts.length > 0 && <RelatedCommunityPosts posts={relatedCommunityPosts} productName={currentProduct.name} />}
 

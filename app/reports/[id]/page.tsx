@@ -4,6 +4,7 @@ import { ArrowLeft, ExternalLink, FileCheck2, ImageOff, ShieldCheck } from "luci
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { BrandMark } from "../../brand-mark";
+import { DecisionDisclaimer } from "../../decision-disclaimer";
 import type { AnalysisFinding } from "../../api/analyze/analysis-contract";
 import { expandedProducts, isOfficialProductImage } from "../../catalog";
 import { verificationVerdictCopy } from "../../verification-history";
@@ -76,6 +77,7 @@ export default async function VerificationReportPage({
             <div><strong>{report.riskSignalCount}</strong><span>위험 신호</span></div>
           </div>
         </section>
+        <DecisionDisclaimer />
 
         <section className="report-findings" aria-labelledby="report-findings-title">
           <header>
