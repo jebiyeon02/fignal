@@ -24,7 +24,7 @@
   border-radius: 10px;
   background: #f1f8f4;
   color: #32664a;
-  font-size: 9px;
+  font-size: 12px;
   font-weight: 700;
   box-shadow: 0 8px 22px rgba(0,0,0,.08);
   cursor: pointer;
@@ -32,7 +32,7 @@
 }
 
 .betaTrigger span { display: inline-flex; align-items: baseline; gap: 3px; white-space: nowrap; }
-.betaTrigger strong { font-size: 9px; letter-spacing: .05em; }
+.betaTrigger strong { font-size: 12px; letter-spacing: .05em; }
 .betaWidget:hover .betaTrigger, .pinned .betaTrigger { width: 120px; background: #eaf6ef; box-shadow: 0 11px 28px rgba(32,91,60,.14); transform: scale(1.025); }
 
 .betaPanel {
@@ -56,22 +56,22 @@
 .pinned .betaPanel { opacity: 1; pointer-events: auto; transform: translate(0, -50%) scale(1); visibility: visible; }
 .betaPanel > header { display: flex; align-items: flex-start; justify-content: space-between; gap: 14px; }
 .betaPanel > header > span { display: grid; gap: 5px; }
-.betaPanel > header em { color: #438060; font-size: 7px; font-style: normal; font-weight: 800; letter-spacing: .12em; }
-.betaPanel > header strong { font-size: 13px; line-height: 1.4; letter-spacing: -.025em; }
+.betaPanel > header em { color: #438060; font-size: 11px; font-style: normal; font-weight: 800; letter-spacing: .12em; }
+.betaPanel > header strong { font-size: 15px; line-height: 1.4; letter-spacing: -.025em; }
 .betaPanel > header button { width: 26px; height: 26px; display: grid; place-items: center; flex: 0 0 auto; border: 0; border-radius: 50%; background: #f1f1f1; color: #777; cursor: pointer; }
-.betaPanel > p { margin: 9px 0 0; color: #888; font-size: 9px; line-height: 1.55; }
+.betaPanel > p { margin: 9px 0 0; color: #888; font-size: 12px; line-height: 1.55; }
 .betaPanel ul { display: grid; gap: 1px; margin: 14px 0 0; padding: 0; overflow: hidden; border: 1px solid #e7e7e7; border-radius: 9px; background: #e7e7e7; }
-.betaPanel li { display: grid; grid-template-columns: 17px 1fr; align-items: start; gap: 7px; padding: 9px 10px; background: #fafafa; color: #555; font-size: 8px; line-height: 1.5; list-style: none; }
+.betaPanel li { display: grid; grid-template-columns: 17px 1fr; align-items: start; gap: 7px; padding: 9px 10px; background: #fafafa; color: #555; font-size: 11px; line-height: 1.5; list-style: none; }
 .betaPanel li svg { margin-top: 1px; color: #777; }
 .modelNote { display: grid; grid-template-columns: 20px minmax(0, 1fr); align-items: start; gap: 8px; margin-top: 12px; padding: 10px 11px; border: 1px solid #dfe6e2; border-radius: 8px; background: #f8faf9; color: #52645a; }
 .modelNote > svg { margin-top: 1px; color: #438060; }
 .modelNote > span { display: grid; gap: 4px; }
-.modelNote strong { color: #315f47; font-size: 8px; }
-.modelNote small { color: #66766d; font-size: 7px; line-height: 1.55; }
+.modelNote strong { color: #315f47; font-size: 11px; }
+.modelNote small { color: #66766d; font-size: 11px; line-height: 1.55; }
 .betaPanel footer { display: grid; gap: 4px; margin-top: 12px; padding: 11px; border-radius: 8px; background: #f1f7f3; }
-.betaPanel footer strong { color: #315f47; font-size: 9px; }
-.betaPanel footer span { color: #5e7166; font-size: 8px; line-height: 1.5; }
-.betaPanel footer small { margin-top: 3px; color: #8a968f; font-size: 7px; line-height: 1.45; }
+.betaPanel footer strong { color: #315f47; font-size: 12px; }
+.betaPanel footer span { color: #5e7166; font-size: 11px; line-height: 1.5; }
+.betaPanel footer small { margin-top: 3px; color: #8a968f; font-size: 11px; line-height: 1.45; }
 
 @media (max-width: 1080px) {
   .rail { right: 12px; top: auto; bottom: 18px; transform: none; }
