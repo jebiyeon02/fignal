@@ -15,7 +15,6 @@
     "catalog:check": "node scripts/sync-nendoroids-1-500.mjs --check",
     "data:dry-run": "node scripts/import-counterfeit-dataset.mjs --dry-run",
     "data:import": "node scripts/import-counterfeit-dataset.mjs --check-links --write",
-    "expert:report": "node scripts/expert-readiness-report.mjs",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "typecheck": "tsc --noEmit",
     "db:generate": "drizzle-kit generate"

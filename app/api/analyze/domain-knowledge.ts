@@ -1,4 +1,4 @@
-// 사람이 읽는 기준은 research/domain과 research/authenticity의 판별 교재에서 관리한다.
+// 사람이 검수한 도메인 기준은 별도의 비공개 연구 자료에서 관리한다.
 export const nendoroidAnalysisDomainKnowledge = [
   "[넨도로이드 도메인 지식]",
   "넨도로이드는 모든 SD 피규어의 일반명이 아니라 굿스마일컴퍼니가 전개하는 제품 브랜드입니다.",

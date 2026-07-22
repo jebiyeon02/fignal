@@ -42,3 +42,14 @@ next-env.d.ts
 /.wrangler/
 /outputs/
 /work/
+
+# private research and local work artifacts
+/research/
+/.codex_tmp/
+/_workspace/
+/instagram-assets/
+/figsignal-ai-handoff-*/
+/figsignal-ai-handoff-*.zip
+/figsignal-ai-handoff-*.zip.sha256
+/scripts/expert-readiness-report.mjs
+/scripts/expert-readiness-report.test.mjs
