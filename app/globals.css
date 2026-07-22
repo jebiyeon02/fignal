@@ -194,7 +194,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .photo-upload input { position: absolute; width: 1px; height: 1px; opacity: 0; pointer-events: none; }
 .photo-upload > div { width: 100%; height: 100%; display: grid; place-items: center; align-content: center; gap: 9px; color: #aaa; }
 .photo-upload span { font-size: 13px; }
-.photo-upload img { width: 100%; height: 100%; display: block; object-fit: cover; }
+.photo-upload img { width: 100%; height: 100%; display: block; object-fit: contain; object-position: center; background: #f5f5f5; }
 .photo-upload:hover > div { color: #555; }
 .photo-card-copy { padding: 14px 14px 12px; }
 .photo-card-copy > div { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
@@ -325,7 +325,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .ai-finding-list { margin-top: 13px; border-top: 1px solid #eee; }
 .ai-finding { display: grid; grid-template-columns: 124px 1fr; gap: 18px; padding: 18px 0; border-bottom: 1px solid #eee; }
 .ai-finding-thumb { width: 124px; height: 124px; display: grid; place-items: center; overflow: hidden; border-radius: 9px; background: #f3f3f3; color: #bbb; }
-.ai-finding-thumb img { width: 100%; height: 100%; display: block; object-fit: cover; }
+.ai-finding-thumb img { width: 100%; height: 100%; display: block; object-fit: contain; object-position: center; background: #f3f3f3; }
 .ai-finding-copy { min-width: 0; }
 .ai-finding-title { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
 .ai-finding-title strong { font-size: 15px; }
@@ -409,8 +409,8 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .case-lightbox-source:hover { color: #222; text-decoration: underline; text-underline-offset: 3px; }
 .case-lightbox > header button { width: 40px; height: 40px; display: grid; place-items: center; flex: 0 0 auto; padding: 0; border: 1px solid #ddd; border-radius: 50%; background: #fff; color: #333; cursor: pointer; }
 .case-lightbox > header button:hover { border-color: #888; }
-.case-lightbox-stage { position: relative; min-height: 0; display: grid; place-items: center; overflow: hidden; padding: 28px 76px; background: #171717; }
-.case-lightbox-stage > img { width: 100%; height: 100%; display: block; object-fit: contain; }
+.case-lightbox-stage { position: relative; min-width: 0; min-height: 0; display: grid; place-items: center; overflow: hidden; padding: 28px 76px; background: #171717; }
+.case-lightbox-stage > img { width: auto; height: auto; max-width: 100%; max-height: 100%; display: block; object-fit: contain; object-position: center; }
 .case-lightbox-external { position: absolute; right: 16px; bottom: 14px; z-index: 1; padding: 7px 9px; border-radius: 5px; background: rgba(0,0,0,.72); color: #fff; font-size: 12px; font-weight: 700; }
 .case-lightbox-arrow { position: absolute; top: 50%; z-index: 1; width: 46px; height: 46px; display: grid; place-items: center; padding: 0; border: 1px solid rgba(255,255,255,.18); border-radius: 50%; background: rgba(255,255,255,.11); color: #fff; cursor: pointer; transform: translateY(-50%); transition: background .15s ease; }
 .case-lightbox-arrow:hover { background: rgba(255,255,255,.22); }
@@ -465,7 +465,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .reason-group.negative .reason-title { background: var(--red-bg); color: var(--red); }
 .reason-row { min-height: 74px; display: grid; grid-template-columns: 56px 1fr; align-items: center; gap: 13px; padding: 10px 4px; border-bottom: 1px solid #eee; }
 .reason-thumb { width: 54px; height: 54px; display: grid; place-items: center; overflow: hidden; border-radius: 7px; background: #f2f2f2; color: #bbb; }
-.reason-thumb img { width: 100%; height: 100%; object-fit: cover; }
+.reason-thumb img { width: 100%; height: 100%; object-fit: contain; object-position: center; background: #f3f3f3; }
 .reason-row strong { font-size: 14px; }
 .reason-row p { margin: 5px 0 0; color: #777; font-size: 13px; line-height: 1.45; }
 .pending-line { display: flex; align-items: flex-start; gap: 9px; margin-top: 22px; padding: 14px; background: #f8f8f8; color: #888; }
@@ -714,7 +714,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .report-finding-list { display: grid; }
 .report-finding { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 30px; padding: 28px 0; border-bottom: 1px solid #e1e1e1; }
 .report-finding-media { width: 280px; aspect-ratio: 4 / 3; display: grid; place-items: center; overflow: hidden; border-radius: 11px; background: #eee; }
-.report-finding-media img { width: 100%; height: 100%; display: block; object-fit: contain; background: #eee; }
+.report-finding-media img { width: 100%; height: 100%; display: block; object-fit: contain; object-position: center; background: #eee; }
 .report-finding-image-button { position: relative; width: 100%; height: 100%; display: block; overflow: hidden; padding: 0; border: 0; background: transparent; cursor: zoom-in; }
 .report-finding-image-button > span { position: absolute; right: 10px; bottom: 10px; width: 34px; height: 34px; display: grid; place-items: center; border: 1px solid rgba(255,255,255,.55); border-radius: 50%; background: rgba(20,20,20,.68); color: #fff; box-shadow: 0 4px 14px rgba(0,0,0,.18); transition: transform .15s ease, background .15s ease; }
 .report-finding-image-button:hover > span, .report-finding-image-button:focus-visible > span { background: rgba(20,20,20,.88); transform: scale(1.06); }
