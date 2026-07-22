@@ -1221,9 +1221,29 @@ export default function Home() {
 
       {stage === "search" && (
         <section className="search-page page-enter">
-          <div className="intro">
-            <h1>넨도로이드 이름을<br />검색해보세요</h1>
-            <p>공식 제품 {products.length}개 · 제품을 고르면 제조사와 번호를 자동으로 찾습니다.</p>
+          <div className="landing-hero">
+            <video
+              className="landing-hero-media"
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              poster="/videos/nendoroid-boxes-carousel-banner-poster.webp"
+              aria-hidden="true"
+            >
+              <source src="/videos/nendoroid-boxes-carousel-banner.mp4" type="video/mp4" />
+            </video>
+            <img
+              className="landing-hero-poster"
+              src="/videos/nendoroid-boxes-carousel-banner-poster.webp"
+              alt=""
+              aria-hidden="true"
+            />
+            <div className="intro landing-hero-copy">
+              <h1>넨도로이드 이름을<br />검색해보세요</h1>
+              <p>공식 제품 {products.length}개 · 제품을 고르면 제조사와 번호를 자동으로 찾습니다.</p>
+            </div>
           </div>
 
           <div className="product-search">

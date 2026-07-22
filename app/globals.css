@@ -28,7 +28,6 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .top-header { position: sticky; top: 0; z-index: 50; height: 70px; border-bottom: 1px solid #eee; background: rgba(255,255,255,.96); backdrop-filter: blur(12px); }
 .top-inner { width: min(1180px, calc(100% - 40px)); height: 100%; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; }
 .logo { display: inline-flex; align-items: center; gap: 7px; padding: 0; border: 0; background: transparent; color: #111; font-size: 17px; font-weight: 850; letter-spacing: .055em; cursor: pointer; }
-.brand-symbol { width: 38px; height: 38px; flex: 0 0 auto; background: url("/images/brand-character-icon.png") center bottom / contain no-repeat; filter: drop-shadow(0 2px 3px rgba(0,0,0,.12)); }
 .brand-beta { display: inline-flex; align-items: center; min-height: 14px; padding: 1px 4px 0; border: 1px solid #bbb; border-radius: 4px; color: #777; font-size: 6px; font-weight: 800; letter-spacing: .08em; line-height: 1; }
 .top-nav { display: flex; align-items: center; gap: 8px; }
 .top-nav > span { color: #777; font-size: 12px; }
@@ -54,6 +53,14 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .simple-heading > span { display: block; margin-bottom: 13px; color: #999; font-size: 10px; font-weight: 750; letter-spacing: .12em; }
 .intro h1, .simple-heading h1 { margin: 0; color: #111; font-size: clamp(31px, 5vw, 42px); font-weight: 760; letter-spacing: -.055em; line-height: 1.18; }
 .intro p, .simple-heading p { margin: 14px 0 0; color: #888; font-size: 13px; }
+
+.landing-hero { position: relative; width: min(1180px, calc(100vw - 40px)); min-height: clamp(430px, 43vw, 510px); margin-left: 50%; overflow: hidden; border-radius: 24px; background: #fff; transform: translateX(-50%); isolation: isolate; }
+.landing-hero::after { content: ""; position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(90deg, #fff 0%, #fff 39%, rgba(255,255,255,.98) 46%, rgba(255,255,255,.8) 54%, rgba(255,255,255,.28) 64%, rgba(255,255,255,0) 73%); }
+.landing-hero-media, .landing-hero-poster { position: absolute; inset: 0; z-index: 0; width: 100%; height: 100%; display: block; object-fit: cover; object-position: center; }
+.landing-hero-poster { display: none; }
+.landing-hero-copy { position: relative; z-index: 2; width: 48%; min-height: inherit; display: flex; flex-direction: column; justify-content: center; padding: 54px 0 58px 56px; }
+.landing-hero-copy h1 { font-size: clamp(48px, 5.6vw, 72px); font-weight: 790; line-height: 1.08; }
+.landing-hero-copy p { max-width: 460px; margin-top: 22px; color: #7e8791; font-size: 14px; line-height: 1.6; }
 
 .product-search { position: relative; z-index: 10; margin-top: 38px; }
 .search-input { height: 62px; display: flex; align-items: center; gap: 13px; padding: 0 18px; border: 1px solid #d8d8d8; border-radius: 12px; background: #fff; transition: border-color .16s, box-shadow .16s; }
@@ -744,6 +751,13 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
   .step-bar p { font-size: 9px; }
   .search-page, .photos-page, .result-page { width: calc(100% - 28px); padding-top: 40px; padding-bottom: 80px; }
   .intro h1, .simple-heading h1 { font-size: 31px; }
+  .landing-hero { width: calc(100vw - 28px); min-height: 570px; border-radius: 18px; }
+  .landing-hero::after { background: linear-gradient(180deg, #fff 0%, #fff 42%, rgba(255,255,255,.94) 50%, rgba(255,255,255,.46) 62%, rgba(255,255,255,0) 74%); }
+  .landing-hero-media, .landing-hero-poster { inset: auto 0 -3% 0; width: 100%; height: 62%; }
+  .landing-hero-media, .landing-hero-poster { object-position: right center; }
+  .landing-hero-copy { width: 100%; min-height: 0; padding: 38px 26px 0; }
+  .landing-hero-copy h1 { font-size: clamp(38px, 11vw, 48px); }
+  .landing-hero-copy p { max-width: 310px; margin-top: 16px; font-size: 12px; }
   .product-search { margin-top: 30px; }
   .search-input { height: 56px; }
   .suggestions { top: 64px; }
@@ -851,4 +865,6 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; scroll-behavior: auto !important; }
+  .landing-hero-media { display: none; }
+  .landing-hero-poster { display: block; }
 }
