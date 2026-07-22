@@ -1,19 +1,8 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import { FloatingUtilityRail } from "./floating-utility-rail";
 import { DEFAULT_PRODUCT_IMAGE } from "./product-image-default";
 import { SITE_DESCRIPTION, SITE_NAME, SITE_TITLE, SITE_URL } from "./site-config";
 import "./globals.css";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 const socialImage = `${SITE_URL}${DEFAULT_PRODUCT_IMAGE}`;
 
@@ -61,9 +50,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="ko">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body>
         {children}
         <FloatingUtilityRail />
       </body>

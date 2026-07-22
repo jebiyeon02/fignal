@@ -21,7 +21,6 @@ import {
   MessageCircle,
   PackageCheck,
   Plus,
-  RotateCcw,
   ScanBarcode,
   ScanFace,
   Search,
@@ -36,7 +35,7 @@ import {
 import { BrandMark } from "./brand-mark";
 import { DecisionDisclaimer } from "./decision-disclaimer";
 import { trackSiteEvent } from "./analytics";
-import { ChangeEvent, KeyboardEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { ChangeEvent, KeyboardEvent, lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import Link from "next/link";
 import {
@@ -46,16 +45,12 @@ import {
   type EvidenceKey,
 } from "./api/analyze/analysis-contract";
 import { displayableCaseImages } from "./case-image-rights";
-import { expandedProducts } from "./catalog";
 import { isCommunityPostStatus, type CommunityPostStatus } from "./community";
-import { communityMentions, type CommunityMention } from "./community-mentions";
+import type { CommunityMention } from "./community-mentions";
 import { DEFAULT_PRODUCT_IMAGE, DEFAULT_PRODUCT_IMAGE_LABEL } from "./product-image-default";
-import {
-  counterfeitCases,
-  type CounterfeitCase,
-  type CounterfeitCaseKind,
-} from "./counterfeit-cases";
-import { resolveReviewPath, type ReviewPath } from "./review-path";
+import type { CounterfeitCase, CounterfeitCaseKind } from "./counterfeit-cases";
+import { resolveReviewPath } from "./review-path";
+import type { EvidenceItem, Observation, Product, Stage } from "./home-types";
 import {
   CLIENT_UPLOAD_TARGET_BYTES,
   allocateImageByteBudgets,
@@ -66,38 +61,6 @@ import {
   verificationVerdictCopy,
   type VerificationHistoryItem,
 } from "./verification-history";
-
-type Stage = "search" | "photos" | "result";
-type Observation = "missing" | "unverified" | "match" | "concern";
-
-type Product = {
-  id: string;
-  name: string;
-  englishName: string;
-  aliases: string[];
-  number: string;
-  maker: string;
-  release: string;
-  image: string;
-  imageSource?: "official" | "none";
-  imageSourceUrl?: string;
-  officialUrl: string;
-  verified: boolean;
-  series?: string;
-  seriesName?: string;
-  englishSeriesName?: string;
-};
-
-type EvidenceItem = {
-  key: EvidenceKey;
-  title: string;
-  description: string;
-  matchReason: string;
-  concernReason: string;
-  weight: number;
-  essential: boolean;
-  icon: typeof Camera;
-};
 
 type AiFinding = AnalysisFinding;
 type AiAnalysis = AnalysisResult;
@@ -220,12 +183,19 @@ const curatedProducts: Product[] = [
   },
 ];
 
-const expandedProductsById = new Map(expandedProducts.map((product) => [product.id, product]));
-const curatedProductIds = new Set(curatedProducts.map((product) => product.id));
-const products: Product[] = [
-  ...curatedProducts.map((product) => ({ ...expandedProductsById.get(product.id), ...product })),
-  ...expandedProducts.filter((product) => !curatedProductIds.has(product.id)),
-];
+const OFFICIAL_PRODUCT_COUNT = 3207;
+const EvidenceCard = lazy(() => import("./photo-evidence-card"));
+const ReviewPathSection = lazy(() => import("./result-summary-sections").then((module) => ({ default: module.ReviewPathSection })));
+const AiFindingsSection = lazy(() => import("./result-summary-sections").then((module) => ({ default: module.AiFindingsSection })));
+
+function mergeCatalogProducts(expandedProducts: Product[]) {
+  const expandedProductsById = new Map(expandedProducts.map((product) => [product.id, product]));
+  const curatedProductIds = new Set(curatedProducts.map((product) => product.id));
+  return [
+    ...curatedProducts.map((product) => ({ ...expandedProductsById.get(product.id), ...product })),
+    ...expandedProducts.filter((product) => !curatedProductIds.has(product.id)),
+  ];
+}
 
 function seriesLabel(product: Product) {
   const korean = product.seriesName?.trim();
@@ -507,6 +477,14 @@ function parseRelatedCommunityPost(value: unknown): RelatedCommunityPost | null 
 
 export default function Home() {
   const [stage, setStage] = useState<Stage>("search");
+  const [products, setProducts] = useState<Product[]>(curatedProducts);
+  const [catalogStatus, setCatalogStatus] = useState<"loading" | "ready" | "error">("loading");
+  const [referenceData, setReferenceData] = useState<{
+    productId: string;
+    cases: CounterfeitCase[];
+    mentions: CommunityMention[];
+    status: "loading" | "ready" | "error";
+  } | null>(null);
   const [query, setQuery] = useState("");
   const [searchOpen, setSearchOpen] = useState(false);
   const [activeSuggestion, setActiveSuggestion] = useState(0);
@@ -546,6 +524,36 @@ export default function Home() {
   const lastTrackedSearchRef = useRef("");
   const resultViewedRef = useRef("");
   const evidenceReadyTrackedRef = useRef("");
+
+  const loadProductCatalog = useCallback(async () => {
+    setCatalogStatus("loading");
+    try {
+      const { expandedProducts } = await import("./catalog");
+      setProducts(mergeCatalogProducts(expandedProducts));
+      setCatalogStatus("ready");
+    } catch {
+      setCatalogStatus("error");
+    }
+  }, []);
+
+  useEffect(() => {
+    let active = true;
+    void import("./catalog").then(({ expandedProducts }) => {
+      if (!active) return;
+      setProducts(mergeCatalogProducts(expandedProducts));
+      setCatalogStatus("ready");
+    }).catch(() => {
+      if (active) setCatalogStatus("error");
+    });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const expandedProductsById = useMemo(
+    () => new Map(products.map((product) => [product.id, product])),
+    [products],
+  );
 
   const showToast = useCallback((message: string) => {
     setToast(message);
@@ -653,7 +661,7 @@ export default function Home() {
         .toLowerCase();
       return searchable.includes(keyword);
     }).slice(0, 30);
-  }, [query]);
+  }, [products, query]);
   const isOnePieceQuery = /원피스|one\s*piece/i.test(query);
 
   const recordSearch = useCallback(() => {
@@ -693,6 +701,32 @@ export default function Home() {
   } : null);
 
   useEffect(() => {
+    if (!currentProduct?.verified) return;
+
+    const productId = currentProduct.id;
+    let active = true;
+    void Promise.all([
+      import("./counterfeit-cases"),
+      import("./community-mentions"),
+    ]).then(([caseModule, mentionModule]) => {
+      if (!active) return;
+      setReferenceData({
+        productId,
+        cases: caseModule.counterfeitCases.filter((item) => item.productId === productId),
+        mentions: mentionModule.communityMentions.filter((item) => item.productId === productId),
+        status: "ready",
+      });
+    }).catch(() => {
+      if (!active) return;
+      setReferenceData({ productId, cases: [], mentions: [], status: "error" });
+    });
+
+    return () => {
+      active = false;
+    };
+  }, [currentProduct?.id, currentProduct?.verified]);
+
+  useEffect(() => {
     if (stage !== "result" || !currentProduct?.verified) return;
     const controller = new AbortController();
     const searchParams = new URLSearchParams({ productId: currentProduct.id });
@@ -720,9 +754,11 @@ export default function Home() {
   const essentialCompleted = evidenceItems.filter((item) => item.essential && observations[item.key] !== "missing").length;
   const concernItems = evidenceItems.filter((item) => observations[item.key] === "concern");
   const pendingItems = evidenceItems.filter((item) => observations[item.key] === "unverified" || observations[item.key] === "missing");
-  const productCases = counterfeitCases.filter((item) => item.productId === currentProduct?.id);
+  const activeReferenceData = referenceData?.productId === currentProduct?.id ? referenceData : null;
+  const productCases = activeReferenceData?.cases ?? [];
   const aiProductCases = productCases.filter((item) => item.verdictImpact !== "none");
-  const productCommunityMentions = communityMentions.filter((item) => item.productId === currentProduct?.id);
+  const productCommunityMentions = activeReferenceData?.mentions ?? [];
+  const referenceDataStatus = activeReferenceData?.status ?? (currentProduct?.verified ? "loading" : "ready");
   const matchedCaseSignals = aiProductCases.flatMap((item) => item.signals)
     .filter((signal) => observations[signal.evidenceKey] === "concern");
   const hasKnownCaseOverlap = matchedCaseSignals.length > 0;
@@ -1242,7 +1278,7 @@ export default function Home() {
             />
             <div className="intro landing-hero-copy">
               <h1>넨도로이드 이름을<br />검색해보세요</h1>
-              <p>공식 제품 {products.length}개 · 제품을 고르면 제조사와 번호를 자동으로 찾습니다.</p>
+              <p>공식 제품 {catalogStatus === "ready" ? products.length : OFFICIAL_PRODUCT_COUNT}개 · 제품을 고르면 제조사와 번호를 자동으로 찾습니다.</p>
             </div>
           </div>
 
@@ -1266,7 +1302,11 @@ export default function Home() {
 
             {searchOpen && query.trim().length > 0 && !selectedProduct && (
               <div className="suggestions" id="product-suggestions" role="listbox">
-                {filteredProducts.length > 0 ? <>
+                {catalogStatus === "loading" ? (
+                  <div className="catalog-loading" role="status"><LoaderCircle className="spin" size={17} /><span>제품 목록을 불러오는 중이에요.</span></div>
+                ) : catalogStatus === "error" ? (
+                  <div className="no-result"><strong>제품 목록을 불러오지 못했어요</strong><button onMouseDown={(event) => event.preventDefault()} onClick={() => void loadProductCatalog()}>다시 시도</button></div>
+                ) : filteredProducts.length > 0 ? <>
                   <div className="suggestion-summary"><span>검색 결과</span><strong>{filteredProducts.length}{filteredProducts.length === 30 ? "+" : ""}개</strong></div>
                   <div className="suggestion-list">
                     {filteredProducts.map((product, index) => (
@@ -1352,6 +1392,7 @@ export default function Home() {
             items={recentVerifications}
             status={historyStatus}
             onRetry={loadRecentVerifications}
+            productImages={expandedProductsById}
           />
         </section>
       )}
@@ -1363,28 +1404,32 @@ export default function Home() {
 
           <ProductStrip product={currentProduct} />
 
-          <div className={`review-route-preview ${aiProductCases.length > 0 ? "known" : "new"}`}>
-            {aiProductCases.length > 0 ? <FileCheck2 size={18} /> : <MessageCircle size={18} />}
+          <div className={`review-route-preview ${referenceDataStatus === "loading" ? "loading" : aiProductCases.length > 0 ? "known" : "new"}`}>
+            {referenceDataStatus === "loading" ? <LoaderCircle className="spin" size={18} /> : aiProductCases.length > 0 ? <FileCheck2 size={18} /> : <MessageCircle size={18} />}
             <span>
-              <strong>{aiProductCases.length > 0 ? `제품별 비교 사례 ${aiProductCases.length}건` : "범용 전문가 패턴으로 분석"}</strong>
-              <small>{aiProductCases.length > 0 ? "사진 분석 후 등록 사례와 공통점과 차이점을 보여드립니다." : "제품별 사례가 없어도 공식·검수 사례에서 정리한 범용 위험 패턴으로 결론을 냅니다."}</small>
+              <strong>{referenceDataStatus === "loading" ? "제품별 비교 자료 확인 중" : aiProductCases.length > 0 ? `제품별 비교 사례 ${aiProductCases.length}건` : "범용 전문가 패턴으로 분석"}</strong>
+              <small>{referenceDataStatus === "loading" ? "사진 준비와 동시에 비교 자료를 불러오고 있습니다." : aiProductCases.length > 0 ? "사진 분석 후 등록 사례와 공통점과 차이점을 보여드립니다." : "제품별 사례가 없어도 공식·검수 사례에서 정리한 범용 위험 패턴으로 결론을 냅니다."}</small>
             </span>
           </div>
 
           <div className="photo-topline"><div><strong>필수 사진</strong><span>{essentialCompleted}/5</span></div><button onClick={copySellerMessage}><Clipboard size={14} /> 판매자에게 요청</button></div>
-          <div className="photo-grid">
-            {evidenceItems.filter((item) => item.essential).map((item) => (
-              <EvidenceCard key={item.key} item={item} observation={observations[item.key]} fileName={fileNames[item.key]} preview={filePreviews[item.key]} onFile={handleFile} onRemove={removeEvidence} onPaste={pasteFromClipboard} />
-            ))}
-          </div>
-
-          <details className="optional-photos">
-            <summary><span><Plus size={15} /> 추가 사진</span><small>있으면 판정이 더 선명해져요</small><ChevronDown size={17} /></summary>
-            <div className="photo-grid optional-grid">
-              {evidenceItems.filter((item) => !item.essential).map((item) => (
+          <Suspense fallback={<div className="stage-loading" role="status"><LoaderCircle className="spin" size={18} /> 사진 입력 화면을 준비하고 있어요.</div>}>
+            <div className="photo-grid">
+              {evidenceItems.filter((item) => item.essential).map((item) => (
                 <EvidenceCard key={item.key} item={item} observation={observations[item.key]} fileName={fileNames[item.key]} preview={filePreviews[item.key]} onFile={handleFile} onRemove={removeEvidence} onPaste={pasteFromClipboard} />
               ))}
             </div>
+          </Suspense>
+
+          <details className="optional-photos">
+            <summary><span><Plus size={15} /> 추가 사진</span><small>있으면 판정이 더 선명해져요</small><ChevronDown size={17} /></summary>
+            <Suspense fallback={<div className="stage-loading" role="status"><LoaderCircle className="spin" size={18} /> 추가 사진 입력 화면을 준비하고 있어요.</div>}>
+              <div className="photo-grid optional-grid">
+                {evidenceItems.filter((item) => !item.essential).map((item) => (
+                  <EvidenceCard key={item.key} item={item} observation={observations[item.key]} fileName={fileNames[item.key]} preview={filePreviews[item.key]} onFile={handleFile} onRemove={removeEvidence} onPaste={pasteFromClipboard} />
+                ))}
+              </div>
+            </Suspense>
           </details>
 
           <div className={`upload-capacity ${uploadCapacityPercent >= 85 ? "near-limit" : ""}`} role="status" aria-live="polite">
@@ -1413,35 +1458,41 @@ export default function Home() {
 
           {relatedCommunityPosts.length > 0 && <RelatedCommunityPosts posts={relatedCommunityPosts} productName={currentProduct.name} />}
 
-          <ReviewPathSection
-            path={reviewPath}
-            product={currentProduct}
-            comparisonCaseCount={aiProductCases.length}
-            matchedCaseCount={aiAnalysis?.caseMatches.length ?? 0}
-            riskSignalCount={concernItems.length}
-            photoActions={photoActions}
-            reviewRequestShared={reviewRequestShared}
-            onAddPhotos={() => { setStage("photos"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
-            onShareReviewRequest={shareReviewRequest}
-            onSelectAnotherProduct={resetAll}
-          />
+          <Suspense fallback={<div className="stage-loading" role="status"><LoaderCircle className="spin" size={18} /> 판정 근거 화면을 준비하고 있어요.</div>}>
+            {referenceDataStatus === "loading" ? (
+              <div className="stage-loading" role="status"><LoaderCircle className="spin" size={18} /> 제품별 비교 자료를 불러오고 있어요.</div>
+            ) : (
+              <ReviewPathSection
+                path={reviewPath}
+                product={currentProduct}
+                comparisonCaseCount={aiProductCases.length}
+                matchedCaseCount={aiAnalysis?.caseMatches.length ?? 0}
+                riskSignalCount={concernItems.length}
+                photoActions={photoActions}
+                reviewRequestShared={reviewRequestShared}
+                onAddPhotos={() => { setStage("photos"); window.scrollTo({ top: 0, behavior: "smooth" }); }}
+                onShareReviewRequest={shareReviewRequest}
+                onSelectAnotherProduct={resetAll}
+              />
+            )}
 
-          {aiAnalysis && (
-            <AiFindingsSection
-              analysis={aiAnalysis}
-              observations={observations}
-              previews={filePreviews}
-              reviewed={reviewedEvidence}
-              onReview={reviewFinding}
-              onResetReview={resetFindingReview}
-            />
-          )}
+            {aiAnalysis && (
+              <AiFindingsSection
+                analysis={aiAnalysis}
+                observations={observations}
+                previews={filePreviews}
+                reviewed={reviewedEvidence}
+                onReview={reviewFinding}
+                onResetReview={resetFindingReview}
+              />
+            )}
+          </Suspense>
 
-          {productCases.length > 0 && (
+          {referenceDataStatus === "ready" && productCases.length > 0 && (
             <CounterfeitCaseSection cases={productCases} observations={observations} aiMatches={aiAnalysis?.caseMatches ?? []} productId={currentProduct.id} verificationId={savedReportId} />
           )}
 
-          {productCommunityMentions.length > 0 && (
+          {referenceDataStatus === "ready" && productCommunityMentions.length > 0 && (
             <CommunityMentionsSection key={currentProduct?.id} mentions={productCommunityMentions} productId={currentProduct.id} verificationId={savedReportId} />
           )}
 
@@ -1538,10 +1589,12 @@ function RecentVerificationSection({
   items,
   status,
   onRetry,
+  productImages,
 }: {
   items: VerificationHistoryItem[];
   status: "loading" | "ready" | "error";
   onRetry: () => Promise<void>;
+  productImages: ReadonlyMap<string, Product>;
 }) {
   return (
     <section className="recent-verifications" id="recent-verifications" aria-labelledby="recent-verifications-title">
@@ -1566,7 +1619,7 @@ function RecentVerificationSection({
         <div className="recent-verification-list">
           {items.map((item) => {
             const verdict = verificationVerdictCopy[item.verdict];
-            const productImage = expandedProductsById.get(item.productId)?.image ?? "";
+            const productImage = productImages.get(item.productId)?.image ?? "";
             return (
               <a key={item.id} className={`recent-verification-card ${verdict.tone}`} href={`/reports/${item.id}`}>
                 <span className="recent-verification-thumb">{productImage ? <img src={productImage} alt={`${item.productName} 공식 제품 이미지`} /> : <ImageIcon size={22} />}</span>
@@ -1581,98 +1634,6 @@ function RecentVerificationSection({
           })}
         </div>
       )}
-    </section>
-  );
-}
-
-function ReviewPathSection({
-  path,
-  product,
-  comparisonCaseCount,
-  matchedCaseCount,
-  riskSignalCount,
-  photoActions,
-  reviewRequestShared,
-  onAddPhotos,
-  onShareReviewRequest,
-  onSelectAnotherProduct,
-}: {
-  path: ReviewPath;
-  product: Product;
-  comparisonCaseCount: number;
-  matchedCaseCount: number;
-  riskSignalCount: number;
-  photoActions: Array<{ key: EvidenceKey; title: string; description: string }>;
-  reviewRequestShared: boolean;
-  onAddPhotos: () => void;
-  onShareReviewRequest: () => void;
-  onSelectAnotherProduct: () => void;
-}) {
-  if (path === "risk_detected") {
-    return (
-      <section className="review-path-panel risk-detected">
-        <div className="review-path-heading"><TriangleAlert size={21} /><span><strong>명확한 비정상 신호 {riskSignalCount}개를 감지했어요</strong></span></div>
-        <p>아래 항목에서 사진에 실제로 보인 내용과 위험 판단 이유를 확인하세요. 이 결과는 가품 확정이 아니라 거래를 중단하고 판매자·제조사 확인을 우선하라는 높은 위험 경고입니다.</p>
-      </section>
-    );
-  }
-
-  if (path === "case_comparison") {
-    return (
-      <section className="review-path-panel comparison">
-        <div className="review-path-heading"><FileCheck2 size={21} /><span><strong>등록 사례 {comparisonCaseCount}건과 비교했어요</strong><small>{matchedCaseCount > 0 ? `현재 사진과 시각적으로 겹치는 사례 ${matchedCaseCount}건을 찾았습니다.` : "현재 사진과 직접 겹치는 사례 특징은 확인되지 않았습니다."}</small></span></div>
-        <p>비교 결과와 원문 근거는 아래 사례 카드에서 확인할 수 있습니다. 등록 사례와 다르다는 이유만으로 정품을 보증하지는 않습니다.</p>
-      </section>
-    );
-  }
-
-  if (path === "additional_review") {
-    return (
-      <section className="review-path-panel additional">
-        <div className="review-path-heading"><MessageCircle size={21} /><span><strong>판본 또는 근거를 한 번 더 확인해 주세요</strong><small>명확한 비정상 신호는 없지만 서로 충돌하는 정보가 남아 있습니다.</small></span></div>
-        <ol className="review-path-steps">
-          <li><span>1</span><p><strong>1차 분석 완료</strong>공식 제품 정보와 범용·제품별 위험 신호를 모두 확인했습니다.</p></li>
-          <li><span>2</span><p><strong>추가 의견 요청</strong>아래 요청서를 커뮤니티 또는 전문가에게 공유해 검토를 이어갈 수 있습니다.</p></li>
-          <li><span>3</span><p><strong>사례로 축적</strong>확인된 근거는 이후 같은 제품을 검토할 때 사용할 수 있습니다.</p></li>
-        </ol>
-        <button className="line-button review-request-button" onClick={onShareReviewRequest}><Share2 size={16} /> {reviewRequestShared ? "검토 요청서 다시 공유" : "검토 요청서 공유"}</button>
-        {reviewRequestShared && <p className="review-request-state"><CheckCircle2 size={14} /> 요청서를 공유했습니다. 충돌한 근거가 해소되면 다시 분석하세요.</p>}
-      </section>
-    );
-  }
-
-  if (path === "general_analysis") {
-    return (
-      <section className="review-path-panel comparison">
-        <div className="review-path-heading"><ShieldCheck size={21} /><span><strong>범용 전문가 패턴으로 분석했어요</strong><small>제품별 사례 부재를 결론 보류 조건으로 사용하지 않았습니다.</small></span></div>
-        <p>공식 가품 사례에서 반복된 포장 문자, 각인, 부품 분할, 연결부, 나사·자석, 도색·재질 패턴과 정상 공정 편차를 함께 적용했습니다.</p>
-      </section>
-    );
-  }
-
-  if (path === "more_photos_needed") {
-    return (
-      <section className="review-path-panel photos-needed">
-        <div className="review-path-heading"><Camera size={21} /><span><strong>다음 사진을 보완해 주세요</strong><small>사진을 추가하면 같은 검증 요청에서 다시 분석할 수 있습니다.</small></span></div>
-        <div className="photo-action-list">
-          {photoActions.length > 0 ? photoActions.map((action) => (
-            <article key={action.key}><span>{action.title}</span><p>{action.description}</p></article>
-          )) : <article><span>식별 정보</span><p>글자와 각인이 잘리지 않도록 밝은 곳에서 가까이 촬영해 주세요.</p></article>}
-        </div>
-        <button className="black-button review-request-button" onClick={onAddPhotos}><Camera size={16} /> 사진 보완하기</button>
-      </section>
-    );
-  }
-
-  return (
-    <section className="review-path-panel unsupported">
-      <div className="review-path-heading"><CircleHelp size={21} /><span><strong>{product.name}은 아직 검증을 지원하지 않아요</strong><small>자료가 없는 제품에 추측성 판정을 제공하지 않습니다.</small></span></div>
-      <ul className="unsupported-actions">
-        <li><strong>제품 식별</strong><span>제조사 공식 카탈로그에서 제품 번호와 발매판을 먼저 확인해 주세요.</span></li>
-        <li><strong>공식 문의</strong><span>제조사 고객지원 또는 정식 유통사에 박스와 각인 사진을 보내 확인해 주세요.</span></li>
-        <li><strong>전문가 확인</strong><span>제품군을 다루는 수집가 커뮤니티나 실물 검토가 가능한 전문가에게 문의해 주세요.</span></li>
-      </ul>
-      <button className="line-button review-request-button" onClick={onSelectAnotherProduct}><Search size={16} /> 지원 제품 다시 찾기</button>
     </section>
   );
 }
@@ -1716,35 +1677,6 @@ function ProductStrip({ product }: { product: Product }) {
 
 function PageBack({ onClick, label }: { onClick: () => void; label: string }) {
   return <button className="page-back" onClick={onClick}><ArrowLeft size={17} /> {label}</button>;
-}
-
-function EvidenceCard({ item, observation, fileName, preview, onFile, onRemove, onPaste }: {
-  item: EvidenceItem;
-  observation: Observation;
-  fileName?: string;
-  preview?: string;
-  onFile: (key: EvidenceKey, event: ChangeEvent<HTMLInputElement>) => void;
-  onRemove: (key: EvidenceKey) => void;
-  onPaste: (key: EvidenceKey) => void;
-}) {
-  const Icon = item.icon;
-  return (
-    <article className={`photo-card ${observation}`}>
-      <label className="photo-upload">
-        <input type="file" accept="image/*" onChange={(event) => onFile(item.key, event)} />
-        {preview ? <img src={preview} alt={`${item.title} 업로드 사진`} /> : <div><Icon size={26} /><span>사진 추가</span></div>}
-      </label>
-      <div className="photo-card-copy"><div><strong>{item.title}</strong>{fileName && <button onClick={() => onRemove(item.key)} aria-label={`${item.title} 삭제`}><X size={14} /></button>}</div><p>{item.description}</p></div>
-      <button
-        type="button"
-        className="paste-target-button"
-        onClick={() => void onPaste(item.key)}
-        aria-label={`${item.title}에 클립보드 이미지 붙여넣기`}
-      >
-        <Clipboard size={13} /> 붙여넣기
-      </button>
-    </article>
-  );
 }
 
 function VerificationCriteriaDialog({ onClose }: { onClose: () => void }) {
@@ -1814,72 +1746,6 @@ function VerificationCriteriaDialog({ onClose }: { onClose: () => void }) {
 
       </aside>
     </div>
-  );
-}
-
-function AiFindingsSection({ analysis, observations, previews, reviewed, onReview, onResetReview }: {
-  analysis: AiAnalysis;
-  observations: Record<EvidenceKey, Observation>;
-  previews: Partial<Record<EvidenceKey, string>>;
-  reviewed: Partial<Record<EvidenceKey, boolean>>;
-  onReview: (finding: AiFinding, value: Observation) => void;
-  onResetReview: (finding: AiFinding) => void;
-}) {
-  const [isEditing, setIsEditing] = useState(false);
-  const statusLabel = (status: Observation) => status === "match" ? "일치" : status === "concern" ? "차이 의심" : "확인 불가";
-
-  return (
-    <section className="ai-section">
-      <header>
-        <div><ShieldCheck size={18} /><h2>AI가 찾은 근거</h2></div>
-        <button
-          type="button"
-          className="ai-review-toggle"
-          aria-expanded={isEditing}
-          aria-controls="ai-review-controls"
-          onClick={() => setIsEditing((current) => !current)}
-        >
-          {isEditing ? "수정 완료" : "이미지 비교 결과 수정하기"}
-        </button>
-      </header>
-      {isEditing && <p className="ai-review-intro">사진에서 실제로 보이는 내용을 확인한 뒤 판정을 선택해 주세요.</p>}
-      <div className="ai-finding-list" id="ai-review-controls">
-        {analysis.findings.map((finding) => {
-          const current = observations[finding.key];
-          const original = finding.status === "unclear" ? "unverified" : finding.status;
-          const changed = reviewed[finding.key] && current !== original;
-          const displayedStatus = reviewed[finding.key] ? current : original;
-          return (
-            <article className={`ai-finding ${displayedStatus}`} key={finding.key}>
-              <div className="ai-finding-thumb">{previews[finding.key] ? <img src={previews[finding.key]} alt={`${finding.title} 분석 사진`} /> : <ImageIcon size={20} />}</div>
-              <div className="ai-finding-copy">
-                <div className="ai-finding-title"><strong>{finding.title}</strong><span>{statusLabel(displayedStatus)}</span></div>
-                <p>{finding.reason}</p>
-                <dl><dt>사진 근거</dt><dd>{finding.visibleEvidence}</dd></dl>
-                {finding.userAction && finding.status !== "match" && <dl><dt>다음 확인</dt><dd>{finding.userAction}</dd></dl>}
-                {isEditing && (
-                  <div className="review-controls" aria-label={`${finding.title} 사용자 확인`}>
-                    <span>{reviewed[finding.key] ? (changed ? "수정됨" : "확인됨") : "내가 확인"}</span>
-                    <button className={reviewed[finding.key] && current === "match" ? "active match" : ""} onClick={() => onReview(finding, "match")}><Check size={12} /> 일치</button>
-                    <button className={reviewed[finding.key] && current === "concern" ? "active concern" : ""} onClick={() => onReview(finding, "concern")}><TriangleAlert size={12} /> 차이</button>
-                    <button className={reviewed[finding.key] && current === "unverified" ? "active" : ""} onClick={() => onReview(finding, "unverified")}>모름</button>
-                    <button
-                      type="button"
-                      className="review-reset"
-                      disabled={!reviewed[finding.key]}
-                      onClick={() => onResetReview(finding)}
-                      aria-label={`${finding.title}을 AI 판단으로 초기화`}
-                    >
-                      <RotateCcw size={12} /> 초기화
-                    </button>
-                  </div>
-                )}
-              </div>
-            </article>
-          );
-        })}
-      </div>
-    </section>
   );
 }
 

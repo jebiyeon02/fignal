@@ -19,7 +19,7 @@
 
 * { box-sizing: border-box; }
 html { background: #fff; }
-body { margin: 0; background: #fff; color: var(--black); font-family: var(--font-geist-sans), "Pretendard", "Noto Sans KR", sans-serif; -webkit-font-smoothing: antialiased; }
+body { margin: 0; background: #fff; color: var(--black); font-family: "Pretendard", "Noto Sans KR", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; -webkit-font-smoothing: antialiased; }
 button, input, select, textarea { font: inherit; }
 button { color: inherit; }
 button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-visible, a:focus-visible { outline: 2px solid #222; outline-offset: 3px; }
@@ -83,6 +83,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 .no-result { display: flex; align-items: center; justify-content: space-between; padding: 22px 18px; }
 .no-result strong { font-size: 15px; }
 .no-result button { padding: 7px 9px; border: 0; border-bottom: 1px solid #333; background: transparent; font-size: 13px; cursor: pointer; }
+.catalog-loading { min-height: 62px; display: flex; align-items: center; justify-content: center; gap: 8px; color: #777; font-size: 14px; }
 .catalog-shortcuts { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 12px; }
 .catalog-shortcuts button { padding: 8px 11px; border: 1px solid #e2e2e2; border-radius: 999px; background: #fff; color: #777; font-size: 13px; cursor: pointer; }
 .catalog-shortcuts button:hover { border-color: #999; color: #222; }
@@ -167,6 +168,7 @@ button:focus-visible, input:focus-visible, select:focus-visible, summary:focus-v
 
 .page-back { display: inline-flex; align-items: center; gap: 7px; margin-bottom: 34px; padding: 0; border: 0; background: transparent; color: #777; font-size: 13px; cursor: pointer; }
 .simple-heading { margin-bottom: 30px; }
+.stage-loading { min-height: 92px; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 18px; border: 1px dashed #ddd; border-radius: 11px; background: #fafafa; color: #777; font-size: 13px; }
 
 .product-strip { min-height: 112px; display: grid; grid-template-columns: 78px 1fr auto; align-items: center; gap: 16px; padding: 12px; margin-bottom: 36px; border: 1px solid #e4e4e4; border-radius: 12px; }
 .product-strip > div:nth-child(2) { min-width: 0; }
